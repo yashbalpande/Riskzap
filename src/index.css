@@ -2,41 +2,67 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* PayFi Insurance DApp Design System - Vibrant Warm Colors Only */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core warm palette - reds, oranges, yellows, greens */
+    --background: 12 100% 4%;
+    --foreground: 45 100% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 16 100% 8%;
+    --card-foreground: 45 100% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 16 100% 8%;
+    --popover-foreground: 45 100% 95%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Fiery Orange */
+    --primary: 25 100% 55%;
+    --primary-foreground: 12 100% 4%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary: Warm Red */
+    --secondary: 0 85% 45%;
+    --secondary-foreground: 45 100% 95%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Success: Vibrant Green */
+    --success: 120 85% 45%;
+    --success-foreground: 45 100% 95%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Warning: Golden Yellow */
+    --warning: 45 100% 55%;
+    --warning-foreground: 12 100% 4%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Muted: Dark Warm */
+    --muted: 20 50% 15%;
+    --muted-foreground: 45 60% 70%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Accent: Bright Green */
+    --accent: 120 100% 35%;
+    --accent-foreground: 45 100% 95%;
 
-    --radius: 0.5rem;
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 45 100% 95%;
+
+    --border: 20 50% 25%;
+    --input: 20 50% 15%;
+    --ring: 25 100% 55%;
+
+    --radius: 1rem;
+
+    /* Custom PayFi gradients */
+    --gradient-fire: linear-gradient(135deg, hsl(0 85% 45%), hsl(25 100% 55%), hsl(45 100% 55%));
+    --gradient-success: linear-gradient(135deg, hsl(120 85% 45%), hsl(120 100% 35%));
+    --gradient-holographic: linear-gradient(45deg, hsl(25 100% 55%), hsl(45 100% 55%), hsl(120 85% 45%), hsl(0 85% 45%));
+    
+    /* Particle effects */
+    --particle-glow: 0 0 20px hsl(25 100% 55% / 0.6);
+    --particle-trail: 0 0 40px hsl(45 100% 55% / 0.4);
+    
+    /* Animation timing */
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +126,118 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-x-hidden;
   }
+}
+
+@layer components {
+  /* PayFi holographic effects */
+  .holographic {
+    background: var(--gradient-holographic);
+    background-size: 200% 200%;
+    animation: holographic-shift 3s ease-in-out infinite;
+  }
+  
+  .particle-glow {
+    box-shadow: var(--particle-glow);
+    animation: particle-pulse 2s ease-in-out infinite;
+  }
+  
+  .vine-progress {
+    background: var(--gradient-success);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .vine-progress::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, hsl(45 100% 55% / 0.4), transparent);
+    animation: vine-grow 2s ease-in-out infinite;
+  }
+  
+  /* Floating elements */
+  .floating {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .floating-delayed {
+    animation: float 6s ease-in-out infinite 2s;
+  }
+  
+  /* Fractal patterns */
+  .fractal-bg {
+    background: 
+      radial-gradient(circle at 20% 20%, hsl(25 100% 55% / 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, hsl(120 85% 45% / 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 40% 70%, hsl(45 100% 55% / 0.2) 0%, transparent 50%);
+    animation: fractal-shift 8s ease-in-out infinite;
+  }
+}
+
+@layer utilities {
+  .text-gradient-fire {
+    background: var(--gradient-fire);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .text-gradient-success {
+    background: var(--gradient-success);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .border-glow {
+    border: 2px solid hsl(var(--primary));
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.5);
+  }
+  
+  .card-hover {
+    transition: var(--transition-bounce);
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px hsl(var(--primary) / 0.3);
+  }
+}
+
+/* Advanced animations */
+@keyframes holographic-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes particle-pulse {
+  0%, 100% { 
+    box-shadow: var(--particle-glow);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: var(--particle-trail);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes vine-grow {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes fractal-shift {
+  0%, 100% { filter: hue-rotate(0deg); }
+  33% { filter: hue-rotate(10deg); }
+  66% { filter: hue-rotate(-10deg); }
 }

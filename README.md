@@ -1,73 +1,248 @@
-# Welcome to your Lovable project
+# PayFi Insurance - Micro-Policy DApp on Shardeum
 
-## Project info
+## 🚀 Revolutionary PayFi Insurance Platform
 
-**URL**: https://lovable.dev/projects/0d29baaf-12d6-44ab-b11d-c0892410f151
+A cutting-edge decentralized insurance platform built on Shardeum Unstablenet, offering instant micro-policies with SHM token payments. This DApp demonstrates the future of Web3 insurance with gamified UX, 3D animations, and smart contract automation.
 
-## How can I edit this code?
+## 🌟 Features
 
-There are several ways of editing your application.
+### Core Functionality
+- **Instant Micro-Policies**: Device protection, event coverage, travel insurance, and equipment rental
+- **PayFi Integration**: Seamless SHM token micropayments for instant coverage
+- **Smart Contract Automation**: Trustless policy issuance and claim processing
+- **Real-time Verification**: Blockchain-based action verification API
+- **AI-Powered Underwriting**: Automated risk assessment and dynamic pricing
 
-**Use Lovable**
+### Advanced UI/UX
+- **3D Particle Effects**: Interactive particle systems representing policy flows
+- **Gamified Navigation**: Progress bars as animated vines, holographic widgets
+- **Warm Color Palette**: Vibrant reds, oranges, yellows, and greens (no blue/purple)
+- **Responsive Design**: Optimized for desktop and mobile devices
+- **Immersive Animations**: Fractal patterns, floating elements, and particle effects
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/0d29baaf-12d6-44ab-b11d-c0892410f151) and start prompting.
+### Technical Stack
+- **Frontend**: React 18 + TypeScript + Vite
+- **3D Graphics**: Three.js + React Three Fiber + Drei
+- **Blockchain**: Web3.js + Shardeum Unstablenet
+- **Styling**: Tailwind CSS + Framer Motion
+- **State Management**: Redux Toolkit + React Context
+- **Smart Contracts**: Solidity (deployed on Shardeum)
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🛠 Installation & Setup
 
-**Use your preferred IDE**
+### Prerequisites
+- Node.js 18+ and npm
+- MetaMask or compatible Web3 wallet
+- Git
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Quick Start
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+```bash
+# Clone the repository
 git clone <YOUR_GIT_URL>
+cd payfi-insurance-dapp
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Smart Contract Deployment
 
-**Use GitHub Codespaces**
+```bash
+# Compile contracts
+npx hardhat compile
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Deploy to Shardeum Unstablenet
+npx hardhat run scripts/deploy.js --network shardeum-unstablenet
 
-## What technologies are used for this project?
+# Verify contracts
+npx hardhat verify --network shardeum-unstablenet <CONTRACT_ADDRESS>
+```
 
-This project is built with:
+## 🔗 API Documentation
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Verification Endpoint
 
-## How can I deploy this project?
+The backend provides a verification API that confirms wallet actions:
 
-Simply open [Lovable](https://lovable.dev/projects/0d29baaf-12d6-44ab-b11d-c0892410f151) and click on Share -> Publish.
+#### POST `/api/verify`
 
-## Can I connect a custom domain to my Lovable project?
+**Request Body:**
+```json
+{
+  "walletAddress": "0x...",
+  "action": "policy_creation",
+  "transactionHash": "0x...",
+  "timestamp": 1704067200000
+}
+```
 
-Yes, you can!
+**Response:**
+```json
+{
+  "success": true,
+  "status": "pass",
+  "message": "Wallet action verified successfully",
+  "data": {
+    "verifiedAt": "2024-01-01T00:00:00.000Z",
+    "blockchainConfirmed": true
+  }
+}
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Policy Management Endpoints
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+#### POST `/api/policies`
+Create a new micro-policy
+
+#### GET `/api/policies/user/:address`
+Get all policies for a wallet address
+
+#### POST `/api/claims`
+Submit an insurance claim
+
+#### POST `/api/kyc/verify`
+Verify user identity for compliance
+
+## 🌐 Shardeum Integration
+
+### Network Configuration
+- **Chain ID**: 1074 (Shardeum Unstablenet)
+- **RPC URL**: https://dapps.shardeum.org/
+- **Currency**: SHM (Shardeum)
+- **Block Explorer**: https://explorer-dapps.shardeum.org/
+
+### Adding Shardeum to MetaMask
+
+The DApp automatically prompts users to add the Shardeum network when connecting their wallet.
+
+## 🎮 Gamified Insurance Flow
+
+The application visualizes the complete insurance backend flow:
+
+1. **User Request** → Smart contract initiation
+2. **Validation** → Input verification and eligibility
+3. **KYC/AML** → Identity verification
+4. **Underwriting** → AI risk assessment
+5. **Quote Generation** → Dynamic pricing
+6. **Policy Selection** → Coverage customization
+7. **PayFi Payment** → SHM token transaction
+8. **Policy Creation** → NFT issuance
+9. **Notification** → Real-time updates
+10. **Dashboard Update** → Live management interface
+
+## 🎨 Design System
+
+### Color Palette (Warm Colors Only)
+- **Primary**: Fiery Orange (`hsl(25 100% 55%)`)
+- **Secondary**: Warm Red (`hsl(0 85% 45%)`)
+- **Success**: Vibrant Green (`hsl(120 85% 45%)`)
+- **Warning**: Golden Yellow (`hsl(45 100% 55%)`)
+
+### Animation Features
+- Holographic background effects
+- Particle glow animations
+- Floating elements with physics
+- Fractal pattern generation
+- Vine-like progress indicators
+
+## 📱 Demo & Testing
+
+### Test Scenarios
+1. **Connect Wallet**: MetaMask integration with Shardeum
+2. **Create Policy**: Device protection for 0.5 SHM
+3. **View Analytics**: Real-time dashboard metrics
+4. **Process Claim**: Automated smart contract execution
+5. **Verification**: API endpoint testing
+
+### Mock Data
+The application includes comprehensive mock data for demonstration:
+- Sample policies and claims
+- Analytics charts and metrics
+- User activity timelines
+- Risk assessment data
+
+## 🔐 Security Features
+
+- **Smart Contract Auditing**: Automated security checks
+- **KYC/AML Compliance**: Identity verification workflows
+- **Secure Payments**: SHM token escrow mechanisms
+- **Data Encryption**: End-to-end security protocols
+
+## 🚀 Deployment
+
+### Frontend Deployment
+```bash
+# Build for production
+npm run build
+
+# Deploy to your preferred hosting platform
+npm run deploy
+```
+
+### Backend Deployment
+```bash
+# Start production server
+npm run start:prod
+
+# Environment variables required:
+# - DATABASE_URL
+# - SHARDEUM_RPC_URL
+# - JWT_SECRET
+```
+
+## 📊 Analytics & Monitoring
+
+The platform includes comprehensive analytics:
+- Policy creation and claim statistics
+- Premium volume and success rates
+- Network performance metrics
+- AI underwriting accuracy
+- User engagement tracking
+
+## 🎥 Demo Video Script Outline
+
+### Opening (30s)
+- Showcase the immersive 3D interface
+- Highlight warm color scheme and animations
+- Demonstrate wallet connection to Shardeum
+
+### Core Features (90s)
+- Create a device protection micro-policy
+- Show PayFi payment with SHM tokens
+- Navigate through the gamified flow visualization
+- Display real-time analytics dashboard
+
+### Technical Demo (60s)
+- Smart contract interaction
+- API verification endpoint
+- Blockchain transaction confirmation
+- Claims processing automation
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## 📄 License
+
+This project is open-source under the MIT License.
+
+## 🆘 Support
+
+For technical support or questions:
+- Create an issue on GitHub
+- Join our Discord community
+- Check the documentation wiki
+
+---
+
+Built with ❤️ for the future of decentralized insurance on Shardeum.
