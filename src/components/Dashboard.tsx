@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  TrendingUp, 
-  Shield, 
-  Zap, 
-  Users, 
-  DollarSign, 
+import {
+  TrendingUp,
+  Shield,
+  Zap,
+  Users,
+  DollarSign,
   Clock,
   Activity,
-  Award
+  Award,
+  CheckCircle,
+  XCircle,
+  AlertCircle
 } from 'lucide-react';
 
 interface StatCardProps {
@@ -21,15 +24,15 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon: IconComponent, trend }) => {
   const trendColor = trend === 'up' ? 'text-success' : trend === 'down' ? 'text-destructive' : 'text-warning';
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="relative overflow-hidden rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6 card-hover"
     >
-      <div className="absolute inset-0 fractal-bg opacity-20" />
-      
+      <div className="absolute inset-0 fractal-bg opacity-16" />
+
       <div className="relative flex items-start justify-between">
         <div>
           <p className="text-sm text-muted-foreground">{title}</p>
@@ -44,6 +47,97 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon: IconCom
         </div>
       </div>
     </motion.div>
+  );
+};
+
+const UserPoliciesDisplay: React.FC = () => {
+  const [userPolicies, setUserPolicies] = useState<any[]>([]);
+
+  useEffect(() => {
+    const policies = JSON.parse(localStorage.getItem('USER_POLICIES') || '[]');
+    setUserPolicies(policies);
+  }, []);
+
+  if (userPolicies.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <Shield className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+        <p className="text-muted-foreground">No insurance policies purchased yet.</p>
+        <p className="text-sm text-muted-foreground mt-2">Go to the Policies section to purchase your first policy!</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {userPolicies.map((policy, index) => (
+        <motion.div
+          key={policy.policyId + policy.purchaseDate}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: index * 0.1 }}
+          className="border border-primary/20 rounded-lg p-4 bg-card/30"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-3">
+                <Shield className="h-5 w-5 text-primary" />
+                <div>
+                  <h3 className="font-semibold capitalize">{policy.policyId.replace(/-/g, ' ')}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Purchased: {new Date(policy.purchaseDate).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Premium:</span>
+                  <p className="font-semibold">{policy.premium} SHM</p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Platform Fee:</span>
+                  <p className="font-semibold">{policy.platformFee?.toFixed(4)} SHM</p>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Total Paid:</span>
+                  <p className="font-semibold">{policy.totalPaid?.toFixed(4)} SHM</p>
+                </div>
+                {policy.status === 'claimed' && (
+                  <div>
+                    <span className="text-muted-foreground">Net Payout:</span>
+                    <p className="font-semibold text-success">{policy.netPayout?.toFixed(4)} SHM</p>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {policy.status === 'active' && (
+                <>
+                  <CheckCircle className="h-5 w-5 text-success" />
+                  <span className="text-success font-semibold">Active</span>
+                </>
+              )}
+              {policy.status === 'claimed' && (
+                <>
+                  <Award className="h-5 w-5 text-warning" />
+                  <span className="text-warning font-semibold">Claimed</span>
+                </>
+              )}
+            </div>
+          </div>
+          
+          {policy.txHash && (
+            <div className="mt-3 pt-3 border-t border-primary/10">
+              <span className="text-xs text-muted-foreground">
+                Transaction: {policy.txHash}
+              </span>
+            </div>
+          )}
+        </motion.div>
+      ))}
+    </div>
   );
 };
 
@@ -75,16 +169,16 @@ const Dashboard: React.FC = () => {
       value: '2.3s',
       change: '-22.1%',
       icon: Zap,
-      trend: 'up' as const
+      trend: 'down' as const
     }
   ];
 
   const recentActivities = [
-    { id: 1, type: 'policy', message: 'Device protection policy created', time: '2 minutes ago', status: 'success' },
-    { id: 2, type: 'payment', message: 'Premium payment of 0.5 SHM received', time: '5 minutes ago', status: 'success' },
-    { id: 3, type: 'claim', message: 'Travel insurance claim approved', time: '8 minutes ago', status: 'success' },
-    { id: 4, type: 'kyc', message: 'KYC verification completed for user 0x4a2b...', time: '12 minutes ago', status: 'success' },
-    { id: 5, type: 'underwriting', message: 'Risk assessment completed for event coverage', time: '15 minutes ago', status: 'success' }
+    { id: 1, type: 'policy', message: 'Device protection policy created', time: '2 minutes ago', exactTime: new Date(Date.now() - 2 * 60 * 1000).toISOString(), status: 'success' },
+    { id: 2, type: 'payment', message: 'Premium payment of 0.5 SHM received', time: '5 minutes ago', exactTime: new Date(Date.now() - 5 * 60 * 1000).toISOString(), status: 'success' },
+    { id: 3, type: 'claim', message: 'Travel insurance claim approved', time: '8 minutes ago', exactTime: new Date(Date.now() - 8 * 60 * 1000).toISOString(), status: 'success' },
+    { id: 4, type: 'kyc', message: 'KYC verification completed for user 0x4a2b...', time: '12 minutes ago', exactTime: new Date(Date.now() - 12 * 60 * 1000).toISOString(), status: 'success' },
+    { id: 5, type: 'underwriting', message: 'Risk assessment completed for event coverage', time: '15 minutes ago', exactTime: new Date(Date.now() - 15 * 60 * 1000).toISOString(), status: 'success' }
   ];
 
   return (
@@ -99,7 +193,7 @@ const Dashboard: React.FC = () => {
           Riskzap Insurance Dashboard
         </h1>
         <p className="text-lg text-muted-foreground">
-          Real-time micro-policy analytics on Shardeum Unstablenet
+          Real-time micro-policy analytics on Shardeum Testnet
         </p>
       </motion.div>
 
@@ -131,7 +225,7 @@ const Dashboard: React.FC = () => {
               <Activity className="h-6 w-6 text-primary particle-glow" />
               <h2 className="text-xl font-bold">Live Activity Feed</h2>
             </div>
-            
+
             <div className="space-y-4">
               {recentActivities.map((activity, index) => (
                 <motion.div
@@ -144,7 +238,7 @@ const Dashboard: React.FC = () => {
                   <div className="w-2 h-2 rounded-full bg-success floating" />
                   <div className="flex-1">
                     <p className="text-sm">{activity.message}</p>
-                    <p className="text-xs text-muted-foreground">{activity.time}</p>
+                    <p className="text-xs text-muted-foreground" title={activity.exactTime}>{activity.time}</p>
                   </div>
                   <div className="w-3 h-3 rounded-full bg-success" />
                 </motion.div>
@@ -164,7 +258,7 @@ const Dashboard: React.FC = () => {
               <Zap className="h-6 w-6 text-warning particle-glow" />
               <h2 className="text-xl font-bold">Quick Actions</h2>
             </div>
-            
+
             <div className="space-y-4">
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -226,6 +320,17 @@ const Dashboard: React.FC = () => {
         </motion.div>
       </div>
 
+      {/* User Policies Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+        className="rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6"
+      >
+        <h2 className="text-xl font-bold mb-4 text-gradient-fire">My Insurance Policies</h2>
+        <UserPoliciesDisplay />
+      </motion.div>
+
       {/* Network Status */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -236,7 +341,7 @@ const Dashboard: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-success floating" />
-            <span className="font-semibold">Shardeum Unstablenet Status</span>
+            <span className="font-semibold">Shardeum Testnet Status</span>
           </div>
           <div className="flex items-center gap-6 text-sm">
             <div className="flex items-center gap-2">

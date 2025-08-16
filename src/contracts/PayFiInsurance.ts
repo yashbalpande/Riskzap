@@ -40,8 +40,8 @@ export const PAYFI_INSURANCE_ABI = [
 
 // Shardeum Unstablenet configuration
 export const SHARDEUM_CONFIG = {
-  chainId: 1074, // Shardeum Unstablenet Chain ID
-  rpcUrl: "https://dapps.shardeum.org/",
+  chainId: 8080, // Shardeum Unstablenet Chain ID
+  rpcUrl: "https://api-unstable.shardeum.org",
   blockExplorer: "https://explorer-dapps.shardeum.org/",
   currency: {
     name: "Shardeum",

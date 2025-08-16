@@ -13,8 +13,7 @@ import {
   TrendingUp,
   Heart
 } from 'lucide-react';
-import { connectWallet, sendShmToken, getConfiguredCompanyWallet, getConfiguredPolicyContract, purchaseWithPolicyContract } from '@/services/web3';
-import { riskzapAPI } from '@/services/api';
+import { connectWallet, sendShmToken, getConfiguredCompanyWallet, calculatePurchaseFee, calculateWithdrawFee } from '@/services/web3';
 
 interface PolicyType {
   id: string;
@@ -152,18 +151,35 @@ const PolicyCards: React.FC = () => {
         throw new Error('No transaction-capable signer available. Ensure you connected a wallet that can send transactions.');
       }
 
-      // If an on-chain PolicyManager is configured, prefer approve->purchase flow
-      const policyContract = getConfiguredPolicyContract();
-      if (policyContract) {
-        const tx = await purchaseWithPolicyContract(txSigner, Number(policy.id) || 0, policy.basePremium);
-        alert(`Policy purchased via contract ${policyContract}. Tx: ${tx.hash}`);
-      } else {
-        // Fallback: transfer SHM tokens equal to basePremium directly to company wallet
-        const tx = await sendShmToken(txSigner, policy.basePremium);
-        console.log('SHM transfer tx:', tx.hash);
-        const company = getConfiguredCompanyWallet();
-        alert(`Policy purchased. SHM ${policy.basePremium} sent to company wallet ${company}. Tx: ${tx.hash}`);
-      }
+      // Calculate total amount: premium + 5% platform fee
+      const feeCalculation = calculatePurchaseFee(policy.basePremium);
+      const totalAmount = policy.basePremium + feeCalculation.fee;
+      
+      // Transfer total amount (premium + platform fee) to company wallet
+      const tx = await sendShmToken(txSigner, totalAmount);
+      console.log('Insurance purchase tx:', tx.hash);
+      
+      // Store policy purchase record
+      const policyRecord = {
+        policyId: policy.id,
+        premium: policy.basePremium,
+        platformFee: feeCalculation.fee,
+        totalPaid: totalAmount,
+        purchaseDate: new Date().toISOString(),
+        userAddress: await txSigner.getAddress(),
+        txHash: tx.hash,
+        status: 'active'
+      };
+      
+      // Save to localStorage (in real app, save to backend)
+      const existingPolicies = JSON.parse(localStorage.getItem('USER_POLICIES') || '[]');
+      existingPolicies.push(policyRecord);
+      localStorage.setItem('USER_POLICIES', JSON.stringify(existingPolicies));
+      
+      const companyWallet = getConfiguredCompanyWallet() || 'configured wallet';
+      const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
+      const modeText = isDemoMode ? ' (Demo Mode - Simulated)' : ' 🚀 (LIVE - Real SHM Transaction!)';
+      alert(`Policy purchased successfully!${modeText}\nPremium: ${policy.basePremium} SHM\nPlatform Fee (5%): ${feeCalculation.fee.toFixed(4)} SHM\nTotal Paid: ${totalAmount.toFixed(4)} SHM\nSent to: ${companyWallet}\nTx: ${tx.hash}`);
     } catch (err: any) {
       console.error('Purchase failed:', err);
       alert('Purchase failed: ' + (err?.message || err));
@@ -201,21 +217,40 @@ const PolicyCards: React.FC = () => {
         return;
       }
 
-      // Submit claim to backend
-  const claimResp = await riskzapAPI.submitClaim({ walletAddress: address, policyId, claimAmount: 0, evidence: [] });
-      if (!claimResp.success) {
-        alert('Claim submission failed: ' + claimResp.message);
+      // Get user's policy records
+      const userPolicies = JSON.parse(localStorage.getItem('USER_POLICIES') || '[]');
+      const policy = userPolicies.find((p: any) => p.policyId === policyId && p.userAddress === address);
+      
+      if (!policy) {
+        alert('Policy not found or you are not the owner.');
         return;
       }
 
-      // Request payout (backend will handle sending tokens from company wallet)
-  const payoutResp = await riskzapAPI.requestPayout(address, 0 /* amount - backend decides */, claimResp.data?.claimId);
-      if (!payoutResp.success) {
-        alert('Payout request failed: ' + payoutResp.message);
+      if (policy.status === 'claimed') {
+        alert('This policy has already been claimed.');
         return;
       }
 
-      alert('Claim and payout requested: ' + payoutResp.message);
+      // For demo: assume claim is approved and payout equals the premium paid
+      const claimAmount = policy.premium; // In real app, this would be determined by claim assessment
+      
+      // Calculate withdrawal fee (0.2%)
+      const feeCalculation = calculateWithdrawFee(claimAmount);
+      const netPayout = feeCalculation.net;
+      
+      // In real app: this would transfer from company wallet to user
+      // For demo: we'll just simulate the transaction
+      alert(`Claim approved!\nClaim Amount: ${claimAmount} SHM\nWithdrawal Fee (0.2%): ${feeCalculation.fee.toFixed(4)} SHM\nNet Payout: ${netPayout.toFixed(4)} SHM\n\nIn production, ${netPayout.toFixed(4)} SHM would be transferred to your wallet.`);
+      
+      // Update policy status
+      policy.status = 'claimed';
+      policy.claimDate = new Date().toISOString();
+      policy.claimAmount = claimAmount;
+      policy.withdrawalFee = feeCalculation.fee;
+      policy.netPayout = netPayout;
+      
+      localStorage.setItem('USER_POLICIES', JSON.stringify(userPolicies));
+      
     } catch (err: any) {
       alert('Claim failed: ' + (err?.message || err));
     }
@@ -402,7 +437,7 @@ const PolicyCards: React.FC = () => {
       >
         <div className="fractal-bg p-8 rounded-2xl border border-primary/20">
           <h3 className="text-2xl font-bold text-gradient-success mb-4">
-            Why Choose Riskzap Micro-Policies?
+            Why Choose PayFi Micro-Policies?
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div>

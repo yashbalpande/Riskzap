@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { setConfiguredTokenAddress, setConfiguredCompanyWallet, getConfiguredTokenAddress, getConfiguredCompanyWallet } from '@/services/web3';
+import { setConfiguredTokenAddress, setConfiguredCompanyWallet, getConfiguredTokenAddress, getConfiguredCompanyWallet, connectWallet } from '@/services/web3';
 import { ethers } from 'ethers';
 
 const AdminSettings: React.FC = () => {
@@ -47,6 +47,26 @@ const AdminSettings: React.FC = () => {
     setOpen(false);
   };
 
+  const deployToken = async () => {
+    setStatus(null);
+    setChecking(true);
+    try {
+      const { signer, address } = await connectWallet();
+      setStatus('Deploying ERC-20 token contract...');
+      
+      // For demo purposes, we'll generate a mock deployed address
+      // In real implementation, you would deploy the actual contract
+      const mockAddress = `0x${Math.random().toString(16).substring(2, 42)}`;
+      
+      setStatus(`✅ Mock deployment completed!\n📋 Token Address: ${mockAddress}\n\n⚠️ This is a demo address. For real deployment:\n1. Use the hardhat deployment script\n2. Or deploy manually to Shardeum testnet`);
+      setToken(mockAddress);
+      
+    } catch (error: any) {
+      setStatus(`❌ Deployment failed: ${error.message}`);
+    }
+    setChecking(false);
+  };
+
   return (
     <div>
       <Button variant="ghost" onClick={() => setOpen(true)}>⚙️</Button>
@@ -61,6 +81,9 @@ const AdminSettings: React.FC = () => {
             <input className="w-full p-2 mb-3 border rounded" value={company} onChange={(e) => setCompany(e.target.value)} placeholder={getConfiguredCompanyWallet()} />
             <div className="flex gap-3 justify-end">
               <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+              <Button onClick={deployToken} disabled={checking} className="bg-primary">
+                {checking ? 'Deploying...' : 'Deploy New Token'}
+              </Button>
               <Button onClick={checkToken} disabled={checking}>{checking ? 'Checking…' : 'Validate Token'}</Button>
               <Button onClick={save}>Save</Button>
             </div>

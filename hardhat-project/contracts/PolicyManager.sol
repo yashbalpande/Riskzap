@@ -67,6 +67,6 @@ contract PolicyManager is Ownable {
         bool sent = token.transfer(to, net);
         require(sent, "withdraw transfer failed");
 
-    emit Withdrawn(to, net, fee);
+        emit Withdrawn(to, net, fee);
     }
 }

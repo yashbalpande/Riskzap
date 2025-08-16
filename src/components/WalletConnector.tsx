@@ -1,11 +1,11 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import Web3 from 'web3';
 import { Button } from '@/components/ui/button';
 import { Wallet, Power, AlertCircle, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { connectWallet, getShmBalance } from '@/services/web3';
+import { ethers } from 'ethers';
 
 interface WalletContextType {
-  web3: Web3 | null;
   account: string | null;
   isConnected: boolean;
   balance: string;
@@ -25,7 +25,6 @@ export const useWallet = () => {
 };
 
 export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [web3, setWeb3] = useState<Web3 | null>(null);
   const [account, setAccount] = useState<string | null>(null);
   const [balance, setBalance] = useState<string>('0');
   const [chainId, setChainId] = useState<number | null>(null);
@@ -38,23 +37,29 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const checkConnection = async () => {
     if (typeof window !== 'undefined' && window.ethereum) {
       try {
-        const web3Instance = new Web3(window.ethereum);
-        const accounts = await web3Instance.eth.getAccounts();
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        console.log('👛 Checking wallet connection, accounts:', accounts);
         
         if (accounts.length > 0) {
-          setWeb3(web3Instance);
           setAccount(accounts[0]);
           setIsConnected(true);
           
-          const balanceWei = await web3Instance.eth.getBalance(accounts[0]);
-          const balanceEth = web3Instance.utils.fromWei(balanceWei, 'ether');
-          setBalance(parseFloat(balanceEth).toFixed(4));
+          // Create provider for balance checking
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          console.log('🔗 Created provider, checking balance...');
           
-          const networkId = await web3Instance.eth.getChainId();
-          setChainId(Number(networkId));
+          const balanceStr = await getShmBalance(provider, accounts[0]);
+          console.log('💰 Balance returned:', balanceStr);
+          
+          setBalance(parseFloat(balanceStr).toFixed(4));
+          
+          const networkId = await window.ethereum.request({ method: 'eth_chainId' });
+          const chainId = parseInt(networkId, 16);
+          console.log('🌐 Chain ID:', chainId);
+          setChainId(chainId);
         }
       } catch (error) {
-        console.error('Error checking connection:', error);
+        console.error('❌ Error checking connection:', error);
       }
     }
   };
@@ -73,7 +78,6 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const disconnect = () => {
-    setWeb3(null);
     setAccount(null);
     setBalance('0');
     setChainId(null);
@@ -81,7 +85,6 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const value: WalletContextType = {
-    web3,
     account,
     isConnected,
     balance,
@@ -102,8 +105,8 @@ const WalletConnector: React.FC = () => {
   const [isShardeum, setIsShardeum] = useState(false);
 
   useEffect(() => {
-    // Shardeum Unstablenet Chain ID is typically 1074 or similar
-    setIsShardeum(chainId === 1074 || chainId === 1073);
+    // Shardeum testnet Chain ID is 8080
+    setIsShardeum(chainId === 8080);
   }, [chainId]);
 
   const formatAddress = (address: string) => {
@@ -113,16 +116,16 @@ const WalletConnector: React.FC = () => {
   return (
     <div className="flex items-center gap-4">
       <AnimatePresence mode="wait">
-        {!isConnected ? (
+    {!isConnected ? (
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
             <Button
-              variant="payfi"
-              onClick={connect}
-              className="gap-2"
+      variant="floating"
+      onClick={connect}
+      className="gap-2 px-3 py-2"
             >
               <Wallet className="h-4 w-4" />
               Connect Wallet
@@ -143,7 +146,7 @@ const WalletConnector: React.FC = () => {
                 <AlertCircle className="h-4 w-4 text-warning" />
               )}
               <span className="text-sm">
-                {isShardeum ? 'Shardeum Unstablenet' : `Chain ${chainId}`}
+                {isShardeum ? 'Shardeum Testnet' : `Chain ${chainId}`}
               </span>
             </div>
 
