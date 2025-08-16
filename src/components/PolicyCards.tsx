@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Smartphone, 
   Calendar, 
@@ -11,9 +12,10 @@ import {
   Clock,
   DollarSign,
   TrendingUp,
-  Heart
+  Heart,
+  ShoppingCart
 } from 'lucide-react';
-import { connectWallet, sendShmToken, getConfiguredCompanyWallet, calculatePurchaseFee, calculateWithdrawFee } from '@/services/web3';
+import { connectWallet, sendShmToken, getConfiguredCompanyWallet, calculatePurchaseFee, calculateWithdrawFee, sendClaimPayout } from '@/services/web3';
 import { ActivityService } from '@/services/activityService';
 
 interface PolicyType {
@@ -123,6 +125,8 @@ const PolicyCards: React.FC = () => {
   // create policy modal
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newPolicyForm, setNewPolicyForm] = useState({ name: '', premium: '', duration: '', coverage: '' });
+  
+  const { toast } = useToast();
 
   const handlePolicySelect = (policyId: string) => {
     setSelectedPolicy(policyId === selectedPolicy ? null : policyId);
@@ -279,9 +283,33 @@ Navigate to "My Policies" in the main menu to manage your insurance policies.`);
       const feeCalculation = calculateWithdrawFee(claimAmount);
       const netPayout = feeCalculation.net;
       
-      // In real app: this would transfer from company wallet to user
-      // For demo: we'll just simulate the transaction
-      alert(`Claim approved!\nClaim Amount: ${claimAmount} SHM\nWithdrawal Fee (0.2%): ${feeCalculation.fee.toFixed(4)} SHM\nNet Payout: ${netPayout.toFixed(4)} SHM\n\nIn production, ${netPayout.toFixed(4)} SHM would be transferred to your wallet.`);
+      // Send actual SHM tokens to user's wallet
+      try {
+        await sendClaimPayout(netPayout, `Claim payout for ${policy.type} policy`);
+        
+        // Log successful claim activity
+        await ActivityService.log({
+          type: 'claim',
+          action: 'received',
+          details: `Received ${netPayout.toFixed(4)} SHM tokens for ${policy.type} policy claim`,
+          value: netPayout.toString(),
+          category: policy.category
+        });
+        
+        toast({
+          title: "Claim Successful! 🎉",
+          description: `${netPayout.toFixed(4)} SHM tokens have been sent to your wallet. You can now purchase new policies!`,
+          variant: "default",
+        });
+        
+      } catch (payoutError: any) {
+        console.error('Token payout failed:', payoutError);
+        toast({
+          title: "Claim Processed",
+          description: `Claim approved for ${netPayout.toFixed(4)} SHM tokens. ${payoutError.message || 'Demo mode - tokens simulated.'}`,
+          variant: "default",
+        });
+      }
       
       // Update policy status
       policy.status = 'claimed';
@@ -365,7 +393,7 @@ Navigate to "My Policies" in the main menu to manage your insurance policies.`);
   return (
     <div className="w-full max-w-6xl mx-auto p-6">
       <div className="text-center mb-12">
-        <h2 className="text-4xl font-bold text-gradient-fire mb-4">
+        <h2 className="text-4xl font-bold text-gradient-primary mb-4">
           Micro-Policy Marketplace
         </h2>
         <p className="text-lg text-muted-foreground">
@@ -479,7 +507,7 @@ Navigate to "My Policies" in the main menu to manage your insurance policies.`);
                         handleQuickBuy(e, policy);
                       }}
                     >
-                      <Zap className="h-4 w-4" />
+                      {isSelected ? <Zap className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
                       {isSelected ? 'Purchase Now' : 'Quick Buy'}
                     </Button>
 
