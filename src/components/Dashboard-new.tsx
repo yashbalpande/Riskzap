@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
 import {
   TrendingUp,
   Shield,
@@ -74,7 +73,7 @@ const UserPoliciesDisplay: React.FC<UserPoliciesDisplayProps> = () => {
         },
         {
           id: 'POL-002', 
-          type: 'Phone Protection',
+          type: 'Device Protection',
           premium: '0.15 SHM',
           coverage: '2.25 SHM',
           status: 'Active',
@@ -89,7 +88,7 @@ const UserPoliciesDisplay: React.FC<UserPoliciesDisplayProps> = () => {
     return (
       <div className="text-center py-8">
         <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <p className="text-muted-foreground">Connect your wallet to see your policies</p>
+        <p className="text-muted-foreground">Connect your wallet to view your policies</p>
       </div>
     );
   }
@@ -98,7 +97,7 @@ const UserPoliciesDisplay: React.FC<UserPoliciesDisplayProps> = () => {
     return (
       <div className="text-center py-8">
         <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <p className="text-muted-foreground">No policies yet</p>
+        <p className="text-muted-foreground">No policies found</p>
         <p className="text-sm text-muted-foreground mt-2">Create your first policy to get started</p>
       </div>
     );
@@ -153,7 +152,7 @@ const Dashboard: React.FC = () => {
     
     // Simulate policy creation
     await ActivityService.logPolicyCreation(account!, 'Custom Micro-Policy');
-    alert('🏗️ Policy creation started!\n\nType: Custom Micro-Policy\nStatus: Processing\nNext: Risk assessment\n\nCheck the activity feed for updates!');  
+    alert('🏗️ Policy Creation Process Started!\n\nPolicy Type: Custom Micro-Policy\nStatus: Initiated\nNext Step: Risk Assessment\n\nCheck the Live Activity Feed for updates!');
   };
 
   const handleProcessClaim = async () => {
@@ -165,7 +164,7 @@ const Dashboard: React.FC = () => {
     // Simulate claim processing
     const claimAmount = (Math.random() * 3 + 1).toFixed(2); // Random amount 1-4 SHM
     await ActivityService.logPolicyClaim(account!, 'Travel Insurance', claimAmount);
-    alert(`✅ Claim submitted!\n\nClaim ID: CL-${Date.now()}\nType: Travel Insurance\nAmount: ${claimAmount} SHM\nStatus: Under review\nProcessing: 24-48 hours\n\n📱 Check activity feed for updates!`);
+    alert(`✅ Claim Process Initiated!\n\nClaim ID: CL-${Date.now()}\nPolicy Type: Travel Insurance\nClaim Amount: ${claimAmount} SHM\nStatus: Under Review\nExpected Processing: 24-48 hours\n\n📱 Watch the Live Activity Feed for real-time updates!`);
   };
 
   const handleKYCVerification = async () => {
@@ -176,7 +175,7 @@ const Dashboard: React.FC = () => {
 
     // Simulate KYC verification
     await ActivityService.logKYCVerification(account!);
-    alert(`🔒 ID verification complete!\n\nUser: ${account!.slice(0, 6)}...${account!.slice(-4)}\nStatus: Verified ✅\nLevel: Basic\nValid until: ${new Date(Date.now() + 365*24*60*60*1000).toLocaleDateString()}\n\n🔴 Logged to activity feed!`);
+    alert(`🔒 KYC Verification Completed!\n\nUser: ${account!.slice(0, 6)}...${account!.slice(-4)}\nStatus: Verified ✅\nLevel: Basic KYC\nValid Until: ${new Date(Date.now() + 365*24*60*60*1000).toLocaleDateString()}\n\n🔴 Activity logged to Live Feed!`);
   };
 
   const handleUnderwriting = async () => {
@@ -190,7 +189,7 @@ const Dashboard: React.FC = () => {
     const recommendedPremium = (Math.random() * 0.5 + 0.3).toFixed(2); // 0.3-0.8 SHM
     
     await ActivityService.logUnderwritingActivity(account!, riskScore, recommendedPremium);
-    alert(`🤖 Risk analysis complete!\n\nRisk score: ${riskScore}/10 (Low risk)\nSuggested premium: ${recommendedPremium} SHM\nMax coverage: ${(parseFloat(recommendedPremium) * 15).toFixed(1)} SHM\nValid for: 365 days\nAI confidence: 94.7%\n\n📊 Added to activity feed!`);
+    alert(`🤖 AI Underwriting Analysis Complete!\n\nRisk Score: ${riskScore}/10 (Low Risk)\nRecommended Premium: ${recommendedPremium} SHM\nMax Coverage: ${(parseFloat(recommendedPremium) * 15).toFixed(1)} SHM\nValidity: 365 days\nAI Confidence: 94.7%\n\n📊 Results added to Live Activity Feed!`);
   };
   
   const stats = [
@@ -225,15 +224,16 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="w-full">
-      {/* Curved Hero Header */}
+    <div className="w-full max-w-7xl mx-auto container-padding space-y-12">
+      {/* Professional Hero Header */}
       <motion.div
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="smooth-curve-header text-center relative"
+        className="text-center section-padding bg-gradient-to-br from-background via-primary/5 to-background rounded-3xl relative overflow-hidden"
       >
-        <div className="max-w-4xl mx-auto">
+        <div className="absolute inset-0 geometric-bg opacity-30" />
+        <div className="relative z-10">
           <motion.div
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
@@ -245,34 +245,14 @@ const Dashboard: React.FC = () => {
           </motion.div>
           
           <h1 className="text-hero text-gradient-primary mb-6 leading-tight">
-            Protect Everything<br />
-            <span className="text-primary">You Love, Instantly</span>
+            The future of <br />
+            <span className="text-primary">insurance is here</span>
           </h1>
           
           <p className="text-subhero max-w-2xl mx-auto mb-8">
-            From your phone to your next trip – Riskzap brings lightning-fast, AI-powered insurance on Shardeum.
+            Decentralized micro-policies powered by blockchain technology. 
+            Fast, secure, and transparent insurance solutions for the modern world.
           </p>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="flex flex-wrap items-center justify-center gap-4 mb-8"
-          >
-            <Button
-              className="webzi-button btn-primary px-8 py-3 text-base"
-              onClick={() => {/* Handle early access */}}
-            >
-              Join Beta
-            </Button>
-            <Button
-              variant="outline"
-              className="webzi-button px-8 py-3 text-base border-primary/20 hover:border-primary/40"
-              onClick={() => {/* Handle demo */}}
-            >
-              Try Demo
-            </Button>
-          </motion.div>
           
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -282,22 +262,19 @@ const Dashboard: React.FC = () => {
           >
             <div className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-success" />
-              <span>Instant payouts</span>
+              <span>Instant Settlements</span>
             </div>
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
-              <span>Blockchain secured</span>
+              <span>Smart Contract Security</span>
             </div>
             <div className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-warning" />
-              <span>Sub-second claims</span>
+              <span>Lightning Fast Claims</span>
             </div>
           </motion.div>
         </div>
       </motion.div>
-
-      {/* Main Content Container */}
-      <div className="w-full max-w-7xl mx-auto container-padding space-y-12">
 
       {/* Professional Stats Grid */}
       <motion.div
@@ -369,8 +346,8 @@ const Dashboard: React.FC = () => {
                     <Shield className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg mb-2">New Policy</h3>
-                    <p className="text-sm text-muted-foreground">Start a new insurance policy with AI risk assessment</p>
+                    <h3 className="font-bold text-lg mb-2">Create Policy</h3>
+                    <p className="text-sm text-muted-foreground">Launch new insurance policy with AI risk assessment</p>
                   </div>
                 </div>
               </motion.button>
@@ -386,8 +363,8 @@ const Dashboard: React.FC = () => {
                     <CheckCircle className="h-6 w-6 text-success" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg mb-2">File Claim</h3>
-                    <p className="text-sm text-muted-foreground">Quick claim verification and payout</p>
+                    <h3 className="font-bold text-lg mb-2">Process Claim</h3>
+                    <p className="text-sm text-muted-foreground">Fast-track claim verification and payout</p>
                   </div>
                 </div>
               </motion.button>
@@ -403,8 +380,8 @@ const Dashboard: React.FC = () => {
                     <Users className="h-6 w-6 text-warning" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg mb-2">Verify ID</h3>
-                    <p className="text-sm text-muted-foreground">Complete identity verification for better coverage</p>
+                    <h3 className="font-bold text-lg mb-2">KYC Verification</h3>
+                    <p className="text-sm text-muted-foreground">Complete identity verification for enhanced coverage</p>
                   </div>
                 </div>
               </motion.button>
@@ -420,8 +397,8 @@ const Dashboard: React.FC = () => {
                     <Activity className="h-6 w-6 text-accent" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-lg mb-2">Risk Check</h3>
-                    <p className="text-sm text-muted-foreground">Smart risk analysis powered by AI</p>
+                    <h3 className="font-bold text-lg mb-2">AI Underwriting</h3>
+                    <p className="text-sm text-muted-foreground">Smart risk analysis with machine learning</p>
                   </div>
                 </div>
               </motion.button>
@@ -436,7 +413,7 @@ const Dashboard: React.FC = () => {
           transition={{ delay: 0.7 }}
           className="glass-card rounded-2xl p-6"
         >
-          <h2 className="text-xl font-bold mb-4 text-gradient-primary">Your Policies</h2>
+          <h2 className="text-xl font-bold mb-4 text-gradient-primary">My Insurance Policies</h2>
           <UserPoliciesDisplay />
         </motion.div>
       </div>
@@ -451,7 +428,7 @@ const Dashboard: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-success floating" />
-            <span className="font-semibold text-lg">Network Status</span>
+            <span className="font-semibold text-lg">Shardeum Testnet Status</span>
           </div>
           <div className="flex items-center gap-6 text-sm">
             <div className="flex items-center gap-2">
@@ -469,7 +446,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </motion.div>
-      </div>
     </div>
   );
 };

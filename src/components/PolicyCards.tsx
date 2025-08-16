@@ -478,7 +478,7 @@ Navigate to "My Policies" in the main menu to manage your insurance policies.`);
       >
         <div className="fractal-bg p-8 rounded-2xl border border-primary/20">
           <h3 className="text-2xl font-bold text-gradient-success mb-4">
-            Why Choose PayFi Micro-Policies?
+            Why Choose Riskzap Micro-Policies?
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div>

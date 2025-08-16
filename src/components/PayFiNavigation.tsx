@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import WalletConnector from './WalletConnector';
-import AdminSettings from './AdminSettings';
 import { 
   Shield, 
   BarChart3, 
@@ -24,50 +23,43 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
   const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
 
   const navigationItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-    { id: 'policies', label: 'Policies', icon: Shield },
-    { id: 'my-policies', label: 'My Policies', icon: Coins },
-    { id: 'flow', label: 'Process Flow', icon: Zap },
-    { id: 'analytics', label: 'Analytics', icon: Sparkles },
+    { id: 'dashboard', label: 'FEATURES', icon: BarChart3 },
+    { id: 'policies', label: 'POLICIES', icon: Shield },
+    { id: 'flow', label: 'HOW IT WORKS', icon: Zap },
+    { id: 'analytics', label: 'ANALYTICS', icon: Sparkles },
+    { id: 'my-policies', label: 'MY ACCOUNT', icon: Coins },
   ];
 
   return (
     <>
       {/* Demo Mode Banner */}
       {isDemoMode && (
-        <div className="bg-warning/20 border-b border-warning/30 px-4 py-2">
-          <div className="flex items-center justify-center gap-2 text-warning text-sm">
-            <Sparkles className="h-4 w-4" />
-            <span>Demo Mode: Simulated transactions (no real contracts deployed)</span>
-            <Sparkles className="h-4 w-4" />
+        <div className="mx-4 mt-2 bg-warning/10 border border-warning/20 rounded-full px-4 py-2 backdrop-blur-sm">
+          <div className="flex items-center justify-center gap-2 text-warning text-xs">
+            <Sparkles className="h-3 w-3" />
+            <span>Demo Mode: Simulated transactions</span>
+            <Sparkles className="h-3 w-3" />
           </div>
         </div>
       )}
 
       {/* Desktop Navigation */}
-      <nav className="hidden lg:flex items-center justify-between p-6 border-b border-primary/20 bg-card/30 backdrop-blur-sm">
+      <nav className="hidden lg:flex items-center justify-between px-6 py-3 mx-4 mt-4 rounded-full glass-card border border-primary/10 backdrop-blur-xl shadow-2xl">
         {/* Logo */}
         <motion.div 
-          className="flex items-center gap-3"
+          className="flex items-center gap-2"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
         >
-          <div className="relative">
-            <Coins className="h-8 w-8 text-primary particle-glow" />
-            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-              <Sparkles className="h-8 w-8 text-warning/70" />
-            </div>
+          <div className="relative glow-primary rounded-full p-2 bg-gradient-to-br from-primary/20 to-primary/10">
+            <Coins className="h-5 w-5 text-primary" />
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-gradient-fire">Riskzap</h1>
-            <p className="text-xs text-muted-foreground">Shardeum Micro-Policies</p>
-          </div>
+          <h1 className="text-lg font-bold text-gradient-primary">Riskzap</h1>
         </motion.div>
 
-        {/* Navigation Links */}
-        <div className="flex items-center gap-2">
+        {/* Navigation Tags - Compressed Webzi Style */}
+        <div className="flex items-center gap-6">
           {navigationItems.map((item, index) => {
-            const IconComponent = item.icon;
             const isActive = activeSection === item.id;
             
             return (
@@ -75,62 +67,67 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
                 key={item.id}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.05 }}
               >
-                <Button
-                  variant={isActive ? "payfi" : "floating"}
-                    onClick={() => onSectionChange(item.id)}
-                    className="gap-2 relative px-4 py-2"
+                <button
+                  onClick={() => onSectionChange(item.id)}
+                  className={`relative px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-300 ${
+                    isActive 
+                      ? 'bg-gradient-to-r from-primary/20 to-primary/10 text-primary border border-primary/30 shadow-lg' 
+                      : 'text-muted-foreground hover:text-foreground hover:bg-primary/5'
+                  }`}
                 >
-                  <IconComponent className="h-4 w-4" />
                   {item.label}
                   {isActive && (
                     <motion.div
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
-                      layoutId="activeIndicator"
+                      layoutId="activeTab"
+                      className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
                     />
                   )}
-                </Button>
+                </button>
               </motion.div>
             );
           })}
         </div>
 
-        {/* Wallet Connector */}
-        <div className="flex items-center gap-2">
-          <AdminSettings />
-          <div className="rounded-full p-0.5 border-glow-soft" title="Connect Wallet">
-            <WalletConnector />
-          </div>
+        {/* Compact Wallet Connector */}
+        <div className="flex items-center">
+          <WalletConnector />
         </div>
       </nav>
 
       {/* Mobile Demo Mode Banner */}
       {isDemoMode && (
-        <div className="lg:hidden bg-warning/20 border-b border-warning/30 px-4 py-2">
-          <div className="flex items-center justify-center gap-2 text-warning text-xs">
+        <div className="lg:hidden mx-2 mt-1 bg-warning/10 border border-warning/20 rounded-full px-3 py-1.5 backdrop-blur-sm">
+          <div className="flex items-center justify-center gap-1 text-warning text-xs">
             <Sparkles className="h-3 w-3" />
-            <span>Demo Mode Active</span>
+            <span>Demo Mode</span>
             <Sparkles className="h-3 w-3" />
           </div>
         </div>
       )}
 
       {/* Mobile Navigation */}
-      <nav className="lg:hidden flex items-center justify-between p-4 border-b border-primary/20 bg-card/30 backdrop-blur-sm">
+      <nav className="lg:hidden flex items-center justify-between p-3 mx-2 mt-2 rounded-2xl glass-card border border-primary/10 backdrop-blur-xl shadow-lg">
         {/* Mobile Logo */}
         <div className="flex items-center gap-2">
-          <Coins className="h-6 w-6 text-primary" />
-          <span className="font-bold text-gradient-fire">Riskzap</span>
+          <div className="glow-primary rounded-full p-1.5 bg-gradient-to-br from-primary/20 to-primary/10">
+            <Coins className="h-4 w-4 text-primary" />
+          </div>
+          <span className="font-bold text-gradient-primary text-sm">Riskzap</span>
         </div>
 
         {/* Mobile Menu Button */}
         <Button
-          variant="floating"
+          variant="ghost"
           size="sm"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="border-glow-soft rounded-full h-8 w-8 p-0"
         >
-          {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          {isMobileMenuOpen ? <X className="h-3 w-3" /> : <Menu className="h-3 w-3" />}
         </Button>
 
         <AnimatePresence>
@@ -141,57 +138,61 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
               exit={{ opacity: 0 }}
               className="lg:hidden fixed inset-0 z-50 bg-background/95 backdrop-blur-sm"
             >
-              <motion.div
-                initial={{ x: '100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '100%' }}
-                className="absolute right-0 top-0 h-full w-80 bg-card border-l border-primary/20 p-6"
-              >
-                {/* Mobile Menu Header */}
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-2">
-                    <Coins className="h-6 w-6 text-primary" />
-                    <span className="font-bold text-gradient-fire">Riskzap</span>
+                <motion.div
+                  initial={{ x: '100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '100%' }}
+                  className="absolute right-2 top-2 bottom-2 w-72 glass-card border border-primary/20 rounded-2xl p-4 shadow-2xl backdrop-blur-xl"
+                >
+                  {/* Mobile Menu Header */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                      <div className="glow-primary rounded-full p-1.5 bg-gradient-to-br from-primary/20 to-primary/10">
+                        <Coins className="h-4 w-4 text-primary" />
+                      </div>
+                      <span className="font-bold text-gradient-primary text-sm">Riskzap</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="border-glow-soft rounded-full h-7 w-7 p-0"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="floating"
-                    size="sm"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {/* Mobile Navigation Items */}
-                <div className="space-y-4 mb-8">
-                  {navigationItems.map((item, index) => {
-                    const IconComponent = item.icon;
-                    const isActive = activeSection === item.id;
-                    return (
-                      <motion.div
-                        key={item.id}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <Button
-                          variant={isActive ? "payfi" : "floating"}
-                          onClick={() => {
-                            onSectionChange(item.id);
-                            setIsMobileMenuOpen(false);
-                          }}
-                          className="w-full justify-start gap-3"
+                  
+                  {/* Mobile Navigation Items */}
+                  <div className="space-y-1 mb-6">
+                    {navigationItems.map((item, index) => {
+                      const isActive = activeSection === item.id;
+                      return (
+                        <motion.div
+                          key={item.id}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
                         >
-                          <IconComponent className="h-5 w-5" />
-                          {item.label}
-                        </Button>
-                      </motion.div>
-                    );
-                  })}
-                </div>
+                          <button
+                            onClick={() => {
+                              onSectionChange(item.id);
+                              setIsMobileMenuOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-all duration-300 ${
+                              isActive 
+                                ? 'bg-gradient-to-r from-primary/20 to-primary/10 text-primary border border-primary/30' 
+                                : 'text-muted-foreground hover:bg-primary/5 hover:text-foreground'
+                            }`}
+                          >
+                            {item.label}
+                          </button>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
 
-                {/* Mobile Wallet Connector */}
-                <div className="border-t border-primary/20 pt-6">
+                  {/* Mobile Wallet Connector */}
+                  <div className="border-t border-primary/20 pt-4">
                   <WalletConnector />
                 </div>
               </motion.div>
