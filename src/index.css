@@ -4,59 +4,91 @@
 
 @layer base {
   :root {
-    /* Professional Webzi-inspired palette (deep dark with warm accents) */
-    --background: 220 25% 3%; /* deeper navy black */
+    /* Modern refined palette - diversified accent colors */
+    --background: 220 15% 6%; /* subtle dark base */
+    --background-secondary: 220 12% 8%; /* slightly lighter for cards */
+    --background-navbar: 220 12% 9%; /* slightly lighter for navbar separation */
     --foreground: 0 0% 95%;   /* crisp white text */
 
-    --card: 220 20% 6%;
+    --card: 220 12% 8%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 220 20% 6%;
+    --popover: 220 12% 8%;
     --popover-foreground: 0 0% 95%;
 
-    /* Primary: Vibrant Orange (Webzi style) */
-    --primary: 35 100% 60%;
+    /* CTA and highlight colors - warm orange/yellow reserved for actions */
+    --primary: 35 85% 58%; /* softer orange for CTAs */
     --primary-foreground: 0 0% 5%;
 
-    /* Secondary: Deep Orange */
-    --secondary: 25 90% 50%;
+    /* Diversified accent colors for different categories */
+    --accent-device: 160 75% 50%; /* teal-green for device protection */
+    --accent-device-foreground: 0 0% 5%;
+    
+    --accent-event: 35 85% 58%; /* warm orange for events */
+    --accent-event-foreground: 0 0% 5%;
+    
+    --accent-travel: 180 75% 55%; /* teal for travel */
+    --accent-travel-foreground: 0 0% 5%;
+    
+    --accent-equipment: 200 85% 55%; /* sky blue for equipment */
+    --accent-equipment-foreground: 0 0% 5%;
+
+    /* Verification colors - cool tones */
+    --verification: 200 85% 55%; /* sky blue for verification */
+    --verification-foreground: 0 0% 5%;
+
+    /* Secondary fallback */
+    --secondary: 180 75% 55%;
     --secondary-foreground: 0 0% 95%;
 
-    /* Success: Modern Green */
-    --success: 142 85% 50%;
+    /* Success: Modern teal-green */
+    --success: 160 75% 50%;
     --success-foreground: 0 0% 5%;
 
-    /* Warning: Golden Yellow */
-    --warning: 45 100% 60%;
+    /* Warning: Refined amber - used sparingly */
+    --warning: 45 85% 55%;
     --warning-foreground: 0 0% 5%;
 
     /* Text neutrals */
     --muted: 0 0% 70%;
     --muted-foreground: 0 0% 65%;
 
-    /* Accent */
-    --accent: 35 100% 60%;
+    /* Accent - general purpose teal */
+    --accent: 180 75% 55%;
     --accent-foreground: 0 0% 95%;
 
-    --destructive: 0 85% 60%;
+    --destructive: 0 75% 58%;
     --destructive-foreground: 0 0% 95%;
 
-    --border: 220 20% 15%;
-    --input: 220 20% 8%;
-    --ring: 35 100% 60%;
+    --border: 0 0% 100% / 0.08; /* soft white border */
+    --border-subtle: 0 0% 100% / 0.05; /* very subtle border */
+    --input: 220 12% 10%;
+    --ring: 200 85% 55%;
 
-    --radius: 1.25rem;
+    --radius: 1rem;
 
-    /* Professional gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(35 100% 60%), hsl(45 100% 60%), hsl(25 90% 50%));
-    --gradient-hero: linear-gradient(135deg, hsl(220 25% 3%) 0%, hsl(35 100% 60% / 0.1) 50%, hsl(220 25% 3%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(220 20% 6%), hsl(220 20% 8%));
-    --gradient-glass: linear-gradient(145deg, hsl(220 20% 6% / 0.8), hsl(220 20% 8% / 0.6));
+    /* Modern gradients - subtle and refined */
+    --gradient-primary: linear-gradient(135deg, hsl(35 85% 58%), hsl(45 85% 55%));
+    --gradient-verification: linear-gradient(135deg, hsl(200 85% 55%), hsl(180 75% 55%));
+    --gradient-hero: linear-gradient(135deg, hsl(220 15% 6%) 0%, hsl(220 12% 8%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(220 12% 8%), hsl(220 10% 10%));
+    --gradient-glass: linear-gradient(145deg, hsl(220 12% 8% / 0.9), hsl(220 10% 10% / 0.8));
 
-    /* Professional shadows and glows */
-    --shadow-glow: 0 0 30px hsl(35 100% 60% / 0.3);
-    --shadow-card: 0 10px 40px hsl(220 25% 3% / 0.5);
-    --shadow-elevated: 0 20px 60px hsl(220 25% 3% / 0.7);
+    /* Modern shadows - clean and professional, no glows */
+    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.15);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.25);
+    --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --shadow-interactive: 0 6px 20px rgba(0, 0, 0, 0.25);
+    
+    /* Subtle hover shadows for interactive elements */
+    --shadow-button-hover: 0 6px 16px rgba(0, 0, 0, 0.2);
+    --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.2);
+    
+    /* Category-specific subtle accent shadows */
+    --shadow-device-glow: 0 4px 16px hsl(160 75% 50% / 0.15);
+    --shadow-event-glow: 0 4px 16px hsl(35 85% 58% / 0.15);
+    --shadow-travel-glow: 0 4px 16px hsl(180 75% 55% / 0.15);
+    --shadow-equipment-glow: 0 4px 16px hsl(200 85% 55% / 0.15);
 
     /* Animation timing - professional easing */
     --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -101,19 +133,34 @@
   }
 
   body {
-    background-color: hsl(var(--background));
+    background: linear-gradient(135deg, hsl(220 15% 6%) 0%, hsl(220 12% 8%) 100%);
     color: hsl(var(--foreground));
     overflow-x: hidden;
+    min-height: 100vh;
   }
 }
 
 @layer components {
-  /* Professional glass morphism effects */
+  /* Modern card system - clean shadows instead of glows */
   .glass-card {
-    background: var(--gradient-glass);
+    background: hsl(var(--background-secondary));
     backdrop-filter: blur(20px);
-    border: 1px solid hsl(220 20% 15% / 0.8);
-    box-shadow: var(--shadow-card);
+    border: 1px solid hsl(var(--border));
+    border-radius: 16px;
+    box-shadow: var(--shadow-medium);
+  }
+  
+  .card-modern {
+    background: hsl(var(--background-secondary));
+    border: 1px solid hsl(var(--border));
+    border-radius: 16px;
+    box-shadow: var(--shadow-medium);
+    transition: all 0.3s ease;
+  }
+  
+  .card-modern:hover {
+    box-shadow: var(--shadow-card-hover);
+    border-color: hsl(var(--border-subtle));
   }
   
   .hero-gradient {
@@ -124,19 +171,25 @@
     background: var(--gradient-primary);
   }
   
-  /* Professional glow effects */
-  .glow-primary {
-    box-shadow: var(--shadow-glow);
+  /* Clean shadow effects - no more neon glow */
+  .card-elevated {
+    box-shadow: var(--shadow-medium);
+    border-radius: 16px;
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--background-secondary));
   }
   
   .elevated-card {
-    box-shadow: var(--shadow-elevated);
+    box-shadow: var(--shadow-medium);
+    border-radius: 16px;
+    border: 1px solid hsl(220 15% 18% / 0.3);
     transition: var(--transition-spring);
   }
   
   .elevated-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 30px 80px hsl(220 25% 3% / 0.8), var(--shadow-glow);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-elevated);
+    border-color: hsl(220 15% 18% / 0.5);
   }
   
   /* Typography enhancements */
@@ -154,20 +207,53 @@
     color: hsl(var(--muted-foreground));
   }
   
-  /* Modern button styles */
+  /* Modern button styles - color-coded by function */
   .btn-primary {
     background: var(--gradient-primary);
     color: hsl(var(--primary-foreground));
-    padding: 1rem 2rem;
-    border-radius: var(--radius);
+    padding: 0.875rem 1.75rem;
+    border-radius: 14px;
     font-weight: 600;
     transition: var(--transition-spring);
-    box-shadow: var(--shadow-glow);
+    box-shadow: var(--shadow-soft);
+    border: none;
   }
   
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 20px 40px hsl(35 100% 60% / 0.4);
+    box-shadow: var(--shadow-primary-glow);
+  }
+  
+  .btn-verification {
+    background: var(--gradient-verification);
+    color: hsl(var(--verification-foreground));
+    padding: 0.875rem 1.75rem;
+    border-radius: 14px;
+    font-weight: 600;
+    transition: var(--transition-spring);
+    box-shadow: var(--shadow-soft);
+    border: none;
+  }
+  
+  .btn-verification:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-verification-glow);
+  }
+  
+  .btn-success {
+    background: linear-gradient(135deg, hsl(160 75% 50%), hsl(160 70% 45%));
+    color: hsl(var(--success-foreground));
+    padding: 0.875rem 1.75rem;
+    border-radius: 14px;
+    font-weight: 600;
+    transition: var(--transition-spring);
+    box-shadow: var(--shadow-soft);
+    border: none;
+  }
+  
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-success-glow);
   }
   
   /* Floating animation */
@@ -196,14 +282,85 @@
     background-clip: text;
   }
   
-  .border-glow {
-    border: 2px solid hsl(var(--primary));
-    box-shadow: var(--shadow-glow);
+  .text-gradient-verification {
+    background: var(--gradient-verification);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Clean modern borders - no glows */
+  .border-modern {
+    border: 1px solid hsl(var(--border));
   }
 
-  .border-glow-soft {
-    border: 1px solid hsl(var(--primary) / 0.6);
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.2);
+  .border-highlight {
+    border: 1px solid hsl(var(--primary) / 0.3);
+  }
+  
+  .border-device {
+    border: 1px solid hsl(var(--accent-device) / 0.3);
+  }
+  
+  .border-event {
+    border: 1px solid hsl(var(--accent-event) / 0.3);
+  }
+  
+  .border-travel {
+    border: 1px solid hsl(var(--accent-travel) / 0.3);
+  }
+  
+  .border-equipment {
+    border: 1px solid hsl(var(--accent-equipment) / 0.3);
+  }
+  
+  .border-success {
+    border: 1px solid hsl(var(--success) / 0.3);
+  }
+  
+  /* Popular tag styling - soft and professional */
+  .tag-popular {
+    background: hsl(45 85% 55% / 0.15);
+    color: hsl(45 85% 55%);
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 500;
+    border: 1px solid hsl(45 85% 55% / 0.2);
+  }
+  
+  /* Category accent classes */
+  .accent-device {
+    color: hsl(var(--accent-device));
+  }
+  
+  .accent-event {
+    color: hsl(var(--accent-event));
+  }
+  
+  .accent-travel {
+    color: hsl(var(--accent-travel));
+  }
+  
+  .accent-equipment {
+    color: hsl(var(--accent-equipment));
+  }
+  
+  /* Background accent variants */
+  .bg-accent-device {
+    background: hsl(var(--accent-device) / 0.1);
+  }
+  
+  .bg-accent-event {
+    background: hsl(var(--accent-event) / 0.1);
+  }
+  
+  .bg-accent-travel {
+    background: hsl(var(--accent-travel) / 0.1);
+  }
+  
+  .bg-accent-equipment {
+    background: hsl(var(--accent-equipment) / 0.1);
   }
   
   .card-hover {
@@ -211,8 +368,8 @@
   }
   
   .card-hover:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: var(--shadow-elevated), var(--shadow-glow);
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: var(--shadow-elevated);
   }
   
   /* Modern navigation styles - Webzi inspired */
@@ -357,7 +514,7 @@
   
   .webzi-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px hsl(var(--primary) / 0.3);
+    box-shadow: var(--shadow-primary-glow);
   }
   
   /* Professional spacing utilities */

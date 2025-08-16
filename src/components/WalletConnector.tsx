@@ -139,7 +139,7 @@ const WalletConnector: React.FC = () => {
             className="flex items-center gap-4"
           >
             {/* Network Status */}
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card/50 backdrop-blur-sm border border-primary/20">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background-navbar/50 backdrop-blur-sm border border-border shadow-soft">
               {isShardeum ? (
                 <CheckCircle className="h-4 w-4 text-success" />
               ) : (
@@ -151,7 +151,7 @@ const WalletConnector: React.FC = () => {
             </div>
 
             {/* Account Info */}
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card/50 backdrop-blur-sm border border-primary/20">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-background-navbar/50 backdrop-blur-sm border border-border shadow-soft">
               <div className="flex flex-col">
                 <span className="text-sm font-medium">
                   {formatAddress(account!)}

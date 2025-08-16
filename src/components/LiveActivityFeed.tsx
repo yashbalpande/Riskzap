@@ -112,11 +112,11 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({ maxItems = 10 }) =>
         </div>
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 p-4 rounded-lg bg-background/50 border border-primary/10">
-              <div className="w-2 h-2 rounded-full bg-gray-300 animate-pulse" />
+            <div key={i} className="flex items-center gap-4 p-4 rounded-xl border-subtle">
+              <div className="w-2 h-2 rounded-full bg-muted animate-pulse" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-300 rounded animate-pulse" />
-                <div className="h-3 bg-gray-200 rounded w-1/3 animate-pulse" />
+                <div className="h-4 bg-muted rounded animate-pulse" />
+                <div className="h-3 bg-muted/50 rounded w-1/3 animate-pulse" />
               </div>
             </div>
           ))}
@@ -126,22 +126,22 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({ maxItems = 10 }) =>
   }
 
   return (
-    <div className="rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6">
+    <div className="card-elevated rounded-xl border-subtle p-6">
       <div className="flex items-center gap-3 mb-6">
-        <Activity className="h-6 w-6 text-primary particle-glow" />
+        <Activity className="h-6 w-6 text-primary" />
         <h2 className="text-xl font-bold">Live Activity Feed</h2>
         {newActivityCount > 0 && (
           <motion.button
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             onClick={clearNewActivityBadge}
-            className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-semibold pulse"
+            className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-semibold"
           >
             {newActivityCount} new
           </motion.button>
         )}
         <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
           Live
         </div>
       </div>
@@ -155,9 +155,9 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({ maxItems = 10 }) =>
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 10, scale: 0.95 }}
               transition={{ delay: index * 0.05 }}
-              className="flex items-center gap-4 p-4 rounded-lg bg-background/50 border border-primary/10 hover:border-primary/30 transition-all group"
+              className="flex items-center gap-4 p-4 rounded-xl border-subtle hover:border-primary/20 transition-all group"
             >
-              <div className={`w-2 h-2 rounded-full ${getStatusColor(activity.status)} floating`} />
+              <div className={`w-2 h-2 rounded-full ${getStatusColor(activity.status)}`} />
               
               <div className="text-2xl">{getActivityIcon(activity.type)}</div>
               

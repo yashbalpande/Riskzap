@@ -297,6 +297,47 @@ Navigate to "My Policies" in the main menu to manage your insurance policies.`);
     }
   };
 
+  // Category color mapping
+  const getCategoryColors = (policyId: string) => {
+    switch (policyId) {
+      case 'device':
+        return {
+          accent: 'accent-device',
+          bgAccent: 'bg-accent-device',
+          border: 'border-device',
+          shadow: 'hover:shadow-device-glow'
+        };
+      case 'event':
+        return {
+          accent: 'accent-event',
+          bgAccent: 'bg-accent-event',
+          border: 'border-event',
+          shadow: 'hover:shadow-event-glow'
+        };
+      case 'travel':
+        return {
+          accent: 'accent-travel',
+          bgAccent: 'bg-accent-travel',
+          border: 'border-travel',
+          shadow: 'hover:shadow-travel-glow'
+        };
+      case 'equipment':
+        return {
+          accent: 'accent-equipment',
+          bgAccent: 'bg-accent-equipment',
+          border: 'border-equipment',
+          shadow: 'hover:shadow-equipment-glow'
+        };
+      default:
+        return {
+          accent: 'text-primary',
+          bgAccent: 'bg-primary/10',
+          border: 'border-highlight',
+          shadow: 'hover:shadow-button-hover'
+        };
+    }
+  };
+
   const openCreatePolicy = () => {
     setShowCreateModal(true);
   };
@@ -351,9 +392,9 @@ Navigate to "My Policies" in the main menu to manage your insurance policies.`);
             >
               {/* Popular Badge */}
               {policy.popular && (
-                <div className="absolute -top-3 -right-3 z-10">
-                  <div className="bg-warning text-warning-foreground px-3 py-1 rounded-full text-sm font-bold particle-glow">
-                    <TrendingUp className="inline h-4 w-4 mr-1" />
+                <div className="absolute -top-2 -right-2 z-10">
+                  <div className="tag-popular">
+                    <TrendingUp className="inline h-3 w-3 mr-1" />
                     Popular
                   </div>
                 </div>
@@ -361,10 +402,10 @@ Navigate to "My Policies" in the main menu to manage your insurance policies.`);
 
               <motion.div
                 className={`
-                  relative overflow-hidden rounded-2xl border-2 transition-all duration-300 cursor-pointer
+                  relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer card-modern
                   ${isSelected 
-                    ? 'border-primary bg-card shadow-2xl shadow-primary/20 scale-105' 
-                    : 'border-primary/20 bg-card/50 hover:border-primary/40 card-hover'
+                    ? `${getCategoryColors(policy.id).border} bg-background-secondary shadow-elevated scale-105` 
+                    : `border-modern hover:${getCategoryColors(policy.id).border} ${getCategoryColors(policy.id).shadow}`
                   }
                 `}
                 onClick={() => handlePolicySelect(policy.id)}
@@ -377,8 +418,8 @@ Navigate to "My Policies" in the main menu to manage your insurance policies.`);
                 <div className="relative p-6 backdrop-blur-sm">
                   {/* Header */}
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="p-3 rounded-xl bg-primary/10 particle-glow">
-                      <IconComponent className="h-8 w-8 text-primary" />
+                    <div className={`p-3 rounded-xl ${getCategoryColors(policy.id).bgAccent}`}>
+                      <IconComponent className={`h-8 w-8 ${getCategoryColors(policy.id).accent}`} />
                     </div>
                     <div>
                       <h3 className="text-xl font-bold">{policy.name}</h3>
@@ -431,8 +472,8 @@ Navigate to "My Policies" in the main menu to manage your insurance policies.`);
                   {/* Action Button */}
                   <div className="space-y-3">
                     <Button
-                      variant={isSelected ? "hero" : "payfi"}
-                      className="w-full gap-2"
+                      variant={isSelected ? "hero" : (policy.id as any)}
+                      className="w-full gap-2 font-semibold"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleQuickBuy(e, policy);
@@ -443,8 +484,8 @@ Navigate to "My Policies" in the main menu to manage your insurance policies.`);
                     </Button>
 
                     <div className="flex gap-3">
-                      <Button onClick={(e) => { e.stopPropagation(); openKycForClaim(policy.id); }} variant="ghost" className="flex-1">Claim</Button>
-                      <Button onClick={(e) => { e.stopPropagation(); alert('More details or manual purchase flow can be added here.'); }} variant="outline" className="flex-1">Details</Button>
+                      <Button onClick={(e) => { e.stopPropagation(); openKycForClaim(policy.id); }} variant="claim" className="flex-1">Claim</Button>
+                      <Button onClick={(e) => { e.stopPropagation(); alert('More details or manual purchase flow can be added here.'); }} variant="details" className="flex-1">Details</Button>
                     </div>
                   </div>
                 </div>
@@ -452,12 +493,12 @@ Navigate to "My Policies" in the main menu to manage your insurance policies.`);
                 {/* Animated Border Effect */}
                 {isSelected && (
                   <motion.div
-                    className="absolute inset-0 rounded-2xl border-2 border-primary"
+                    className={`absolute inset-0 rounded-2xl border-2 ${getCategoryColors(policy.id).border}`}
                     animate={{ 
                       boxShadow: [
-                        '0 0 20px hsl(var(--primary) / 0.5)',
-                        '0 0 40px hsl(var(--primary) / 0.8)',
-                        '0 0 20px hsl(var(--primary) / 0.5)'
+                        '0 0 20px rgba(0,0,0,0.3)',
+                        '0 0 40px rgba(0,0,0,0.4)',
+                        '0 0 20px rgba(0,0,0,0.3)'
                       ]
                     }}
                     transition={{ repeat: Infinity, duration: 2 }}
@@ -469,43 +510,7 @@ Navigate to "My Policies" in the main menu to manage your insurance policies.`);
         })}
       </div>
 
-      {/* Bottom CTA */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="mt-16 text-center"
-      >
-        <div className="fractal-bg p-8 rounded-2xl border border-primary/20">
-          <h3 className="text-2xl font-bold text-gradient-success mb-4">
-            Why Choose Riskzap Micro-Policies?
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div>
-              <Zap className="h-12 w-12 text-primary mx-auto mb-3 particle-glow" />
-              <h4 className="font-bold mb-2">Instant Coverage</h4>
-              <p className="text-sm text-muted-foreground">
-                Get protected in seconds with smart contract automation
-              </p>
-            </div>
-            <div>
-              <DollarSign className="h-12 w-12 text-success mx-auto mb-3 particle-glow" />
-              <h4 className="font-bold mb-2">Micro-Payments</h4>
-              <p className="text-sm text-muted-foreground">
-                Pay only for what you need with SHM tokens
-              </p>
-            </div>
-            <div>
-              <Shield className="h-12 w-12 text-warning mx-auto mb-3 particle-glow" />
-              <h4 className="font-bold mb-2">Trustless Claims</h4>
-              <p className="text-sm text-muted-foreground">
-                Automated claim processing via blockchain verification
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
+     
       {/* KYC Modal (simple) */}
       {showKycModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -518,7 +523,7 @@ Navigate to "My Policies" in the main menu to manage your insurance policies.`);
               <Button onClick={() => setShowKycModal(null)} variant="ghost">Cancel</Button>
               <Button onClick={submitKyc}>Submit & Verify</Button>
             </div>
-          </div>
+          </div>  
         </div>
       )}
 

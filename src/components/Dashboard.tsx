@@ -33,10 +33,8 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon: IconCom
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-2xl glass-card p-6 elevated-card"
+      className="relative overflow-hidden rounded-xl card-elevated p-6"
     >
-      <div className="absolute inset-0 geometric-bg opacity-20" />
-
       <div className="relative flex items-start justify-between">
         <div>
           <p className="text-sm text-muted-foreground font-medium">{title}</p>
@@ -46,8 +44,8 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon: IconCom
             <span className={`text-sm font-medium ${trendColor}`}>{change}</span>
           </div>
         </div>
-        <div className="p-4 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 glow-primary">
-          <IconComponent className="h-7 w-7 text-primary" />
+        <div className="p-3 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5">
+          <IconComponent className="h-6 w-6 text-primary" />
         </div>
       </div>
     </motion.div>
@@ -112,27 +110,29 @@ const UserPoliciesDisplay: React.FC<UserPoliciesDisplayProps> = () => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: index * 0.1 }}
-          className="p-4 rounded-lg glass-card border-glow-soft"
+          className="p-5 rounded-xl card-elevated border-subtle"
         >
           <div className="flex items-center justify-between">
-            <div>
-              <h4 className="font-semibold">{policy.type}</h4>
-              <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+            <div className="flex-1">
+              <h4 className="font-semibold text-lg">{policy.type}</h4>
+              <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                 <span>ID: {policy.id}</span>
-                <span>Premium: {policy.premium}</span>
-                <span>Coverage: {policy.coverage}</span>
+                <span className="border-l border-border pl-3">Premium: {policy.premium}</span>
+                <span className="border-l border-border pl-3">Coverage: {policy.coverage}</span>
               </div>
             </div>
             <div className="text-right">
-              <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-                policy.status === 'Active' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'
+              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
+                policy.status === 'Active' 
+                  ? 'bg-success/10 text-success border border-success/20' 
+                  : 'bg-muted/10 text-muted border border-muted/20'
               }`}>
                 <div className={`w-1.5 h-1.5 rounded-full ${
-                  policy.status === 'Active' ? 'bg-success' : 'bg-warning'
+                  policy.status === 'Active' ? 'bg-success' : 'bg-muted'
                 }`} />
                 {policy.status}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Expires: {policy.expires}</p>
+              <p className="text-xs text-muted-foreground mt-2">Expires: {policy.expires}</p>
             </div>
           </div>
         </motion.div>
@@ -198,28 +198,28 @@ const Dashboard: React.FC = () => {
       title: 'Active Policies',
       value: '1,247',
       change: '+12.5%',
-      icon: Shield,
+      icon: () => null,
       trend: 'up' as const
     },
     {
       title: 'Total Premium (SHM)',
       value: '8,429.3',
       change: '+8.2%',
-      icon: DollarSign,
+      icon: () => null,
       trend: 'up' as const
     },
     {
       title: 'Claims Processed',
       value: '342',
       change: '+15.7%',
-      icon: Award,
+      icon: () => null,
       trend: 'up' as const
     },
     {
       title: 'Avg. Response Time',
       value: '2.3s',
       change: '-22.1%',
-      icon: Zap,
+      icon: () => null,
       trend: 'down' as const
     }
   ];
@@ -238,7 +238,7 @@ const Dashboard: React.FC = () => {
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full glass-card border-glow-soft"
+            className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full card-elevated border-success"
           >
             <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
             <span className="text-sm font-medium text-success">Live on Shardeum Testnet</span>
@@ -260,14 +260,14 @@ const Dashboard: React.FC = () => {
             className="flex flex-wrap items-center justify-center gap-4 mb-8"
           >
             <Button
-              className="webzi-button btn-primary px-8 py-3 text-base"
+              className="btn-primary px-8 py-3 text-base"
               onClick={() => {/* Handle early access */}}
             >
               Join Beta
             </Button>
             <Button
               variant="outline"
-              className="webzi-button px-8 py-3 text-base border-primary/20 hover:border-primary/40"
+              className="px-8 py-3 text-base border-subtle hover:border-primary/40 bg-background/50"
               onClick={() => {/* Handle demo */}}
             >
               Try Demo
@@ -338,9 +338,9 @@ const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <div className="glass-card rounded-2xl p-8">
+          <div className="card-elevated rounded-xl p-8">
             <div className="flex items-center gap-3 mb-8">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-warning/20 to-warning/10 glow-primary">
+              <div className="p-2 rounded-xl bg-warning/10">
                 <Zap className="h-6 w-6 text-warning" />
               </div>
               <h2 className="text-2xl font-bold">Quick Actions</h2>
@@ -357,15 +357,15 @@ const Dashboard: React.FC = () => {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <motion.button
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleCreatePolicy}
-                className="p-6 rounded-xl glass-card border-glow-soft text-left group transition-all duration-300 hover:shadow-2xl"
+                className="p-6 rounded-xl card-elevated border-highlight text-left group transition-all duration-300"
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 glow-primary group-hover:scale-110 transition-transform">
+                  <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/15 transition-colors">
                     <Shield className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-1">
@@ -379,10 +379,10 @@ const Dashboard: React.FC = () => {
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleProcessClaim}
-                className="p-6 rounded-xl glass-card border-glow-soft text-left group transition-all duration-300 hover:shadow-2xl"
+                className="p-6 rounded-xl card-elevated border-success text-left group transition-all duration-300"
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-gradient-to-br from-success/20 to-success/10 glow-primary group-hover:scale-110 transition-transform">
+                  <div className="p-3 rounded-xl bg-success/10 group-hover:bg-success/15 transition-colors">
                     <CheckCircle className="h-6 w-6 text-success" />
                   </div>
                   <div className="flex-1">
@@ -396,11 +396,11 @@ const Dashboard: React.FC = () => {
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleKYCVerification}
-                className="p-6 rounded-xl glass-card border-glow-soft text-left group transition-all duration-300 hover:shadow-2xl"
+                className="p-6 rounded-xl card-elevated border-subtle text-left group transition-all duration-300"
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-gradient-to-br from-warning/20 to-warning/10 glow-primary group-hover:scale-110 transition-transform">
-                    <Users className="h-6 w-6 text-warning" />
+                  <div className="p-3 rounded-xl bg-verification/10 group-hover:bg-verification/15 transition-colors">
+                    <Users className="h-6 w-6 text-verification" />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-bold text-lg mb-2">Verify ID</h3>
@@ -413,10 +413,10 @@ const Dashboard: React.FC = () => {
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleUnderwriting}
-                className="p-6 rounded-xl glass-card border-glow-soft text-left group transition-all duration-300 hover:shadow-2xl"
+                className="p-6 rounded-xl card-elevated border-subtle text-left group transition-all duration-300"
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-gradient-to-br from-accent/20 to-accent/10 glow-primary group-hover:scale-110 transition-transform">
+                  <div className="p-3 rounded-xl bg-accent/10 group-hover:bg-accent/15 transition-colors">
                     <Activity className="h-6 w-6 text-accent" />
                   </div>
                   <div className="flex-1">
@@ -434,9 +434,9 @@ const Dashboard: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
-          className="glass-card rounded-2xl p-6"
+          className="card-elevated rounded-xl p-6"
         >
-          <h2 className="text-xl font-bold mb-4 text-gradient-primary">Your Policies</h2>
+          <h2 className="text-xl font-bold mb-6 text-gradient-primary">Your Policies</h2>
           <UserPoliciesDisplay />
         </motion.div>
       </div>
@@ -446,11 +446,11 @@ const Dashboard: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="glass-card rounded-2xl p-6"
+        className="card-elevated rounded-xl p-6"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-3 h-3 rounded-full bg-success floating" />
+            <div className="w-3 h-3 rounded-full bg-success" />
             <span className="font-semibold text-lg">Network Status</span>
           </div>
           <div className="flex items-center gap-6 text-sm">

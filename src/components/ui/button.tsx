@@ -19,13 +19,23 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
   // Riskzap specific variants (variant key 'payfi' retained for compatibility)
-  // toned-down active variant: single primary color + subtle glow
-  payfi: "bg-primary text-primary-foreground font-bold hover:scale-105 border-glow",
-        hero: "bg-gradient-to-r from-primary via-warning to-success text-background font-bold hover:scale-110 hover:shadow-2xl particle-glow",
+  // toned-down active variant: single primary color + subtle shadow
+  payfi: "bg-primary text-primary-foreground font-bold hover:scale-105 hover:shadow-button-hover",
+        hero: "bg-gradient-to-r from-primary via-warning to-success text-background font-bold hover:scale-110 hover:shadow-elevated",
         success: "bg-success text-success-foreground hover:bg-success/90 hover:scale-105",
         warning: "bg-warning text-warning-foreground hover:bg-warning/90 hover:scale-105",
-        floating: "bg-card/80 backdrop-blur-sm border border-primary/30 text-foreground hover:bg-card hover:border-primary/60 floating particle-glow",
+        floating: "bg-card/80 backdrop-blur-sm border border-primary/30 text-foreground hover:bg-card hover:border-primary/60",
         vine: "vine-progress text-foreground hover:scale-105 border border-success/50",
+        
+        // New category-specific button variants
+        device: "bg-accent-device text-accent-device-foreground font-semibold hover:scale-105 hover:shadow-device-glow transition-all duration-300",
+        event: "bg-accent-event text-accent-event-foreground font-semibold hover:scale-105 hover:shadow-event-glow transition-all duration-300", 
+        travel: "bg-accent-travel text-accent-travel-foreground font-semibold hover:scale-105 hover:shadow-travel-glow transition-all duration-300",
+        equipment: "bg-accent-equipment text-accent-equipment-foreground font-semibold hover:scale-105 hover:shadow-equipment-glow transition-all duration-300",
+        
+        // Secondary action buttons
+        claim: "bg-accent/20 text-accent border border-accent/30 hover:bg-accent/30 hover:border-accent/50 transition-all duration-300",
+        details: "bg-muted/10 text-muted-foreground border border-muted/20 hover:bg-muted/20 hover:text-foreground transition-all duration-300",
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -127,7 +127,7 @@ export async function purchaseWithPolicyContract(
   signer: ethers.Signer,
   policyId: number,
   amountInShm: string | number
-) {
+) { 
   const provider = signer.provider;
   if (!provider) throw new Error('Signer has no provider');
 

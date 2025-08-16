@@ -44,7 +44,7 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
       )}
 
       {/* Desktop Navigation */}
-      <nav className="hidden lg:flex items-center justify-between px-6 py-3 mx-4 mt-4 rounded-full glass-card border border-primary/10 backdrop-blur-xl shadow-2xl">
+      <nav className="hidden lg:flex items-center justify-between px-6 py-3 mx-4 mt-4 rounded-full bg-background-navbar border border-border backdrop-blur-xl shadow-medium">
         {/* Logo */}
         <motion.div 
           className="flex items-center gap-2"
@@ -73,8 +73,8 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
                   onClick={() => onSectionChange(item.id)}
                   className={`relative px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-300 ${
                     isActive 
-                      ? 'bg-gradient-to-r from-primary/20 to-primary/10 text-primary border border-primary/30 shadow-lg' 
-                      : 'text-muted-foreground hover:text-foreground hover:bg-primary/5'
+                      ? 'bg-primary/15 text-primary border border-primary/30' 
+                      : 'text-slate-400 hover:text-foreground hover:bg-primary/5'
                   }`}
                 >
                   {item.label}
@@ -142,12 +142,12 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
                   initial={{ x: '100%' }}
                   animate={{ x: 0 }}
                   exit={{ x: '100%' }}
-                  className="absolute right-2 top-2 bottom-2 w-72 glass-card border border-primary/20 rounded-2xl p-4 shadow-2xl backdrop-blur-xl"
+                  className="absolute right-2 top-2 bottom-2 w-72 card-modern border border-border rounded-2xl p-4 shadow-elevated backdrop-blur-xl"
                 >
                   {/* Mobile Menu Header */}
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-2">
-                      <div className="glow-primary rounded-full p-1.5 bg-gradient-to-br from-primary/20 to-primary/10">
+                      <div className="rounded-full p-1.5 bg-primary/10">
                         <Coins className="h-4 w-4 text-primary" />
                       </div>
                       <span className="font-bold text-gradient-primary text-sm">Riskzap</span>
@@ -156,7 +156,7 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
                       variant="ghost"
                       size="sm"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="border-glow-soft rounded-full h-7 w-7 p-0"
+                      className="border-modern rounded-full h-7 w-7 p-0"
                     >
                       <X className="h-3 w-3" />
                     </Button>

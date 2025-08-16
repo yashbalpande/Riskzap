@@ -21,7 +21,7 @@ describe('PolicyManager', function () {
     const amount = ethers.parseUnits('10', 18); // buyer pays 10 SHM
 
     // buyer approves contract for total amount
-    await token.connect(buyer).approve(policy.target, amount);
+    await token.connect(buyer).approve(await policy.getAddress(), amount);
 
     // purchase: expect fee = 2% = 0.2, net = 9.8
     await policy.connect(buyer).purchase(1, amount, '0x');
