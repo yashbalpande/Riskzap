@@ -1,4 +1,4 @@
-// PayFi Insurance Smart Contract Interface
+// Riskzap Insurance Smart Contract Interface
 // This would be deployed on Shardeum Unstablenet
 
 export const PAYFI_INSURANCE_ABI = [

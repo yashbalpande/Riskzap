@@ -18,8 +18,9 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        // PayFi specific variants
-        payfi: "holographic text-foreground font-bold hover:scale-105 hover:shadow-2xl border-glow",
+  // Riskzap specific variants (variant key 'payfi' retained for compatibility)
+  // toned-down active variant: single primary color + subtle glow
+  payfi: "bg-primary text-primary-foreground font-bold hover:scale-105 border-glow",
         hero: "bg-gradient-to-r from-primary via-warning to-success text-background font-bold hover:scale-110 hover:shadow-2xl particle-glow",
         success: "bg-success text-success-foreground hover:bg-success/90 hover:scale-105",
         warning: "bg-warning text-warning-foreground hover:bg-warning/90 hover:scale-105",

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import WalletConnector from './WalletConnector';
+import AdminSettings from './AdminSettings';
 import { 
   Shield, 
   BarChart3, 
@@ -40,16 +41,12 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
         >
           <div className="relative">
             <Coins className="h-8 w-8 text-primary particle-glow" />
-            <motion.div
-              className="absolute inset-0"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-            >
-              <Sparkles className="h-8 w-8 text-warning" />
-            </motion.div>
+            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+              <Sparkles className="h-8 w-8 text-warning/70" />
+            </div>
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gradient-fire">PayFi Insurance</h1>
+            <h1 className="text-xl font-bold text-gradient-fire">Riskzap</h1>
             <p className="text-xs text-muted-foreground">Shardeum Micro-Policies</p>
           </div>
         </motion.div>
@@ -87,7 +84,12 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
         </div>
 
         {/* Wallet Connector */}
-        <WalletConnector />
+        <div className="flex items-center gap-2">
+          <AdminSettings />
+          <div className="rounded-full p-0.5 border-glow" title="Connect Wallet">
+            <WalletConnector />
+          </div>
+        </div>
       </nav>
 
       {/* Mobile Navigation */}
@@ -95,7 +97,7 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
         {/* Mobile Logo */}
         <div className="flex items-center gap-2">
           <Coins className="h-6 w-6 text-primary" />
-          <span className="font-bold text-gradient-fire">PayFi</span>
+          <span className="font-bold text-gradient-fire">Riskzap</span>
         </div>
 
         {/* Mobile Menu Button */}
@@ -127,7 +129,7 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-2">
                   <Coins className="h-6 w-6 text-primary" />
-                  <span className="font-bold text-gradient-fire">PayFi Insurance</span>
+                  <span className="font-bold text-gradient-fire">Riskzap</span>
                 </div>
                 <Button
                   variant="floating"

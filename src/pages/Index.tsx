@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PayFiBackground from '@/components/PayFiBackground';
 import PayFiNavigation from '@/components/PayFiNavigation';
+import SectionTransition from '@/components/SectionTransition';
 import Dashboard from '@/components/Dashboard';
 import PolicyCards from '@/components/PolicyCards';
 import InsuranceFlowVisualization from '@/components/InsuranceFlowVisualization';
@@ -30,13 +31,17 @@ const Index = () => {
     <WalletProvider>
       <div className="min-h-screen bg-background relative">
         {/* 3D Particle Background */}
-        <PayFiBackground />
-        
+        <SectionTransition index={0} className="absolute inset-0 -z-10">
+          <PayFiBackground />
+        </SectionTransition>
+
         {/* Navigation */}
-        <PayFiNavigation 
-          activeSection={activeSection} 
-          onSectionChange={setActiveSection} 
-        />
+        <SectionTransition index={1}>
+          <PayFiNavigation 
+            activeSection={activeSection} 
+            onSectionChange={setActiveSection} 
+          />
+        </SectionTransition>
         
         {/* Main Content */}
         <main className="relative z-10">
@@ -49,7 +54,9 @@ const Index = () => {
               transition={{ duration: 0.3 }}
               className="container mx-auto py-8"
             >
-              {renderSection()}
+              <SectionTransition index={2}>
+                {renderSection()}
+              </SectionTransition>
             </motion.div>
           </AnimatePresence>
         </main>

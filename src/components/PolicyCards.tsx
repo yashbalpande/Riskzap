@@ -10,8 +10,11 @@ import {
   Zap,
   Clock,
   DollarSign,
-  TrendingUp
+  TrendingUp,
+  Heart
 } from 'lucide-react';
+import { connectWallet, sendShmToken, getConfiguredCompanyWallet, getConfiguredPolicyContract, purchaseWithPolicyContract } from '@/services/web3';
+import { riskzapAPI } from '@/services/api';
 
 interface PolicyType {
   id: string;
@@ -25,84 +28,221 @@ interface PolicyType {
   features: string[];
 }
 
+const initialPolicies: PolicyType[] = [
+  {
+    id: 'device',
+    name: 'Device Protection',
+    description: 'Instant coverage for smartphones, tablets, and electronics',
+    icon: Smartphone,
+    basePremium: 0.5,
+    duration: '24 hours',
+    coverage: 'Up to $500',
+    popular: true,
+    features: [
+      'Accidental damage',
+      'Theft protection',
+      'Liquid damage',
+      'Instant claim processing'
+    ]
+  },
+  {
+    id: 'event',
+    name: 'Event Coverage',
+    description: 'Quick insurance for concerts, sports events, and gatherings',
+    icon: Calendar,
+    basePremium: 1.2,
+    duration: 'Single event',
+    coverage: 'Up to $1,000',
+    popular: false,
+    features: [
+      'Event cancellation',
+      'Weather protection',
+      'Travel delays',
+      'Emergency medical'
+    ]
+  },
+  {
+    id: 'travel',
+    name: 'Micro Travel',
+    description: 'Short-term travel insurance for day trips and weekends',
+    icon: Plane,
+    basePremium: 2.0,
+    duration: '1-7 days',
+    coverage: 'Up to $2,500',
+    popular: true,
+    features: [
+      'Trip interruption',
+      'Baggage loss',
+      'Medical emergency',
+      'Flight delays'
+    ]
+  },
+  {
+    id: 'equipment',
+    name: 'Equipment Rental',
+    description: 'Coverage for rented cameras, tools, and equipment',
+    icon: Camera,
+    basePremium: 0.8,
+    duration: 'Rental period',
+    coverage: 'Full replacement',
+    popular: false,
+    features: [
+      'Damage protection',
+      'Theft coverage',
+      'Loss replacement',
+      'No deductible'
+    ]
+  },
+  {
+    id: 'Health',
+  name: 'Health Insurance',
+  description: 'Comprehensive coverage for medical emergencies and hospital visits',
+  icon: Heart,
+  basePremium: 1.2,
+  duration: '1 year',
+  coverage: 'Up to $50,000',
+  popular: true,
+  features: [
+    'Hospitalization expenses',
+    'Pre & post hospitalization cover',
+    'Cashless treatments',
+    'Ambulance charges covered'
+    ]
+  },
+];
+
 const PolicyCards: React.FC = () => {
   const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
+  const [policyTypes, setPolicyTypes] = useState<PolicyType[]>(initialPolicies);
 
-  const policyTypes: PolicyType[] = [
-    {
-      id: 'device',
-      name: 'Device Protection',
-      description: 'Instant coverage for smartphones, tablets, and electronics',
-      icon: Smartphone,
-      basePremium: 0.5,
-      duration: '24 hours',
-      coverage: 'Up to $500',
-      popular: true,
-      features: [
-        'Accidental damage',
-        'Theft protection',
-        'Liquid damage',
-        'Instant claim processing'
-      ]
-    },
-    {
-      id: 'event',
-      name: 'Event Coverage',
-      description: 'Quick insurance for concerts, sports events, and gatherings',
-      icon: Calendar,
-      basePremium: 1.2,
-      duration: 'Single event',
-      coverage: 'Up to $1,000',
-      popular: false,
-      features: [
-        'Event cancellation',
-        'Weather protection',
-        'Travel delays',
-        'Emergency medical'
-      ]
-    },
-    {
-      id: 'travel',
-      name: 'Micro Travel',
-      description: 'Short-term travel insurance for day trips and weekends',
-      icon: Plane,
-      basePremium: 2.0,
-      duration: '1-7 days',
-      coverage: 'Up to $2,500',
-      popular: true,
-      features: [
-        'Trip interruption',
-        'Baggage loss',
-        'Medical emergency',
-        'Flight delays'
-      ]
-    },
-    {
-      id: 'equipment',
-      name: 'Equipment Rental',
-      description: 'Coverage for rented cameras, tools, and equipment',
-      icon: Camera,
-      basePremium: 0.8,
-      duration: 'Rental period',
-      coverage: 'Full replacement',
-      popular: false,
-      features: [
-        'Damage protection',
-        'Theft coverage',
-        'Loss replacement',
-        'No deductible'
-      ]
-    }
-  ];
+  // KYC / modal state
+  const [showKycModal, setShowKycModal] = useState<null | { type: 'claim' | 'create'; policyId?: string }>(null);
+  const [kycForm, setKycForm] = useState({ fullName: '', idNumber: '' });
+  const [kycVerified, setKycVerified] = useState<Record<string, boolean>>({}); // maps wallet address -> verified
+
+  // create policy modal
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newPolicyForm, setNewPolicyForm] = useState({ name: '', premium: '', duration: '', coverage: '' });
 
   const handlePolicySelect = (policyId: string) => {
     setSelectedPolicy(policyId === selectedPolicy ? null : policyId);
   };
 
-  const purchasePolicy = (policy: PolicyType) => {
+  // Preserve original purchasePolicy but extend to perform token transfer via SHM
+  const purchasePolicy = async (policy: PolicyType) => {
     // This would integrate with the smart contract
     console.log('Purchasing policy:', policy.name);
-    // Implementation for Web3 transaction would go here
+
+    try {
+      const { provider, signer, address } = await connectWallet() as any;
+
+      // Ensure we pass a transaction-capable signer to sendShmToken.
+      let txSigner: any = signer;
+      try {
+        const prov = provider;
+        if ((!txSigner || typeof txSigner.sendTransaction !== 'function') && prov && typeof prov.getSigner === 'function') {
+          const maybe = prov.getSigner();
+          txSigner = typeof maybe.then === 'function' ? await maybe : maybe;
+        }
+      } catch (e) {
+        // ignore and fallback to signer
+      }
+
+      if (!txSigner || typeof txSigner.sendTransaction !== 'function') {
+        throw new Error('No transaction-capable signer available. Ensure you connected a wallet that can send transactions.');
+      }
+
+      // If an on-chain PolicyManager is configured, prefer approve->purchase flow
+      const policyContract = getConfiguredPolicyContract();
+      if (policyContract) {
+        const tx = await purchaseWithPolicyContract(txSigner, Number(policy.id) || 0, policy.basePremium);
+        alert(`Policy purchased via contract ${policyContract}. Tx: ${tx.hash}`);
+      } else {
+        // Fallback: transfer SHM tokens equal to basePremium directly to company wallet
+        const tx = await sendShmToken(txSigner, policy.basePremium);
+        console.log('SHM transfer tx:', tx.hash);
+        const company = getConfiguredCompanyWallet();
+        alert(`Policy purchased. SHM ${policy.basePremium} sent to company wallet ${company}. Tx: ${tx.hash}`);
+      }
+    } catch (err: any) {
+      console.error('Purchase failed:', err);
+      alert('Purchase failed: ' + (err?.message || err));
+    }
+  };
+
+  // Quick buy helper bound to UI - keeps the same label and behavior expectations
+  const handleQuickBuy = async (e: React.MouseEvent, policy: PolicyType) => {
+    e.stopPropagation();
+    await purchasePolicy(policy);
+  };
+
+  const openKycForClaim = (policyId: string) => {
+    setShowKycModal({ type: 'claim', policyId });
+  };
+
+  const submitKyc = async () => {
+    try {
+      const { address } = await connectWallet();
+      // In real app: send KYC documents to a trusted provider. Here we simulate approval.
+      setKycVerified((s) => ({ ...s, [address]: true }));
+      setShowKycModal(null);
+      alert('KYC submitted and verified for ' + address);
+    } catch (err: any) {
+      alert('KYC failed: ' + (err?.message || err));
+    }
+  };
+
+  const handleClaim = async (policyId: string) => {
+    try {
+      const { address } = await connectWallet();
+      if (!kycVerified[address]) {
+        // prompt KYC
+        setShowKycModal({ type: 'claim', policyId });
+        return;
+      }
+
+      // Submit claim to backend
+  const claimResp = await riskzapAPI.submitClaim({ walletAddress: address, policyId, claimAmount: 0, evidence: [] });
+      if (!claimResp.success) {
+        alert('Claim submission failed: ' + claimResp.message);
+        return;
+      }
+
+      // Request payout (backend will handle sending tokens from company wallet)
+  const payoutResp = await riskzapAPI.requestPayout(address, 0 /* amount - backend decides */, claimResp.data?.claimId);
+      if (!payoutResp.success) {
+        alert('Payout request failed: ' + payoutResp.message);
+        return;
+      }
+
+      alert('Claim and payout requested: ' + payoutResp.message);
+    } catch (err: any) {
+      alert('Claim failed: ' + (err?.message || err));
+    }
+  };
+
+  const openCreatePolicy = () => {
+    setShowCreateModal(true);
+  };
+
+  const submitCreatePolicy = async () => {
+    // Simple client-side create flow (would normally go to backend / contract)
+    const id = newPolicyForm.name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
+    const newPolicy: PolicyType = {
+      id,
+      name: newPolicyForm.name || 'Custom Policy',
+      description: 'User created policy',
+      icon: Smartphone,
+      basePremium: Number(newPolicyForm.premium) || 0.1,
+      duration: newPolicyForm.duration || 'Custom',
+      coverage: newPolicyForm.coverage || 'Custom',
+      popular: false,
+      features: ['User created policy']
+    };
+    setPolicyTypes((p) => [newPolicy, ...p]);
+    setShowCreateModal(false);
+    setNewPolicyForm({ name: '', premium: '', duration: '', coverage: '' });
+    alert('Policy created locally. For production, persist this via backend or smart contract.');
   };
 
   return (
@@ -116,11 +256,15 @@ const PolicyCards: React.FC = () => {
         </p>
       </div>
 
+      <div className="mb-6 text-right">
+        <Button onClick={openCreatePolicy} variant="outline">Create New Policy</Button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
         {policyTypes.map((policy, index) => {
           const IconComponent = policy.icon;
           const isSelected = selectedPolicy === policy.id;
-          
+
           return (
             <motion.div
               key={policy.id}
@@ -153,7 +297,7 @@ const PolicyCards: React.FC = () => {
               >
                 {/* Holographic Background Effect */}
                 <div className="absolute inset-0 holographic opacity-10" />
-                
+
                 <div className="relative p-6 backdrop-blur-sm">
                   {/* Header */}
                   <div className="flex items-center gap-4 mb-6">
@@ -209,17 +353,24 @@ const PolicyCards: React.FC = () => {
                   </motion.div>
 
                   {/* Action Button */}
-                  <Button
-                    variant={isSelected ? "hero" : "payfi"}
-                    className="w-full gap-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      purchasePolicy(policy);
-                    }}
-                  >
-                    <Zap className="h-4 w-4" />
-                    {isSelected ? 'Purchase Now' : 'Quick Buy'}
-                  </Button>
+                  <div className="space-y-3">
+                    <Button
+                      variant={isSelected ? "hero" : "payfi"}
+                      className="w-full gap-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleQuickBuy(e, policy);
+                      }}
+                    >
+                      <Zap className="h-4 w-4" />
+                      {isSelected ? 'Purchase Now' : 'Quick Buy'}
+                    </Button>
+
+                    <div className="flex gap-3">
+                      <Button onClick={(e) => { e.stopPropagation(); openKycForClaim(policy.id); }} variant="ghost" className="flex-1">Claim</Button>
+                      <Button onClick={(e) => { e.stopPropagation(); alert('More details or manual purchase flow can be added here.'); }} variant="outline" className="flex-1">Details</Button>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Animated Border Effect */}
@@ -251,7 +402,7 @@ const PolicyCards: React.FC = () => {
       >
         <div className="fractal-bg p-8 rounded-2xl border border-primary/20">
           <h3 className="text-2xl font-bold text-gradient-success mb-4">
-            Why Choose PayFi Micro-Policies?
+            Why Choose Riskzap Micro-Policies?
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div>
@@ -278,6 +429,39 @@ const PolicyCards: React.FC = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* KYC Modal (simple) */}
+      {showKycModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-card p-6 rounded-lg w-full max-w-md">
+            <h3 className="text-lg font-bold mb-4">KYC Verification</h3>
+            <p className="text-sm text-muted-foreground mb-4">To proceed you must complete a quick KYC.</p>
+            <input className="w-full p-2 mb-2 border rounded" placeholder="Full name" value={kycForm.fullName} onChange={(e) => setKycForm((s) => ({ ...s, fullName: e.target.value }))} />
+            <input className="w-full p-2 mb-4 border rounded" placeholder="Government ID number" value={kycForm.idNumber} onChange={(e) => setKycForm((s) => ({ ...s, idNumber: e.target.value }))} />
+            <div className="flex gap-3">
+              <Button onClick={() => setShowKycModal(null)} variant="ghost">Cancel</Button>
+              <Button onClick={submitKyc}>Submit & Verify</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Policy Modal (simple) */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-card p-6 rounded-lg w-full max-w-md">
+            <h3 className="text-lg font-bold mb-4">Create New Policy</h3>
+            <input className="w-full p-2 mb-2 border rounded" placeholder="Policy name" value={newPolicyForm.name} onChange={(e) => setNewPolicyForm((s) => ({ ...s, name: e.target.value }))} />
+            <input className="w-full p-2 mb-2 border rounded" placeholder="Premium (SHM)" value={newPolicyForm.premium} onChange={(e) => setNewPolicyForm((s) => ({ ...s, premium: e.target.value }))} />
+            <input className="w-full p-2 mb-2 border rounded" placeholder="Duration" value={newPolicyForm.duration} onChange={(e) => setNewPolicyForm((s) => ({ ...s, duration: e.target.value }))} />
+            <input className="w-full p-2 mb-4 border rounded" placeholder="Coverage" value={newPolicyForm.coverage} onChange={(e) => setNewPolicyForm((s) => ({ ...s, coverage: e.target.value }))} />
+            <div className="flex gap-3">
+              <Button onClick={() => setShowCreateModal(false)} variant="ghost">Cancel</Button>
+              <Button onClick={submitCreatePolicy}>Create</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

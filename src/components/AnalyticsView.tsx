@@ -36,7 +36,7 @@ const AnalyticsView: React.FC = () => {
         className="text-center"
       >
         <h1 className="text-4xl font-bold text-gradient-fire mb-4">
-          PayFi Analytics Dashboard
+          Riskzap Analytics Dashboard
         </h1>
         <p className="text-lg text-muted-foreground">
           Real-time insights and performance metrics

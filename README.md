@@ -1,6 +1,6 @@
-# PayFi Insurance - Micro-Policy DApp on Shardeum
+# Riskzap - Micro-Policy DApp on Shardeum
 
-## 🚀 Revolutionary PayFi Insurance Platform
+## 🚀 Revolutionary Riskzap Platform
 
 A cutting-edge decentralized insurance platform built on Shardeum Unstablenet, offering instant micro-policies with SHM token payments. This DApp demonstrates the future of Web3 insurance with gamified UX, 3D animations, and smart contract automation.
 
@@ -40,7 +40,7 @@ A cutting-edge decentralized insurance platform built on Shardeum Unstablenet, o
 ```bash
 # Clone the repository
 git clone <YOUR_GIT_URL>
-cd payfi-insurance-dapp
+cd riskzap-dapp
 
 # Install dependencies
 npm install
@@ -50,6 +50,19 @@ npm run dev
 ```
 
 The app will be available at `http://localhost:8080`
+
+### Verifying the SHM token address (helper)
+
+This repo includes a small script to validate a candidate ERC-20 token address before you set it in the environment.
+
+Usage:
+
+```bash
+# (optional) set RPC if you need a custom endpoint
+RPC=https://dapps.shardeum.org/ node scripts/check-token.mjs 0xCANDIDATE_ADDRESS [optional_wallet_address]
+```
+
+The script checks whether code exists at the address and attempts to call `decimals()`, `symbol()` and `name()` to confirm it's an ERC-20.
 
 ### Smart Contract Deployment
 
@@ -131,7 +144,7 @@ The application visualizes the complete insurance backend flow:
 4. **Underwriting** → AI risk assessment
 5. **Quote Generation** → Dynamic pricing
 6. **Policy Selection** → Coverage customization
-7. **PayFi Payment** → SHM token transaction
+7. **Riskzap Payment** → SHM token transaction
 8. **Policy Creation** → NFT issuance
 9. **Notification** → Real-time updates
 10. **Dashboard Update** → Live management interface
@@ -214,7 +227,7 @@ The platform includes comprehensive analytics:
 
 ### Core Features (90s)
 - Create a device protection micro-policy
-- Show PayFi payment with SHM tokens
+- Show Riskzap payment with SHM tokens
 - Navigate through the gamified flow visualization
 - Display real-time analytics dashboard
 
