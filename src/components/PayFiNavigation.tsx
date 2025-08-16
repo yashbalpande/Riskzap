@@ -26,6 +26,7 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
   const navigationItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { id: 'policies', label: 'Policies', icon: Shield },
+    { id: 'my-policies', label: 'My Policies', icon: Coins },
     { id: 'flow', label: 'Process Flow', icon: Zap },
     { id: 'analytics', label: 'Analytics', icon: Sparkles },
   ];

@@ -14,6 +14,7 @@ import {
   Heart
 } from 'lucide-react';
 import { connectWallet, sendShmToken, getConfiguredCompanyWallet, calculatePurchaseFee, calculateWithdrawFee } from '@/services/web3';
+import { ActivityService } from '@/services/activityService';
 
 interface PolicyType {
   id: string;
@@ -159,6 +160,14 @@ const PolicyCards: React.FC = () => {
       const tx = await sendShmToken(txSigner, totalAmount);
       console.log('Insurance purchase tx:', tx.hash);
       
+      // Log activity to Supabase real-time feed
+      await ActivityService.logPolicyPurchase(
+        await txSigner.getAddress(),
+        policy.name,
+        totalAmount.toFixed(4),
+        tx.hash
+      );
+      
       // Store policy purchase record
       const policyRecord = {
         policyId: policy.id,
@@ -176,10 +185,42 @@ const PolicyCards: React.FC = () => {
       existingPolicies.push(policyRecord);
       localStorage.setItem('USER_POLICIES', JSON.stringify(existingPolicies));
       
+      // Calculate coverage amount and expiry
+      const coverageAmount = policy.basePremium * (policy.id === 'health-micro' ? 20 : 15);
+      const expiryDate = new Date();
+      const daysToAdd = policy.id === 'travel-insurance' ? 30 : 365;
+      expiryDate.setDate(expiryDate.getDate() + daysToAdd);
+      
       const companyWallet = getConfiguredCompanyWallet() || 'configured wallet';
       const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
       const modeText = isDemoMode ? ' (Demo Mode - Simulated)' : ' 🚀 (LIVE - Real SHM Transaction!)';
-      alert(`Policy purchased successfully!${modeText}\nPremium: ${policy.basePremium} SHM\nPlatform Fee (5%): ${feeCalculation.fee.toFixed(4)} SHM\nTotal Paid: ${totalAmount.toFixed(4)} SHM\nSent to: ${companyWallet}\nTx: ${tx.hash}`);
+      
+      // Enhanced success message with policy details
+      alert(`🎉 POLICY PURCHASED SUCCESSFULLY!${modeText}
+
+📋 POLICY DETAILS:
+• Policy Type: ${policy.name}
+• Policy ID: ${policy.id}
+• Coverage Amount: ${coverageAmount} SHM
+• Valid Until: ${expiryDate.toLocaleDateString()}
+
+💰 PAYMENT BREAKDOWN:
+• Premium: ${policy.basePremium} SHM
+• Platform Fee (5%): ${feeCalculation.fee.toFixed(4)} SHM
+• Total Paid: ${totalAmount.toFixed(4)} SHM
+
+🔗 TRANSACTION:
+• Sent to: ${companyWallet}
+• Transaction Hash: ${tx.hash}
+
+✅ Your policy is now ACTIVE!
+
+📱 NEXT STEPS:
+• View your policy in the "My Policies" section
+• Download your policy certificate
+• Track your policy status and claims
+
+Navigate to "My Policies" in the main menu to manage your insurance policies.`);
     } catch (err: any) {
       console.error('Purchase failed:', err);
       alert('Purchase failed: ' + (err?.message || err));

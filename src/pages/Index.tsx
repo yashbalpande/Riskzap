@@ -7,6 +7,7 @@ import Dashboard from '@/components/Dashboard';
 import PolicyCards from '@/components/PolicyCards';
 import InsuranceFlowVisualization from '@/components/InsuranceFlowVisualization';
 import AnalyticsView from '@/components/AnalyticsView';
+import MyPoliciesPage from '@/pages/MyPoliciesPage';
 import { WalletProvider } from '@/components/WalletConnector';
 
 const Index = () => {
@@ -22,6 +23,8 @@ const Index = () => {
         return <InsuranceFlowVisualization />;
       case 'analytics':
         return <AnalyticsView />;
+      case 'my-policies':
+        return <MyPoliciesPage onBack={() => setActiveSection('dashboard')} />;
       default:
         return <Dashboard />;
     }
@@ -60,18 +63,6 @@ const Index = () => {
             </motion.div>
           </AnimatePresence>
         </main>
-        
-        {/* Floating Elements */}
-        <div className="fixed bottom-8 right-8 z-20">
-          <motion.div
-            className="floating-delayed"
-            whileHover={{ scale: 1.1 }}
-          >
-            <div className="w-16 h-16 rounded-full bg-primary/20 backdrop-blur-sm border border-primary/30 flex items-center justify-center particle-glow">
-              <span className="text-xs font-bold text-primary">SHM</span>
-            </div>
-          </motion.div>
-        </div>
       </div>
     </WalletProvider>
   );

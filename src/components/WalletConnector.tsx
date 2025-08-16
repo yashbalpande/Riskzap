@@ -105,8 +105,8 @@ const WalletConnector: React.FC = () => {
   const [isShardeum, setIsShardeum] = useState(false);
 
   useEffect(() => {
-    // Shardeum testnet Chain ID is 8080
-    setIsShardeum(chainId === 8080);
+    // Shardeum testnet Chain ID is 8083
+    setIsShardeum(chainId === 8083);
   }, [chainId]);
 
   const formatAddress = (address: string) => {
