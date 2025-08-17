@@ -76,10 +76,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
-    "@nomicfoundation/hardhat-chai-matchers": "2.1.0",
-    "@nomicfoundation/hardhat-ethers": "4.0.0",
-    "@nomicfoundation/hardhat-network-helpers": "^3.0.0",
-    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.1.0",,
+    "@nomicfoundation/hardhat-ethers": "^3.1.0",,
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
     "@nomicfoundation/hardhat-verify": "^3.0.0",
     "@nomiclabs/hardhat-ethers": "3.1.0",
     "@openzeppelin/contracts": "^4.9.3",
@@ -112,4 +111,5 @@
     "vite": "^5.4.19",
     "vitest": "^0.34.2"
   }
+}
 }

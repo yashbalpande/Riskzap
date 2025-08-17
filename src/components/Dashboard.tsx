@@ -12,7 +12,8 @@ import {
   Award,
   CheckCircle,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  ShoppingCart
 } from 'lucide-react';
 import LiveActivityFeed from '@/components/LiveActivityFeed';
 import { ActivityService } from '@/services/activityService';
@@ -24,6 +25,18 @@ interface StatCardProps {
   change: string;
   icon: React.ComponentType<any>;
   trend: 'up' | 'down' | 'stable';
+}
+
+interface Policy {
+  id: string;
+  type: string;
+  premium: string;
+  coverage: string;
+  status: 'Active' | 'Expired' | 'Pending';
+  expires: string;
+  created: string;
+  duration: string;
+  description: string;
 }
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon: IconComponent, trend }) => {
@@ -52,36 +65,8 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon: IconCom
   );
 };
 
-interface UserPoliciesDisplayProps {}
-
-const UserPoliciesDisplay: React.FC<UserPoliciesDisplayProps> = () => {
-  const { isConnected, account } = useWallet();
-  const [userPolicies, setUserPolicies] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (isConnected && account) {
-      
-      const policies = [
-        {
-          id: 'POL-001',
-          type: 'Travel Insurance',
-          premium: '0.25 SHM',
-          coverage: '3.75 SHM',
-          status: 'Active',
-          expires: '2025-02-16'
-        },
-        {
-          id: 'POL-002', 
-          type: 'Phone Protection',
-          premium: '0.15 SHM',
-          coverage: '2.25 SHM',
-          status: 'Active',
-          expires: '2025-03-01'
-        }
-      ];
-      setUserPolicies(policies);
-    }
-  }, [isConnected, account]);
+const UserPoliciesDisplay: React.FC<{ policies: Policy[] }> = ({ policies }) => {
+  const { isConnected } = useWallet();
 
   if (!isConnected) {
     return (
@@ -92,7 +77,7 @@ const UserPoliciesDisplay: React.FC<UserPoliciesDisplayProps> = () => {
     );
   }
 
-  if (userPolicies.length === 0) {
+  if (policies.length === 0) {
     return (
       <div className="text-center py-8">
         <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -103,57 +88,192 @@ const UserPoliciesDisplay: React.FC<UserPoliciesDisplayProps> = () => {
   }
 
   return (
-    <div className="space-y-4">
-      {userPolicies.map((policy, index) => (
-        <motion.div
-          key={policy.id}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: index * 0.1 }}
-          className="p-5 rounded-xl card-elevated border-subtle"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <h4 className="font-semibold text-lg">{policy.type}</h4>
-              <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                <span>ID: {policy.id}</span>
-                <span className="border-l border-border pl-3">Premium: {policy.premium}</span>
-                <span className="border-l border-border pl-3">Coverage: {policy.coverage}</span>
+    <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-yellow-500">Your Policies</h2>
+        <div className="text-gray-400 text-sm">
+          {policies.length} policies
+        </div>
+      </div>
+
+      {/* Policies Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {policies.map((policy, index) => (
+          <motion.div
+            key={policy.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="relative bg-slate-800 rounded-2xl p-6 border border-slate-700"
+          >
+            {/* Popular Badge */}
+            {index === 0 && (
+              <div className="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                Popular
+              </div>
+            )}
+
+            {/* Policy Header */}
+            <div className="flex items-start gap-4 mb-6">
+              <div className="p-3 bg-orange-500 rounded-lg">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-white mb-1">{policy.type}</h3>
+                <p className="text-gray-400 text-sm">{policy.description}</p>
               </div>
             </div>
-            <div className="text-right">
-              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
-                policy.status === 'Active' 
-                  ? 'bg-success/10 text-success border border-success/20' 
-                  : 'bg-muted/10 text-muted border border-muted/20'
-              }`}>
-                <div className={`w-1.5 h-1.5 rounded-full ${
-                  policy.status === 'Active' ? 'bg-success' : 'bg-muted'
-                }`} />
-                {policy.status}
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="text-center">
+                <div className="text-green-400 mb-2">
+                  <DollarSign className="w-5 h-5 mx-auto" />
+                </div>
+                <div className="text-2xl font-bold text-green-400">
+                  {policy.premium.split(' ')[0]}
+                  <span className="text-sm font-normal text-gray-400 ml-1">{policy.premium.split(' ')[1]}</span>
+                </div>
+                <div className="text-gray-400 text-sm mt-1">Premium</div>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">Expires: {policy.expires}</p>
+
+              <div className="text-center">
+                <div className="text-yellow-400 mb-2">
+                  <Clock className="w-5 h-5 mx-auto" />
+                </div>
+                <div className="text-lg font-semibold text-white">{policy.duration}</div>
+                <div className="text-gray-400 text-sm mt-1">Duration</div>
+              </div>
+
+              <div className="text-center">
+                <div className="text-yellow-400 mb-2">
+                  <Shield className="w-5 h-5 mx-auto" />
+                </div>
+                <div className="text-lg font-semibold text-white">{policy.coverage}</div>
+                <div className="text-gray-400 text-sm mt-1">Coverage</div>
+              </div>
             </div>
-          </div>
-        </motion.div>
-      ))}
+
+            {/* Quick Buy Button */}
+            <div className="mb-4">
+              <button className="w-full bg-slate-700 hover:bg-slate-600 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2">
+                <ShoppingCart className="w-4 h-4" />
+                Quick Buy
+              </button>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-3">
+              <button className="bg-teal-600 hover:bg-teal-700 text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-200">
+                Claim
+              </button>
+              <button className="bg-slate-600 hover:bg-slate-500 text-gray-300 py-2.5 px-4 rounded-lg font-medium transition-colors duration-200">
+                Details
+              </button>
+            </div>
+
+            {/* Status Indicator */}
+            <div className="absolute bottom-4 right-4">
+              <div className={`w-2 h-2 rounded-full ${
+                policy.status === 'Active' ? 'bg-green-400' : 'bg-gray-500'
+              }`} />
+            </div>
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 };
 
 const Dashboard: React.FC = () => {
   const { isConnected, account } = useWallet();
+  const [userPolicies, setUserPolicies] = useState<Policy[]>([]);
 
-  // Quick Action Handlers
+  // Initialize with existing policies when wallet connects
+  useEffect(() => {
+    if (isConnected && account) {
+      const existingPolicies: Policy[] = [
+        {
+          id: 'POL-001',
+          type: 'Device Protection',
+          premium: '0.5 SHM',
+          coverage: 'Up to $500',
+          status: 'Active',
+          expires: '2025-02-16',
+          created: '2024-01-16',
+          duration: '24 hours',
+          description: 'Instant coverage for smartphones, tablets, and electronics'
+        },
+        {
+          id: 'POL-002', 
+          type: 'Event Coverage',
+          premium: '1.2 SHM',
+          coverage: 'Up to $1,000',
+          status: 'Active',
+          expires: '2025-03-01',
+          created: '2024-01-01',
+          duration: 'Single event',
+          description: 'Quick insurance for concerts, sports events, and gatherings'
+        }
+      ];
+      setUserPolicies(existingPolicies);
+    } else {
+      setUserPolicies([]);
+    }
+  }, [isConnected, account]);
+
+  // Helper functions
+  const generatePolicyId = () => {
+    const timestamp = Date.now().toString().slice(-6);
+    return `POL-${timestamp}`;
+  };
+
+  const calculateCoverage = (premium: number) => {
+    return `Up to $${Math.round(premium * 1000)}`;
+  };
+
+  const getExpiryDate = () => {
+    const expiry = new Date();
+    expiry.setFullYear(expiry.getFullYear() + 1);
+    return expiry.toISOString().split('T')[0];
+  };
+
+  // Create Policy Handler
   const handleCreatePolicy = async () => {
     if (!isConnected) {
       alert('Please connect your wallet to create a policy');
       return;
     }
     
-    // Simulate policy creation
-    await ActivityService.logPolicyCreation(account!, 'Custom Micro-Policy');
-    alert('🏗️ Policy creation started!\n\nType: Custom Micro-Policy\nStatus: Processing\nNext: Risk assessment\n\nCheck the activity feed for updates!');  
+    const policyOptions = [
+      { type: 'Device Protection', description: 'Instant coverage for smartphones, tablets, and electronics', duration: '24 hours' },
+      { type: 'Micro Travel', description: 'Short-term travel insurance for day trips and weekends', duration: '1-7 days' },
+      { type: 'Event Coverage', description: 'Quick insurance for concerts, sports events, and gatherings', duration: 'Single event' },
+      { type: 'Equipment Rental', description: 'Coverage for rented cameras, tools, and equipment', duration: 'Rental period' }
+    ];
+    
+    const randomPolicy = policyOptions[Math.floor(Math.random() * policyOptions.length)];
+    const premiumAmount = (Math.random() * 2 + 0.5).toFixed(1);
+    const coverageAmount = calculateCoverage(parseFloat(premiumAmount));
+    
+    const newPolicy: Policy = {
+      id: generatePolicyId(),
+      type: randomPolicy.type,
+      premium: `${premiumAmount} SHM`,
+      coverage: coverageAmount,
+      status: 'Active',
+      expires: getExpiryDate(),
+      created: new Date().toISOString().split('T')[0],
+      duration: randomPolicy.duration,
+      description: randomPolicy.description
+    };
+
+    setUserPolicies(prevPolicies => [newPolicy, ...prevPolicies]);
+    
+    await ActivityService.logPolicyCreation(account!, randomPolicy.type);
+    
+    alert(`🎉 Policy created successfully!\n\nType: ${randomPolicy.type}\nID: ${newPolicy.id}\nPremium: ${premiumAmount} SHM\nCoverage: ${coverageAmount}\nStatus: Active\n\n✅ Check your policies section!`);
   };
 
   const handleProcessClaim = async () => {
@@ -162,10 +282,9 @@ const Dashboard: React.FC = () => {
       return;
     }
 
-    // Simulate claim processing
-    const claimAmount = (Math.random() * 3 + 1).toFixed(2); // Random amount 1-4 SHM
+    const claimAmount = (Math.random() * 3 + 1).toFixed(2);
     await ActivityService.logPolicyClaim(account!, 'Travel Insurance', claimAmount);
-    alert(`✅ Claim submitted!\n\nClaim ID: CL-${Date.now()}\nType: Travel Insurance\nAmount: ${claimAmount} SHM\nStatus: Under review\nProcessing: 24-48 hours\n\n📱 Check activity feed for updates!`);
+    alert(`✅ Claim submitted!\n\nClaim ID: CL-${Date.now()}\nAmount: ${claimAmount} SHM\nStatus: Under review`);
   };
 
   const handleKYCVerification = async () => {
@@ -174,7 +293,6 @@ const Dashboard: React.FC = () => {
       return;
     }
 
-    // Simulate KYC verification
     await ActivityService.logKYCVerification(account!);
     alert(`🔒 ID verification complete!\n\nUser: ${account!.slice(0, 6)}...${account!.slice(-4)}\nStatus: Verified ✅\nLevel: Basic\nValid until: ${new Date(Date.now() + 365*24*60*60*1000).toLocaleDateString()}\n\n🔴 Logged to activity feed!`);
   };
@@ -185,9 +303,8 @@ const Dashboard: React.FC = () => {
       return;
     }
 
-    // Simulate AI underwriting with random values
-    const riskScore = (Math.random() * 3 + 1).toFixed(1); // 1.0-4.0
-    const recommendedPremium = (Math.random() * 0.5 + 0.3).toFixed(2); // 0.3-0.8 SHM
+    const riskScore = (Math.random() * 3 + 1).toFixed(1);
+    const recommendedPremium = (Math.random() * 0.5 + 0.3).toFixed(2);
     
     await ActivityService.logUnderwritingActivity(account!, riskScore, recommendedPremium);
     alert(`🤖 Risk analysis complete!\n\nRisk score: ${riskScore}/10 (Low risk)\nSuggested premium: ${recommendedPremium} SHM\nMax coverage: ${(parseFloat(recommendedPremium) * 15).toFixed(1)} SHM\nValid for: 365 days\nAI confidence: 94.7%\n\n📊 Added to activity feed!`);
@@ -198,28 +315,28 @@ const Dashboard: React.FC = () => {
       title: 'Active Policies',
       value: '1,247',
       change: '+12.5%',
-      icon: () => null,
+      icon: Shield,
       trend: 'up' as const
     },
     {
       title: 'Total Premium (SHM)',
       value: '8,429.3',
       change: '+8.2%',
-      icon: () => null,
+      icon: DollarSign,
       trend: 'up' as const
     },
     {
       title: 'Claims Processed',
       value: '342',
       change: '+15.7%',
-      icon: () => null,
+      icon: CheckCircle,
       trend: 'up' as const
     },
     {
       title: 'Avg. Response Time',
       value: '2.3s',
       change: '-22.1%',
-      icon: () => null,
+      icon: Clock,
       trend: 'down' as const
     }
   ];
@@ -250,7 +367,7 @@ const Dashboard: React.FC = () => {
           </h1>
           
           <p className="text-subhero max-w-2xl mx-auto mb-8">
-            From your phone to your next trip – Riskzap brings lightning-fast, AI-powered insurance on Shardeum.
+            From your phone to your next trip Riskzap brings lightning-fast, AI-powered insurance on Shardeum.
           </p>
           
           <motion.div
@@ -320,7 +437,6 @@ const Dashboard: React.FC = () => {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 gap-8">
-        {/* Activity Feed */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -429,15 +545,14 @@ const Dashboard: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* User Policies Display */}
+        {/* User Policies Display - Updated */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
-          className="card-elevated rounded-xl p-6"
+          className="w-full"
         >
-          <h2 className="text-xl font-bold mb-6 text-gradient-primary">Your Policies</h2>
-          <UserPoliciesDisplay />
+          <UserPoliciesDisplay policies={userPolicies} />
         </motion.div>
       </div>
 

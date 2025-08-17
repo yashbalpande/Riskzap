@@ -399,7 +399,8 @@ Platform: RiskZap Insurance (Shardeum Testnet)
         </div>
       )}
 
-      <div className="space-y-4 max-h-96 overflow-y-auto">
+      {/* Policies Grid - Updated to match pricing cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-96 overflow-y-auto">
         <AnimatePresence mode="popLayout">
           {policies.map((policy, index) => (
             <motion.div
@@ -408,81 +409,72 @@ Platform: RiskZap Insurance (Shardeum Testnet)
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ delay: index * 0.1 }}
-              className="p-4 rounded-lg bg-background/50 border border-primary/10 hover:border-primary/30 transition-all group"
+              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
+              {/* Policy Header */}
+              <div className="text-center mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-xl font-semibold text-gray-900">{policy.policyName}</h3>
                   <div className={`flex items-center gap-1 ${getStatusColor(policy.status)}`}>
                     {getStatusIcon(policy.status)}
-                    <span className="text-sm font-medium capitalize">{policy.status}</span>
                   </div>
-                  <h3 className="font-semibold text-sm">{policy.policyName}</h3>
                 </div>
-                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => downloadPolicyPDF(policy)}
-                    className="h-8 w-8 p-0"
-                    title="Download Policy Document"
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => viewOnExplorer(policy.txHash)}
-                    className="h-8 w-8 p-0"
-                    title="View Transaction"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
+                <p className="text-gray-600 text-sm">{policy.policyType} Coverage</p>
+              </div>
+
+              {/* Premium Display */}
+              <div className="text-center mb-6">
+                <div className="text-4xl font-bold text-gray-900 mb-1">
+                  {policy.premium}
+                  <span className="text-lg font-normal text-gray-500 ml-1">SHM</span>
+                </div>
+                <div className="text-sm text-gray-500">Premium Paid</div>
+              </div>
+
+              {/* Policy Features */}
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center">
+                    <CheckCircle className="w-3 h-3 text-purple-600" />
+                  </div>
+                  <span className="text-gray-700 text-sm">Coverage: {policy.coverageAmount} SHM</span>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center">
+                    <CheckCircle className="w-3 h-3 text-purple-600" />
+                  </div>
+                  <span className="text-gray-700 text-sm">ID: {policy.policyId}</span>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center">
+                    <CheckCircle className="w-3 h-3 text-purple-600" />
+                  </div>
+                  <span className="text-gray-700 text-sm">Expires: {formatDate(policy.expiryDate || '')}</span>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center">
+                    <CheckCircle className="w-3 h-3 text-purple-600" />
+                  </div>
+                  <span className="text-gray-700 text-sm">Blockchain Secured</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground mb-3">
-                <div className="flex items-center gap-1">
-                  <DollarSign className="h-3 w-3" />
-                  <span>Coverage: {policy.coverageAmount} SHM</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <DollarSign className="h-3 w-3" />
-                  <span>Premium: {policy.premium} SHM</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  <span>Purchased: {formatDate(policy.purchaseDate)}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  <span>Expires: {formatDate(policy.expiryDate || '')}</span>
-                </div>
-              </div>
-
-              {/* Claim Potential Section for Active Policies */}
+              {/* Claim Potential for Active Policies */}
               {policy.status === 'active' && (() => {
                 const claimInfo = calculatePotentialClaim(policy);
                 return (
-                  <div className="mb-3 p-2 rounded-md bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-green-600 font-medium">Current Claim Value:</span>
-                      <span className="font-bold text-green-700">{claimInfo.potentialAmount.toFixed(4)} SHM</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs mt-1">
-                      <span className="text-muted-foreground">Claim Rate: {claimInfo.claimPercentage.toFixed(1)}%</span>
-                      <span className="text-muted-foreground">Held: {claimInfo.daysSincePurchase} days</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                      <div 
-                        className="bg-gradient-to-r from-green-400 to-blue-500 h-1.5 rounded-full transition-all duration-300"
-                        style={{ width: `${Math.min(claimInfo.claimPercentage, 100)}%` }}
-                      ></div>
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {claimInfo.claimPercentage < 100 
-                        ? `📈 Value grows over time! Hold longer for higher returns.` 
-                        : `🎉 Maximum value reached! You can claim 100%+ of your investment.`
-                      }
+                  <div className="mb-6 p-3 rounded-lg bg-green-50 border border-green-200">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-green-600 mb-1">
+                        {claimInfo.potentialAmount.toFixed(4)} SHM
+                      </div>
+                      <div className="text-sm text-green-700">Current Claim Value</div>
+                      <div className="text-xs text-gray-600 mt-2">
+                        {claimInfo.claimPercentage.toFixed(1)}% rate • Held {claimInfo.daysSincePurchase} days
+                      </div>
                     </div>
                   </div>
                 );
@@ -490,31 +482,42 @@ Platform: RiskZap Insurance (Shardeum Testnet)
 
               {/* Claim Results for Claimed Policies */}
               {policy.status === 'claimed' && policy.claimAmount && (
-                <div className="mb-3 p-2 rounded-md bg-blue-500/10 border border-blue-500/20">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-blue-600 font-medium">Claim Processed:</span>
-                    <span className="font-bold text-blue-700">{policy.claimAmount.toFixed(4)} SHM</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs mt-1">
-                    <span className="text-muted-foreground">Rate: {policy.claimPercentage?.toFixed(1)}%</span>
-                    <span className="text-muted-foreground">Held: {policy.daysSincePurchase} days</span>
-                  </div>
-                  {policy.timeBonus && policy.timeBonus > 0 && (
-                    <div className="text-xs text-blue-600 mt-1">
-                      💰 Time Bonus: +{policy.timeBonus.toFixed(4)} SHM
+                <div className="mb-6 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-blue-600 mb-1">
+                      {policy.claimAmount.toFixed(4)} SHM
                     </div>
-                  )}
+                    <div className="text-sm text-blue-700">Claim Processed</div>
+                    <div className="text-xs text-gray-600 mt-2">
+                      {policy.claimPercentage?.toFixed(1)}% rate • Held {policy.daysSincePurchase} days
+                    </div>
+                  </div>
                 </div>
               )}
 
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <Hash className="h-3 w-3" />
-                  <span>Policy: {policy.policyId}</span>
-                </div>
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <User className="h-3 w-3" />
-                  <span>{formatAddress(policy.userAddress)}</span>
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                {policy.status === 'active' && (
+                  <button className="w-full bg-black text-white py-3 px-6 rounded-xl font-medium hover:bg-gray-800 transition-colors duration-200">
+                    File Claim
+                  </button>
+                )}
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <button 
+                    onClick={() => downloadPolicyPDF(policy)}
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 px-4 rounded-xl font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download
+                  </button>
+                  <button 
+                    onClick={() => viewOnExplorer(policy.txHash)}
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 px-4 rounded-xl font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Explorer
+                  </button>
                 </div>
               </div>
             </motion.div>
@@ -522,7 +525,7 @@ Platform: RiskZap Insurance (Shardeum Testnet)
         </AnimatePresence>
 
         {policies.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="col-span-full text-center py-8 text-muted-foreground">
             <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p className="mb-2">No insurance policies found</p>
             <p className="text-xs">Purchase a policy to see it here!</p>
