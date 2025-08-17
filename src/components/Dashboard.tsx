@@ -60,7 +60,7 @@ const UserPoliciesDisplay: React.FC<UserPoliciesDisplayProps> = () => {
 
   useEffect(() => {
     if (isConnected && account) {
-      // Load user's policies from localStorage or generate sample data
+      
       const policies = [
         {
           id: 'POL-001',
