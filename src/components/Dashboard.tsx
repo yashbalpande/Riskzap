@@ -447,7 +447,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Secondary Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8">
         {/* Quick Actions */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -543,16 +543,6 @@ const Dashboard: React.FC = () => {
               </motion.button>
             </div>
           </div>
-        </motion.div>
-
-        {/* User Policies Display - Updated */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="w-full"
-        >
-          <UserPoliciesDisplay policies={userPolicies} />
         </motion.div>
       </div>
 

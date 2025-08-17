@@ -429,29 +429,80 @@ Click "Purchase Now" to buy this policy or "Claim" if you already own it.`);
       // Get user's policy records from database
       const userPolicies = await localDatabaseService.getUserPolicies(address);
 
-      const policy = userPolicies.find((p: any) => 
-        p.metadata?.policyId === policyId || 
-        p.policy_type?.toLowerCase().includes(policyId.toLowerCase()) ||
-        p.id === policyId ||
-        p.policyId === policyId ||
-        p.type === policyId
-      );
+      // Enhanced policy matching logic to work with all policy types
+      const policy = userPolicies.find((p: any) => {
+        // Direct ID matches
+        if (p.id === policyId || p.policyId === policyId || p.type === policyId) {
+          return true;
+        }
+        
+        // Metadata policy ID match
+        if (p.metadata?.policyId === policyId) {
+          return true;
+        }
+        
+        // Policy type name matching (flexible)
+        const userPolicyType = (p.policy_type || p.type || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        const searchPolicyType = policyId.toLowerCase().replace(/[^a-z0-9]/g, '');
+        
+        // Check if policy types match (removing spaces, hyphens, etc.)
+        if (userPolicyType.includes(searchPolicyType) || searchPolicyType.includes(userPolicyType)) {
+          return true;
+        }
+        
+        // Map common policy type variations
+        const policyTypeMap: { [key: string]: string[] } = {
+          'deviceprotection': ['device', 'electronics', 'smartphone', 'tablet'],
+          'travelinsurance': ['travel', 'trip', 'vacation'],
+          'eventcoverage': ['event', 'concert', 'sports', 'gathering'],
+          'equipmentrental': ['equipment', 'rental', 'camera', 'tools'],
+          'healthmicro': ['health', 'medical', 'micro'],
+          'freelancerprotection': ['freelancer', 'professional', 'work']
+        };
+        
+        // Check alternative names for policy types
+        for (const [key, alternatives] of Object.entries(policyTypeMap)) {
+          if (searchPolicyType.includes(key) || key.includes(searchPolicyType)) {
+            if (alternatives.some(alt => userPolicyType.includes(alt) || alt.includes(userPolicyType))) {
+              return true;
+            }
+          }
+        }
+        
+        return false;
+      });
       
       if (!policy) {
-        // Enhanced debugging information
+        // Show available policies to help with debugging
+        const availablePolicies = userPolicies.map(p => ({
+          id: p.id,
+          type: p.policy_type || p.type,
+          status: p.status,
+          metadata_policyId: p.metadata?.policyId
+        }));
+        
         console.log('Policy lookup failed:');
         console.log('- Looking for policyId:', policyId);
-        console.log('- Available policies:', userPolicies.map(p => ({
-          id: p.id,
-          metadata_policyId: p.metadata?.policyId,
-          policy_type: p.policy_type
-        })));
+        console.log('- Available policies:', availablePolicies);
         
-        toast({
-          title: "Policy Not Found",
-          description: `No active policy found for ID: ${policyId}. You have ${userPolicies.length} total policies.`,
-          variant: "destructive",
-        });
+        // If user has policies but none match, show them
+        if (userPolicies.length > 0) {
+          const policyList = userPolicies.map(p => 
+            `• ${p.policy_type || p.type} (${p.status})`
+          ).join('\n');
+          
+          toast({
+            title: "Policy Type Mismatch",
+            description: `No matching policy found for "${policyId}". Your policies:\n${policyList}`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "No Policies Found",
+            description: "You don't have any active policies yet. Purchase a policy first to claim it.",
+            variant: "destructive",
+          });
+        }
         return;
       }
 
@@ -595,17 +646,30 @@ Click "Purchase Now" to buy this policy or "Claim" if you already own it.`);
         }
         await sendClaimPayout(companySigner, userAddress, netPayout);
         
-        // Log successful claim activity
+        // Update policy status to claimed in the database
+        try {
+          await localDatabaseService.updatePolicyStatus(policy.id, 'claimed');
+        } catch (dbError) {
+          console.warn('Failed to update policy status in database:', dbError);
+        }
+        
+        // Get proper policy type name for logging
+        const policyTypeName = policy.policy_type || 
+                              policy.metadata?.policyId || 
+                              policyId || 
+                              'Insurance Policy';
+        
+        // Log successful claim activity with detailed information
         await ActivityService.logPolicyClaim(
           address,
-          policy.policy_type || policy.metadata?.policyId || 'Unknown Policy',
+          policyTypeName,
           netPayout.toFixed(4),
           "CLAIM_TX" // would be actual transaction hash in production
         );
         
         toast({
           title: "🎉 Claim Successful!",
-          description: `${netPayout.toFixed(4)} SHM (${claimCalculation.claimPercentage.toFixed(1)}% + bonus) sent to your wallet after ${claimCalculation.daysSincePurchase} days!`,
+          description: `${netPayout.toFixed(4)} SHM (${claimCalculation.claimPercentage.toFixed(1)}% + bonus) sent to your wallet for ${policyTypeName} after ${claimCalculation.daysSincePurchase} days!`,
           variant: "default",
         });
         

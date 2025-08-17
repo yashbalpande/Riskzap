@@ -12,7 +12,8 @@ import {
   CheckCircle,
   AlertCircle,
   Calendar,
-  Hash
+  Hash,
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWallet } from '@/components/WalletConnector';
@@ -90,6 +91,30 @@ const MyPolicies: React.FC = () => {
     loadUserPolicies();
   }, [account]);
 
+  // Add periodic refresh to catch new policies
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (account) {
+        loadUserPolicies();
+      }
+    }, 10000); // Refresh every 10 seconds
+
+    return () => clearInterval(interval);
+  }, [account]);
+
+  // Listen for localStorage changes (when policies are added from other components)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'ZENITH_POLICIES' && account) {
+        console.log('🔄 Storage changed, refreshing policies...');
+        loadUserPolicies();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [account]);
+
   const loadUserPolicies = async () => {
     setLoading(true);
     try {
@@ -101,6 +126,7 @@ const MyPolicies: React.FC = () => {
 
       console.log('🔍 Starting to load user policies...');
       console.log('👤 Account:', account);
+      console.log('⏰ Timestamp:', new Date().toISOString());
       
       
       await localDatabaseService.inspectLocalStorage();
@@ -108,6 +134,14 @@ const MyPolicies: React.FC = () => {
       const dbPolicies = await localDatabaseService.getUserPolicies(account);
       
       console.log('📊 Raw policies from localStorage:', dbPolicies);
+      console.log('📈 Number of raw policies:', dbPolicies.length);
+
+      if (dbPolicies.length === 0) {
+        console.log('📭 No policies found for user');
+        setPolicies([]);
+        setLoading(false);
+        return;
+      }
       console.log('📊 Number of raw policies:', dbPolicies.length);
       
         const enhancedPolicies = dbPolicies.map((policy: any) => {
@@ -137,8 +171,11 @@ const MyPolicies: React.FC = () => {
 
       console.log('✅ Enhanced policies for UI:', enhancedPolicies);
       console.log('📊 Number of enhanced policies:', enhancedPolicies.length);
+      console.log('🔗 Setting policies in state...');
 
       setPolicies(enhancedPolicies);
+      
+      console.log('✅ Policies set in state successfully');
     } catch (error) {
       console.error('Error loading policies:', error);
       setPolicies([]);
@@ -267,14 +304,76 @@ Platform: RiskZap Insurance (Shardeum Testnet)
     window.open(`https://explorer-testnet.shardeum.org/transaction/${txHash}`, '_blank');
   };
 
+  const fileClaim = async (policy: PolicyRecord) => {
+    try {
+      if (!account) {
+        alert('Please connect your wallet to file a claim.');
+        return;
+      }
+
+      const claimInfo = calculatePotentialClaim(policy);
+      
+      // Show confirmation dialog
+      const confirmed = confirm(
+        `File claim for Policy ${policy.policyId}?\n\n` +
+        `Current claim value: ${claimInfo.potentialAmount.toFixed(4)} SHM\n` +
+        `Claim percentage: ${claimInfo.claimPercentage.toFixed(1)}%\n` +
+        `Days held: ${claimInfo.daysSincePurchase}\n\n` +
+        `This action will mark your policy as claimed and cannot be undone.`
+      );
+
+      if (!confirmed) return;
+
+      // Update policy status in local database
+      const claimDate = new Date().toISOString();
+      const updatedPolicy = {
+        ...policy,
+        status: 'claimed' as const,
+        claimDate: claimDate,
+        claimAmount: claimInfo.potentialAmount,
+        claimPercentage: claimInfo.claimPercentage,
+        daysSincePurchase: claimInfo.daysSincePurchase,
+        baseClaimAmount: claimInfo.potentialAmount,
+        timeBonus: 0,
+        withdrawalFee: 0,
+        netPayout: claimInfo.potentialAmount
+      };
+
+      // Update the policy in the database
+      await localDatabaseService.updatePolicyStatus(policy.policyId, 'claimed', claimInfo.potentialAmount);
+
+      // Log the claim activity
+      await localDatabaseService.logActivity({
+        userWalletAddress: account,
+        action: 'claim_filed',
+        description: `Filed claim for ${policy.policyName} - ${claimInfo.potentialAmount.toFixed(4)} SHM`,
+        amount: claimInfo.potentialAmount,
+        policyId: policy.policyId,
+      });
+
+      // Update local state
+      setPolicies(prevPolicies => 
+        prevPolicies.map(p => 
+          p.policyId === policy.policyId ? updatedPolicy : p
+        )
+      );
+
+      alert(`Claim filed successfully!\n\nClaim Amount: ${claimInfo.potentialAmount.toFixed(4)} SHM\nStatus: Processed`);
+      
+    } catch (error) {
+      console.error('Error filing claim:', error);
+      alert('Failed to file claim. Please try again.');
+    }
+  };
+
   if (!account) {
     return (
-      <div className="rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6">
+      <div className="rounded-2xl border border-primary/20 bg-gray-900/90 backdrop-blur-sm p-6">
         <div className="flex items-center gap-3 mb-6">
           <Shield className="h-6 w-6 text-primary" />
-          <h2 className="text-xl font-bold">My Policies</h2>
+          <h2 className="text-xl font-bold text-white">My Policies</h2>
         </div>
-        <div className="text-center py-8 text-muted-foreground">
+        <div className="text-center py-8 text-gray-400">
           <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
           <p>Connect your wallet to view your insurance policies</p>
         </div>
@@ -284,16 +383,16 @@ Platform: RiskZap Insurance (Shardeum Testnet)
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6">
+      <div className="rounded-2xl border border-primary/20 bg-gray-900/90 backdrop-blur-sm p-6">
         <div className="flex items-center gap-3 mb-6">
           <Shield className="h-6 w-6 text-primary animate-pulse" />
-          <h2 className="text-xl font-bold">My Policies</h2>
+          <h2 className="text-xl font-bold text-white">My Policies</h2>
         </div>
         <div className="space-y-4">   
           {[...Array(2)].map((_, i) => (
-            <div key={i} className="p-4 rounded-lg bg-background/50 border border-primary/10 animate-pulse">
-              <div className="h-4 bg-gray-300 rounded mb-2" />
-              <div className="h-3 bg-gray-200 rounded w-2/3" />
+            <div key={i} className="p-4 rounded-lg bg-gray-800/50 border border-gray-700 animate-pulse">
+              <div className="h-4 bg-gray-600 rounded mb-2" />
+              <div className="h-3 bg-gray-700 rounded w-2/3" />
             </div>
           ))}
         </div>
@@ -302,105 +401,66 @@ Platform: RiskZap Insurance (Shardeum Testnet)
   }
 
   return (
-    <div className="rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <Shield className="h-6 w-6 text-primary particle-glow" />
-        <h2 className="text-xl font-bold">My Policies</h2>
-        <span className="bg-primary/20 text-primary px-2 py-1 rounded-full text-xs font-semibold">
-          {policies.length} {policies.length === 1 ? 'Policy' : 'Policies'}
-        </span>
-        
-        {/* Debug Buttons */}
-        <div className="flex gap-2 ml-auto">
-          <Button
-            onClick={async () => {
-              console.log('🔧 MANUAL DEBUG TRIGGERED');
-              await localDatabaseService.inspectLocalStorage();
-              await loadUserPolicies();
-            }}
-            size="sm"
-            variant="outline"
-          >
-            🔧 Debug
-          </Button>
-          
-          <Button
-            onClick={async () => {
-              console.log('🧪 TESTING POLICY CREATION WITH CORRECT FORMAT');
-              try {
-                const testPolicy = await localDatabaseService.createPolicy({
-                  userWalletAddress: account || '0x1234567890abcdef',
-                  policyType: 'Device Protection',
-                  premium: 0.5,
-                  coverage: 'Up to $500',
-                  duration: '24 hours',
-                  metadata: {
-                    policyId: 'device-protection',
-                    txHash: '0xtest123',
-                    platformFee: 0.01,
-                    totalPaid: 0.51,
-                    features: ['Accidental damage', 'Theft protection'],
-                    walletAddress: account || '0x1234567890abcdef'
-                  }
-                });
-                console.log('✅ Test policy created:', testPolicy);
-                await loadUserPolicies();
-              } catch (error) {
-                console.error('❌ Test policy creation failed:', error);
-              }
-            }}
-            size="sm"
-            variant="outline"
-          >
-            🧪 Test Create
-          </Button>
-          
-          <Button
-            onClick={async () => {
-              console.log('🗑️ CLEARING ALL DATA');
-              await localDatabaseService.clearAllData();
-              await loadUserPolicies();
-            }}
-            size="sm"
-            variant="destructive"
-          >
-            🗑️ Clear
-          </Button>
+    <div className="rounded-2xl border border-white/10 bg-black/60 backdrop-blur-md shadow-lg p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Shield className="h-6 w-6 text-white" />
+          <h2 className="text-xl font-bold text-white">My Policies</h2>
+          <span className="bg-white/10 text-white px-3 py-1 rounded-full text-xs font-semibold">
+            {policies.length} {policies.length === 1 ? 'Policy' : 'Policies'}
+          </span>
         </div>
+        <button
+          onClick={loadUserPolicies}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-colors duration-200"
+          title="Refresh policies"
+        >
+          <RefreshCw className="h-4 w-4" />
+          <span className="text-sm">Refresh</span>
+        </button>
       </div>
 
       {/* Policy Summary */}
       {policies.length > 0 && (
-        <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20">
-          <h3 className="font-semibold mb-3 text-sm">Portfolio Summary</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div className="mb-8 p-6 rounded-xl bg-black/80 backdrop-blur-md border border-white/10 shadow-lg">
+          <h3 className="font-semibold mb-6 text-sm text-white">Portfolio Overview</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="text-lg font-bold text-green-600">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <Shield className="h-4 w-4 text-gray-300" />
+                <span className="text-sm text-gray-300">Active Policies</span>
+              </div>
+              <div className="text-2xl font-bold font-mono text-white">
                 {policies.filter(p => p.status === 'active').length}
               </div>
-              <div className="text-muted-foreground">Active Policies</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-blue-600">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <DollarSign className="h-4 w-4 text-gray-300" />
+                <span className="text-sm text-gray-300">Total Invested</span>
+              </div>
+              <div className="text-2xl font-bold font-mono text-white">
                 {policies.reduce((sum, p) => sum + p.totalPaid, 0).toFixed(4)} SHM
               </div>
-              <div className="text-muted-foreground">Total Invested</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-purple-600">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <Calendar className="h-4 w-4 text-gray-300" />
+                <span className="text-sm text-gray-300">Claim Value</span>
+              </div>
+              <div className="text-2xl font-bold font-mono text-facc15">
                 {policies
                   .filter(p => p.status === 'active')
                   .reduce((sum, p) => sum + calculatePotentialClaim(p).potentialAmount, 0)
                   .toFixed(4)} SHM
               </div>
-              <div className="text-muted-foreground">Current Claim Value</div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Policies Grid - Updated to match pricing cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-96 overflow-y-auto">
+      {/* Policies Grid - Premium Black & White Design */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <AnimatePresence mode="popLayout">
           {policies.map((policy, index) => (
             <motion.div
@@ -409,115 +469,126 @@ Platform: RiskZap Insurance (Shardeum Testnet)
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300"
+              whileHover={{ scale: 1.01, y: -2 }}
+              className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/60 backdrop-blur-md shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
             >
-              {/* Policy Header */}
-              <div className="text-center mb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-semibold text-gray-900">{policy.policyName}</h3>
-                  <div className={`flex items-center gap-1 ${getStatusColor(policy.status)}`}>
-                    {getStatusIcon(policy.status)}
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm">{policy.policyType} Coverage</p>
-              </div>
-
-              {/* Premium Display */}
-              <div className="text-center mb-6">
-                <div className="text-4xl font-bold text-gray-900 mb-1">
-                  {policy.premium}
-                  <span className="text-lg font-normal text-gray-500 ml-1">SHM</span>
-                </div>
-                <div className="text-sm text-gray-500">Premium Paid</div>
-              </div>
-
-              {/* Policy Features */}
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center">
-                    <CheckCircle className="w-3 h-3 text-purple-600" />
-                  </div>
-                  <span className="text-gray-700 text-sm">Coverage: {policy.coverageAmount} SHM</span>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center">
-                    <CheckCircle className="w-3 h-3 text-purple-600" />
-                  </div>
-                  <span className="text-gray-700 text-sm">ID: {policy.policyId}</span>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center">
-                    <CheckCircle className="w-3 h-3 text-purple-600" />
-                  </div>
-                  <span className="text-gray-700 text-sm">Expires: {formatDate(policy.expiryDate || '')}</span>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center">
-                    <CheckCircle className="w-3 h-3 text-purple-600" />
-                  </div>
-                  <span className="text-gray-700 text-sm">Blockchain Secured</span>
-                </div>
-              </div>
-
-              {/* Claim Potential for Active Policies */}
-              {policy.status === 'active' && (() => {
-                const claimInfo = calculatePotentialClaim(policy);
-                return (
-                  <div className="mb-6 p-3 rounded-lg bg-green-50 border border-green-200">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-green-600 mb-1">
-                        {claimInfo.potentialAmount.toFixed(4)} SHM
-                      </div>
-                      <div className="text-sm text-green-700">Current Claim Value</div>
-                      <div className="text-xs text-gray-600 mt-2">
-                        {claimInfo.claimPercentage.toFixed(1)}% rate • Held {claimInfo.daysSincePurchase} days
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Claim Results for Claimed Policies */}
-              {policy.status === 'claimed' && policy.claimAmount && (
-                <div className="mb-6 p-3 rounded-lg bg-blue-50 border border-blue-200">
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-blue-600 mb-1">
-                      {policy.claimAmount.toFixed(4)} SHM
-                    </div>
-                    <div className="text-sm text-blue-700">Claim Processed</div>
-                    <div className="text-xs text-gray-600 mt-2">
-                      {policy.claimPercentage?.toFixed(1)}% rate • Held {policy.daysSincePurchase} days
-                    </div>
+              {/* Status Badge */}
+              {policy.status === 'active' && (
+                <div className="absolute top-4 right-4 z-10">
+                  <div className="bg-white text-black px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                    <CheckCircle className="h-3 w-3" />
+                    Active
                   </div>
                 </div>
               )}
 
-              {/* Action Buttons */}
-              <div className="space-y-3">
-                {policy.status === 'active' && (
-                  <button className="w-full bg-black text-white py-3 px-6 rounded-xl font-medium hover:bg-gray-800 transition-colors duration-200">
-                    File Claim
-                  </button>
+              <div className="relative p-6">
+                {/* Policy Header */}
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-semibold text-white mb-2">{policy.policyName}</h3>
+                  <p className="text-sm text-gray-400">{policy.policyType} Coverage</p>
+                </div>
+
+                {/* Premium Display */}
+                <div className="text-center mb-8">
+                  <div className="text-4xl font-bold font-mono text-white mb-2">
+                    {policy.premium}
+                    <span className="text-lg font-normal text-gray-400 ml-2">SHM</span>
+                  </div>
+                  <div className="text-sm text-gray-400">Premium Paid</div>
+                </div>
+
+                {/* Policy Features */}
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center">
+                      <CheckCircle className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-gray-300 text-sm">Coverage: <span className="font-mono text-white">{policy.coverageAmount} SHM</span></span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center">
+                      <Hash className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-gray-300 text-sm">ID: <span className="font-mono text-white">{policy.policyId}</span></span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center">
+                      <Clock className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-gray-300 text-sm">Expires: <span className="text-white">{formatDate(policy.expiryDate || '')}</span></span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center">
+                      <Shield className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-gray-300 text-sm">Blockchain Secured</span>
+                  </div>
+                </div>
+
+                {/* Claim Potential for Active Policies */}
+                {policy.status === 'active' && (() => {
+                  const claimInfo = calculatePotentialClaim(policy);
+                  return (
+                    <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold font-mono text-yellow-400 mb-1">
+                          {claimInfo.potentialAmount.toFixed(4)} SHM
+                        </div>
+                        <div className="text-sm text-white font-medium">Current Claim Value</div>
+                        <div className="text-xs text-gray-400 mt-2">
+                          {claimInfo.claimPercentage.toFixed(1)}% rate • Held {claimInfo.daysSincePurchase} days
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Claim Results for Claimed Policies */}
+                {policy.status === 'claimed' && policy.claimAmount && (
+                  <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold font-mono text-white mb-1">
+                        {policy.claimAmount.toFixed(4)} SHM
+                      </div>
+                      <div className="text-sm text-gray-300 font-medium">Claim Processed</div>
+                      <div className="text-xs text-gray-400 mt-2">
+                        {policy.claimPercentage?.toFixed(1)}% rate • Held {policy.daysSincePurchase} days
+                      </div>
+                    </div>
+                  </div>
                 )}
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <button 
-                    onClick={() => downloadPolicyPDF(policy)}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 px-4 rounded-xl font-medium transition-colors duration-200 flex items-center justify-center gap-2"
-                  >
-                    <Download className="w-4 h-4" />
-                    Download
-                  </button>
-                  <button 
-                    onClick={() => viewOnExplorer(policy.txHash)}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 px-4 rounded-xl font-medium transition-colors duration-200 flex items-center justify-center gap-2"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Explorer
-                  </button>
+
+                {/* Action Buttons */}
+                <div className="space-y-3">
+                  {policy.status === 'active' && (
+                    <button 
+                      onClick={() => fileClaim(policy)}
+                      className="w-full px-4 py-3 rounded-xl bg-white text-black font-medium hover:bg-gray-200 transition-colors duration-200"
+                    >
+                      File Claim
+                    </button>
+                  )}
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <button 
+                      onClick={() => downloadPolicyPDF(policy)}
+                      className="px-4 py-2 rounded-xl bg-white/10 text-white font-medium hover:bg-white/20 transition-colors duration-200 flex items-center justify-center gap-2"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download
+                    </button>
+                    <button 
+                      onClick={() => viewOnExplorer(policy.txHash)}
+                      className="px-4 py-2 rounded-xl bg-white/10 text-white font-medium hover:bg-white/20 transition-colors duration-200 flex items-center justify-center gap-2"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Explorer
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -525,7 +596,7 @@ Platform: RiskZap Insurance (Shardeum Testnet)
         </AnimatePresence>
 
         {policies.length === 0 && (
-          <div className="col-span-full text-center py-8 text-muted-foreground">
+          <div className="col-span-full text-center py-8 text-gray-400">
             <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p className="mb-2">No insurance policies found</p>
             <p className="text-xs">Purchase a policy to see it here!</p>
