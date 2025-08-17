@@ -33,16 +33,24 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
     <>
       {/* Desktop Navigation */}
       <nav className="hidden lg:flex items-center justify-between px-6 py-3 mx-4 mt-4 rounded-full bg-background-navbar border border-border backdrop-blur-xl shadow-medium">
-        {/* Logo */}
+        {/* Logo - Glassmorphism Badge Style */}
         <motion.div 
-          className="flex items-center gap-2"
+          className="flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 shadow-lg"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
+          whileHover={{ scale: 1.05, y: -1 }}
+          transition={{ duration: 0.2 }}
         >
-          <div className="relative glow-primary rounded-full p-2 bg-gradient-to-br from-primary/20 to-primary/10">
-            <Coins className="h-5 w-5 text-primary" />
+          <div className="relative">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg">
+              <Coins className="h-5 w-5 text-black" />
+            </div>
+            {/* Futuristic Glow Effect */}
+            <div className="absolute inset-0 w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 opacity-30 blur-sm animate-pulse"></div>
           </div>
-          <h1 className="text-lg font-bold text-gradient-primary">Riskzap</h1>
+          <h1 className="text-lg font-bold text-yellow-400 tracking-wide drop-shadow-[0_0_6px_rgba(250,204,21,0.7)]">
+            Riskzap
+          </h1>
         </motion.div>
 
         {/* Navigation Tags - Compressed Webzi Style */}
@@ -89,13 +97,22 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
 
       {/* Mobile Navigation */}
       <nav className="lg:hidden flex items-center justify-between p-3 mx-2 mt-2 rounded-2xl glass-card border border-primary/10 backdrop-blur-xl shadow-lg">
-        {/* Mobile Logo */}
-        <div className="flex items-center gap-2">
-          <div className="glow-primary rounded-full p-1.5 bg-gradient-to-br from-primary/20 to-primary/10">
-            <Coins className="h-4 w-4 text-primary" />
+        {/* Mobile Logo - Elevated Badge Style */}
+        <motion.div 
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/70 shadow-lg border border-white/10"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <div className="relative">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 flex items-center justify-center">
+              <Coins className="h-3.5 w-3.5 text-black" />
+            </div>
+            <div className="absolute inset-0 w-6 h-6 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 opacity-30 blur-sm animate-pulse"></div>
           </div>
-          <span className="font-bold text-gradient-primary text-sm">Riskzap</span>
-        </div>
+          <span className="font-bold text-yellow-400 text-sm tracking-wide drop-shadow-[0_0_6px_rgba(250,204,21,0.7)]">
+            Riskzap
+          </span>
+        </motion.div>
 
         {/* Mobile Menu Button */}
         <Button
@@ -123,11 +140,14 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
                 >
                   {/* Mobile Menu Header */}
                   <div className="flex items-center justify-between mb-6">
+                    {/* Mobile Menu Logo - Minimal Outline Style */}
                     <div className="flex items-center gap-2">
-                      <div className="rounded-full p-1.5 bg-primary/10">
-                        <Coins className="h-4 w-4 text-primary" />
+                      <div className="w-6 h-6 rounded-full border-2 border-yellow-400 flex items-center justify-center">
+                        <Coins className="h-3.5 w-3.5 text-yellow-400" />
                       </div>
-                      <span className="font-bold text-gradient-primary text-sm">Riskzap</span>
+                      <span className="font-bold text-white">
+                        <span className="underline decoration-yellow-400 decoration-2 underline-offset-2">Riskzap</span>
+                      </span>
                     </div>
                     <Button
                       variant="ghost"

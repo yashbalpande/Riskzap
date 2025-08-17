@@ -15,7 +15,8 @@ import {
   DollarSign,
   TrendingUp,
   Heart,
-  ShoppingCart
+  ShoppingCart,
+  Coins
 } from 'lucide-react';
 import { connectWallet, sendShmToken, getConfiguredCompanyWallet, calculatePurchaseFee, calculateWithdrawFee, sendClaimPayout } from '@/services/web3';
 import { ActivityService } from '@/services/activityService';
@@ -476,7 +477,7 @@ Click "Purchase Now" to buy this policy or "Claim" if you already own it.`);
         // Show available policies to help with debugging
         const availablePolicies = userPolicies.map(p => ({
           id: p.id,
-          type: p.policy_type || p.type,
+          type: p.policy_type,
           status: p.status,
           metadata_policyId: p.metadata?.policyId
         }));
@@ -488,7 +489,7 @@ Click "Purchase Now" to buy this policy or "Claim" if you already own it.`);
         // If user has policies but none match, show them
         if (userPolicies.length > 0) {
           const policyList = userPolicies.map(p => 
-            `• ${p.policy_type || p.type} (${p.status})`
+            `• ${p.policy_type} (${p.status})`
           ).join('\n');
           
           toast({
@@ -808,7 +809,7 @@ Click "Purchase Now" to buy this policy or "Claim" if you already own it.`);
 
   return (
     <div className="w-full max-w-6xl mx-auto p-6">
-      <div className="text-center mb-12">
+           <div className="text-center mb-12">
         <h2 className="text-4xl font-bold text-gradient-primary mb-4">
           Micro-Policy Marketplace
         </h2>
