@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { localDatabaseService } from '@/services/localDatabase';
 import { 
   Shield, 
   Clock, 
@@ -29,6 +30,14 @@ interface PolicyRecord {
   policyType?: string;
   coverageAmount?: number;
   expiryDate?: string;
+  claimDate?: string;
+  claimAmount?: number;
+  baseClaimAmount?: number;
+  timeBonus?: number;
+  claimPercentage?: number;
+  daysSincePurchase?: number;
+  withdrawalFee?: number;
+  netPayout?: number;
 }
 
 const MyPolicies: React.FC = () => {
@@ -36,30 +45,98 @@ const MyPolicies: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { account } = useWallet();
 
+  const calculatePotentialClaim = (policy: PolicyRecord) => {
+    const purchaseDate = new Date(policy.purchaseDate);
+    const currentDate = new Date();
+    const daysSincePurchase = Math.floor((currentDate.getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    let claimPercentage = 0;
+    let timeBonus = 0;
+    
+    if (daysSincePurchase <= 1) {
+      claimPercentage = 0.5;
+    } else if (daysSincePurchase <= 7) {
+      claimPercentage = 5 + (daysSincePurchase * 0.5);
+    } else if (daysSincePurchase <= 30) {
+      const weeksHeld = Math.floor(daysSincePurchase / 7);
+      claimPercentage = 10 + (weeksHeld * 1);
+    } else if (daysSincePurchase <= 90) {
+      const monthsHeld = Math.floor(daysSincePurchase / 30);
+      claimPercentage = 25 + (monthsHeld * 2);
+    } else if (daysSincePurchase <= 180) {
+      const monthsHeld = Math.floor(daysSincePurchase / 30);
+      claimPercentage = 50 + ((monthsHeld - 3) * 3);
+    } else if (daysSincePurchase <= 365) {
+      const monthsHeld = Math.floor(daysSincePurchase / 30);
+      claimPercentage = 75 + ((monthsHeld - 6) * 2);
+    } else {
+      claimPercentage = 100;
+      const yearsHeld = Math.floor(daysSincePurchase / 365);
+      timeBonus = yearsHeld * 5;
+    }
+    
+    claimPercentage = Math.min(claimPercentage, 100);
+    const totalPercentage = claimPercentage + timeBonus;
+    const potentialAmount = (policy.totalPaid * totalPercentage) / 100;
+    
+    return {
+      claimPercentage: totalPercentage,
+      potentialAmount,
+      daysSincePurchase
+    };
+  };
+
   useEffect(() => {
     loadUserPolicies();
   }, [account]);
 
-  const loadUserPolicies = () => {
+  const loadUserPolicies = async () => {
     setLoading(true);
     try {
-      const existingPolicies = JSON.parse(localStorage.getItem('USER_POLICIES') || '[]');
+      if (!account) {
+        setPolicies([]);
+        setLoading(false);
+        return;
+      }
+
+      console.log('🔍 Starting to load user policies...');
+      console.log('👤 Account:', account);
       
-      // Filter policies for current user if wallet is connected
-      const userPolicies = account 
-        ? existingPolicies.filter((policy: PolicyRecord) => 
-            policy.userAddress.toLowerCase() === account.toLowerCase()
-          )
-        : existingPolicies;
       
-      // Enhance policies with additional info
-      const enhancedPolicies = userPolicies.map((policy: PolicyRecord) => ({
-        ...policy,
-        policyName: getPolicyName(policy.policyId),
-        policyType: getPolicyType(policy.policyId),
-        coverageAmount: getCoverageAmount(policy.policyId, policy.premium),
-        expiryDate: getExpiryDate(policy.purchaseDate, policy.policyId)
-      }));
+      await localDatabaseService.inspectLocalStorage();
+
+      const dbPolicies = await localDatabaseService.getUserPolicies(account);
+      
+      console.log('📊 Raw policies from localStorage:', dbPolicies);
+      console.log('📊 Number of raw policies:', dbPolicies.length);
+      
+        const enhancedPolicies = dbPolicies.map((policy: any) => {
+        const policyId = policy.metadata?.policyId || policy.policy_type || 'general';
+        console.log('🔧 Converting policy:', { originalPolicy: policy, policyId });
+        
+        return {
+          policyId: policyId,
+          premium: policy.premium,
+          platformFee: policy.metadata?.platformFee || (policy.premium * 0.02), // 2% platform fee
+          userAddress: policy.user_wallet_address,
+          txHash: policy.metadata?.txHash || '',
+          status: policy.status,
+          coverage: policy.coverage,
+          duration: policy.duration,
+          features: policy.metadata?.features || [],
+          purchaseDate: policy.purchase_date,
+          totalPaid: policy.metadata?.totalPaid || policy.premium,
+          claimAmount: policy.claim_amount,
+          claimDate: policy.claim_date,
+          policyName: getPolicyName(policyId),
+          policyType: getPolicyType(policyId),
+          coverageAmount: getCoverageAmount(policyId, policy.premium),
+          expiryDate: getExpiryDate(policy.purchase_date, policyId)
+        };
+      });
+
+      console.log('✅ Enhanced policies for UI:', enhancedPolicies);
+      console.log('📊 Number of enhanced policies:', enhancedPolicies.length);
 
       setPolicies(enhancedPolicies);
     } catch (error) {
@@ -232,7 +309,95 @@ Platform: RiskZap Insurance (Shardeum Testnet)
         <span className="bg-primary/20 text-primary px-2 py-1 rounded-full text-xs font-semibold">
           {policies.length} {policies.length === 1 ? 'Policy' : 'Policies'}
         </span>
+        
+        {/* Debug Buttons */}
+        <div className="flex gap-2 ml-auto">
+          <Button
+            onClick={async () => {
+              console.log('🔧 MANUAL DEBUG TRIGGERED');
+              await localDatabaseService.inspectLocalStorage();
+              await loadUserPolicies();
+            }}
+            size="sm"
+            variant="outline"
+          >
+            🔧 Debug
+          </Button>
+          
+          <Button
+            onClick={async () => {
+              console.log('🧪 TESTING POLICY CREATION WITH CORRECT FORMAT');
+              try {
+                const testPolicy = await localDatabaseService.createPolicy({
+                  userWalletAddress: account || '0x1234567890abcdef',
+                  policyType: 'Device Protection',
+                  premium: 0.5,
+                  coverage: 'Up to $500',
+                  duration: '24 hours',
+                  metadata: {
+                    policyId: 'device-protection',
+                    txHash: '0xtest123',
+                    platformFee: 0.01,
+                    totalPaid: 0.51,
+                    features: ['Accidental damage', 'Theft protection'],
+                    walletAddress: account || '0x1234567890abcdef'
+                  }
+                });
+                console.log('✅ Test policy created:', testPolicy);
+                await loadUserPolicies();
+              } catch (error) {
+                console.error('❌ Test policy creation failed:', error);
+              }
+            }}
+            size="sm"
+            variant="outline"
+          >
+            🧪 Test Create
+          </Button>
+          
+          <Button
+            onClick={async () => {
+              console.log('🗑️ CLEARING ALL DATA');
+              await localDatabaseService.clearAllData();
+              await loadUserPolicies();
+            }}
+            size="sm"
+            variant="destructive"
+          >
+            🗑️ Clear
+          </Button>
+        </div>
       </div>
+
+      {/* Policy Summary */}
+      {policies.length > 0 && (
+        <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20">
+          <h3 className="font-semibold mb-3 text-sm">Portfolio Summary</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div className="text-center">
+              <div className="text-lg font-bold text-green-600">
+                {policies.filter(p => p.status === 'active').length}
+              </div>
+              <div className="text-muted-foreground">Active Policies</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-bold text-blue-600">
+                {policies.reduce((sum, p) => sum + p.totalPaid, 0).toFixed(4)} SHM
+              </div>
+              <div className="text-muted-foreground">Total Invested</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-bold text-purple-600">
+                {policies
+                  .filter(p => p.status === 'active')
+                  .reduce((sum, p) => sum + calculatePotentialClaim(p).potentialAmount, 0)
+                  .toFixed(4)} SHM
+              </div>
+              <div className="text-muted-foreground">Current Claim Value</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-4 max-h-96 overflow-y-auto">
         <AnimatePresence mode="popLayout">
@@ -293,6 +458,54 @@ Platform: RiskZap Insurance (Shardeum Testnet)
                   <span>Expires: {formatDate(policy.expiryDate || '')}</span>
                 </div>
               </div>
+
+              {/* Claim Potential Section for Active Policies */}
+              {policy.status === 'active' && (() => {
+                const claimInfo = calculatePotentialClaim(policy);
+                return (
+                  <div className="mb-3 p-2 rounded-md bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-green-600 font-medium">Current Claim Value:</span>
+                      <span className="font-bold text-green-700">{claimInfo.potentialAmount.toFixed(4)} SHM</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs mt-1">
+                      <span className="text-muted-foreground">Claim Rate: {claimInfo.claimPercentage.toFixed(1)}%</span>
+                      <span className="text-muted-foreground">Held: {claimInfo.daysSincePurchase} days</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                      <div 
+                        className="bg-gradient-to-r from-green-400 to-blue-500 h-1.5 rounded-full transition-all duration-300"
+                        style={{ width: `${Math.min(claimInfo.claimPercentage, 100)}%` }}
+                      ></div>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {claimInfo.claimPercentage < 100 
+                        ? `📈 Value grows over time! Hold longer for higher returns.` 
+                        : `🎉 Maximum value reached! You can claim 100%+ of your investment.`
+                      }
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Claim Results for Claimed Policies */}
+              {policy.status === 'claimed' && policy.claimAmount && (
+                <div className="mb-3 p-2 rounded-md bg-blue-500/10 border border-blue-500/20">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-blue-600 font-medium">Claim Processed:</span>
+                    <span className="font-bold text-blue-700">{policy.claimAmount.toFixed(4)} SHM</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs mt-1">
+                    <span className="text-muted-foreground">Rate: {policy.claimPercentage?.toFixed(1)}%</span>
+                    <span className="text-muted-foreground">Held: {policy.daysSincePurchase} days</span>
+                  </div>
+                  {policy.timeBonus && policy.timeBonus > 0 && (
+                    <div className="text-xs text-blue-600 mt-1">
+                      💰 Time Bonus: +{policy.timeBonus.toFixed(4)} SHM
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-1 text-muted-foreground">

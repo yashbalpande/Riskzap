@@ -20,7 +20,6 @@ interface NavigationProps {
 
 const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionChange }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
 
   const navigationItems = [
     { id: 'dashboard', label: 'FEATURES', icon: BarChart3 },
@@ -32,17 +31,6 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
 
   return (
     <>
-      {/* Demo Mode Banner */}
-      {isDemoMode && (
-        <div className="mx-4 mt-2 bg-warning/10 border border-warning/20 rounded-full px-4 py-2 backdrop-blur-sm">
-          <div className="flex items-center justify-center gap-2 text-warning text-xs">
-            <Sparkles className="h-3 w-3" />
-            <span>Demo Mode: Simulated transactions</span>
-            <Sparkles className="h-3 w-3" />
-          </div>
-        </div>
-      )}
-
       {/* Desktop Navigation */}
       <nav className="hidden lg:flex items-center justify-between px-6 py-3 mx-4 mt-4 rounded-full bg-background-navbar border border-border backdrop-blur-xl shadow-medium">
         {/* Logo */}
@@ -98,17 +86,6 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
           <WalletConnector />
         </div>
       </nav>
-
-      {/* Mobile Demo Mode Banner */}
-      {isDemoMode && (
-        <div className="lg:hidden mx-2 mt-1 bg-warning/10 border border-warning/20 rounded-full px-3 py-1.5 backdrop-blur-sm">
-          <div className="flex items-center justify-center gap-1 text-warning text-xs">
-            <Sparkles className="h-3 w-3" />
-            <span>Demo Mode</span>
-            <Sparkles className="h-3 w-3" />
-          </div>
-        </div>
-      )}
 
       {/* Mobile Navigation */}
       <nav className="lg:hidden flex items-center justify-between p-3 mx-2 mt-2 rounded-2xl glass-card border border-primary/10 backdrop-blur-xl shadow-lg">

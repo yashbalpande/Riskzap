@@ -73,7 +73,7 @@ class RiskzapAPIService {
     }
   }
 
-  // Verification endpoint for hackathon requirement
+  // Verification endpoint for production
   async verifyWalletAction(request: VerificationRequest): Promise<VerificationResponse> {
     try {
       return await this.fetchJson<VerificationResponse>('/api/verify', {
@@ -82,42 +82,8 @@ class RiskzapAPIService {
       });
     } catch (error) {
       console.error('Verification API error:', error);
-      // Fallback verification logic for demo purposes
-      return this.fallbackVerification(request);
+      throw new Error('Verification service unavailable');
     }
-  }
-
-  // Fallback verification for demo when backend is not available
-  private fallbackVerification(request: VerificationRequest): VerificationResponse {
-    // Simple validation logic for demo
-    const isValidAddress = request.walletAddress && request.walletAddress.startsWith('0x');
-    const hasValidAction = ['policy_creation', 'claim_submission', 'premium_payment'].includes(request.action);
-    const isRecentTimestamp = Date.now() - request.timestamp < 24 * 60 * 60 * 1000; // 24 hours
-
-    if (isValidAddress && hasValidAction && isRecentTimestamp) {
-      return {
-        success: true,
-        status: 'pass',
-        message: 'Wallet action verified successfully',
-        data: {
-          verifiedAt: new Date().toISOString(),
-          blockchainConfirmed: true
-        }
-      };
-    }
-
-    return {
-      success: false,
-      status: 'fail',
-      message: 'Wallet action verification failed',
-      data: {
-        reasons: [
-          !isValidAddress && 'Invalid wallet address',
-          !hasValidAction && 'Invalid action type',
-          !isRecentTimestamp && 'Action timestamp too old'
-        ].filter(Boolean)
-      }
-    };
   }
 
   // Policy creation endpoint
@@ -129,19 +95,7 @@ class RiskzapAPIService {
       });
     } catch (error) {
       console.error('Policy creation API error:', error);
-      
-      // Demo response
-      return {
-        success: true,
-        status: 'pass',
-        message: 'Policy created successfully',
-        data: {
-          policyId: `POL_${Date.now()}`,
-          premium: request.premium,
-          coverage: request.coverage,
-          expiresAt: new Date(Date.now() + request.duration * 24 * 60 * 60 * 1000).toISOString()
-        }
-      };
+      throw new Error('Policy creation service unavailable');
     }
   }
 
@@ -159,18 +113,7 @@ class RiskzapAPIService {
       return await response.json();
     } catch (error) {
       console.error('Claim submission API error:', error);
-      
-      // Demo response
-      return {
-        success: true,
-        status: 'pass',
-        message: 'Claim submitted for review',
-        data: {
-          claimId: `CLM_${Date.now()}`,
-          estimatedProcessingTime: '2-4 hours',
-          nextSteps: ['Document verification', 'Risk assessment', 'Payout calculation']
-        }
-      };
+      throw new Error('Claim submission service unavailable');
     }
   }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PayFiBackground from '@/components/PayFiBackground';
 import PayFiNavigation from '@/components/PayFiNavigation';
@@ -13,6 +13,29 @@ import { WalletProvider } from '@/components/WalletConnector';
 const Index = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
 
+  // Handle URL hash changes for navigation
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash && ['dashboard', 'policies', 'flow', 'analytics', 'my-policies'].includes(hash)) {
+        setActiveSection(hash);
+      }
+    };
+
+    // Check initial hash
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Update URL when section changes
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
+    window.location.hash = section;
+  };
+
   const renderSection = () => {
     switch (activeSection) {
       case 'dashboard':
@@ -24,7 +47,7 @@ const Index = () => {
       case 'analytics':
         return <AnalyticsView />;
       case 'my-policies':
-        return <MyPoliciesPage onBack={() => setActiveSection('dashboard')} />;
+        return <MyPoliciesPage onBack={() => handleSectionChange('dashboard')} />;
       default:
         return <Dashboard />;
     }
@@ -42,7 +65,7 @@ const Index = () => {
         <SectionTransition index={1}>
           <PayFiNavigation 
             activeSection={activeSection} 
-            onSectionChange={setActiveSection} 
+            onSectionChange={handleSectionChange} 
           />
         </SectionTransition>
         

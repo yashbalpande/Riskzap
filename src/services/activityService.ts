@@ -1,11 +1,39 @@
-import { supabase } from '@/integrations/supabase/client';
+import { localDatabaseService } from './localDatabase';
 import type { ActivityFeedItem } from '@/types/activities';
 
 export class ActivityService {
   /**
-   * Add a new activity to the feed (localStorage version for now)
+   * Add a new activity to the feed (database version)
    */
   static async addActivity(activity: Omit<ActivityFeedItem, 'id' | 'created_at'>) {
+    try {
+      // Convert to database format
+      const dbActivity = await localDatabaseService.logActivity({
+        userWalletAddress: activity.user_address,
+        action: activity.type,
+        description: activity.message,
+        amount: activity.amount ? parseFloat(activity.amount) : undefined,
+        transactionHash: activity.transaction_hash,
+      });
+
+      if (dbActivity) {
+        // Trigger custom event for real-time updates
+        window.dispatchEvent(new CustomEvent('activity_feed_update', { detail: [dbActivity] }));
+        return dbActivity;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Activity service error:', error);
+      // Fallback to localStorage if database fails
+      return this.addActivityFallback(activity);
+    }
+  }
+
+  /**
+   * Fallback method using localStorage
+   */
+  private static async addActivityFallback(activity: Omit<ActivityFeedItem, 'id' | 'created_at'>) {
     try {
       const activityWithId = {
         ...activity,
@@ -14,15 +42,13 @@ export class ActivityService {
       };
 
       const existing = JSON.parse(localStorage.getItem('activity_feed') || '[]');
-      const updated = [activityWithId, ...existing].slice(0, 50); // Keep only last 50
+      const updated = [activityWithId, ...existing].slice(0, 50);
       localStorage.setItem('activity_feed', JSON.stringify(updated));
       
-      // Trigger custom event for real-time updates
       window.dispatchEvent(new CustomEvent('activity_feed_update', { detail: updated }));
-      
       return activityWithId;
     } catch (error) {
-      console.error('Activity service error:', error);
+      console.error('Activity fallback error:', error);
       return null;
     }
   }
@@ -30,25 +56,50 @@ export class ActivityService {
   /**
    * Get recent activities for the feed
    */
-  static async getRecentActivities(limit = 10) {
+  static async getRecentActivities(limit = 10, userAddress?: string) {
     try {
-      const activities = JSON.parse(localStorage.getItem('activity_feed') || '[]');
-      
-      // Clear any sample data (activities without real transaction hashes)
-      const realActivities = activities.filter((activity: any) => 
-        activity.transaction_hash || activity.type === 'kyc' || activity.type === 'risk_assessment'
-      );
-      
-      // Update localStorage if we filtered out sample data
-      if (realActivities.length !== activities.length) {
-        localStorage.setItem('activity_feed', JSON.stringify(realActivities));
+      if (userAddress) {
+        // Get user-specific activities from database
+        const dbActivities = await localDatabaseService.getUserActivities(userAddress, limit);
+        if (dbActivities.length > 0) {
+          return dbActivities.map(this.convertDbToActivityFormat);
+        }
+      } else {
+        // Get global activities from database
+        const dbActivities = await localDatabaseService.getGlobalActivities(limit);
+        if (dbActivities.length > 0) {
+          return dbActivities.map(this.convertDbToActivityFormat);
+        }
       }
+
+      // Fallback to localStorage
+      const activities = JSON.parse(localStorage.getItem('activity_feed') || '[]');
+      const filtered = userAddress 
+        ? activities.filter((activity: any) => activity.user_address === userAddress)
+        : activities;
       
-      return realActivities.slice(0, limit);
+      return filtered.slice(0, limit);
     } catch (error) {
       console.error('Error fetching activities:', error);
       return [];
     }
+  }
+
+  /**
+   * Convert database activity to ActivityFeedItem format
+   */
+  private static convertDbToActivityFormat(dbActivity: any): ActivityFeedItem {
+    return {
+      id: dbActivity.id,
+      type: dbActivity.action,
+      message: dbActivity.description,
+      user_address: dbActivity.user_wallet_address,
+      amount: dbActivity.amount?.toString(),
+      transaction_hash: dbActivity.transaction_hash,
+      policy_type: dbActivity.policy_id ? 'insurance' : undefined,
+      status: 'success',
+      created_at: dbActivity.timestamp || dbActivity.created_at
+    };
   }
 
   /**

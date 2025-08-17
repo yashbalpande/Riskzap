@@ -4,6 +4,7 @@ import { Wallet, Power, AlertCircle, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { connectWallet, getShmBalance } from '@/services/web3';
 import { ethers } from 'ethers';
+import { toast } from '@/hooks/use-toast';
 
 interface WalletContextType {
   account: string | null;
@@ -57,6 +58,14 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           const chainId = parseInt(networkId, 16);
           console.log('🌐 Chain ID:', chainId);
           setChainId(chainId);
+          
+          // Show local storage mode notification
+          if (accounts.length > 0) {
+            toast({
+              title: "🎉 Local Storage Mode Active",
+              description: "Connected to real blockchain. All transactions use actual SHM tokens stored locally in your browser.",
+            });
+          }
         }
       } catch (error) {
         console.error('❌ Error checking connection:', error);
@@ -69,11 +78,26 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       try {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         await checkConnection();
+        
+        // Local storage mode welcome message
+        toast({
+          title: "🚀 Welcome to Local Storage Mode",
+          description: "You're now connected to the live system. All policies will be stored locally in your browser and use real SHM tokens.",
+        });
       } catch (error) {
         console.error('Error connecting wallet:', error);
+        toast({
+          title: "Connection Failed",
+          description: "Unable to connect wallet. Please try again.",
+          variant: "destructive",
+        });
       }
     } else {
-      alert('Please install MetaMask or another Web3 wallet');
+      toast({
+        title: "Wallet Required",
+        description: "Please install MetaMask or another Web3 wallet to continue.",
+        variant: "destructive",
+      });
     }
   };
 
