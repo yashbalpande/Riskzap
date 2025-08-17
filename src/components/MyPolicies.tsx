@@ -150,13 +150,15 @@ Policy Details:
 - Status: ${policy.status.toUpperCase()}
 
 Coverage Information:
-- Coverage Amount: ${policy.coverageAmount} SHM
+- Coverage Amount: ${policy.coverageAmount} SHM 
 - Premium Paid: ${policy.premium} SHM
 - Platform Fee: ${policy.platformFee} SHM
+--------------------------------------------
 - Total Paid: ${policy.totalPaid} SHM
 
 Policyholder:
 - Wallet Address: ${policy.userAddress}
+
 - Purchase Date: ${formatDate(policy.purchaseDate)}
 - Expiry Date: ${formatDate(policy.expiryDate || '')}
 
@@ -185,7 +187,7 @@ Platform: RiskZap Insurance (Shardeum Testnet)
   };
 
   const viewOnExplorer = (txHash: string) => {
-    window.open(`https://explorer-dapps.shardeum.org/transaction/${txHash}`, '_blank');
+    window.open(`https://explorer-testnet.shardeum.org/transaction/${txHash}`, '_blank');
   };
 
   if (!account) {
@@ -210,7 +212,7 @@ Platform: RiskZap Insurance (Shardeum Testnet)
           <Shield className="h-6 w-6 text-primary animate-pulse" />
           <h2 className="text-xl font-bold">My Policies</h2>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-4">   
           {[...Array(2)].map((_, i) => (
             <div key={i} className="p-4 rounded-lg bg-background/50 border border-primary/10 animate-pulse">
               <div className="h-4 bg-gray-300 rounded mb-2" />

@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    /* Modern refined palette - diversified accent colors */
-    --background: 220 15% 6%; /* subtle dark base */
+    
+    --background: 220 15% 6%; 
     --background-secondary: 220 12% 8%; /* slightly lighter for cards */
     --background-navbar: 220 12% 9%; /* slightly lighter for navbar separation */
     --foreground: 0 0% 95%;   /* crisp white text */

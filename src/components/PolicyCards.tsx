@@ -184,12 +184,10 @@ const PolicyCards: React.FC = () => {
         status: 'active'
       };
       
-      // Save to localStorage (in real app, save to backend)
       const existingPolicies = JSON.parse(localStorage.getItem('USER_POLICIES') || '[]');
       existingPolicies.push(policyRecord);
       localStorage.setItem('USER_POLICIES', JSON.stringify(existingPolicies));
       
-      // Calculate coverage amount and expiry
       const coverageAmount = policy.basePremium * (policy.id === 'health-micro' ? 20 : 15);
       const expiryDate = new Date();
       const daysToAdd = policy.id === 'travel-insurance' ? 30 : 365;
