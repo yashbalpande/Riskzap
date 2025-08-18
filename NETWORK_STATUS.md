@@ -3,7 +3,7 @@
 ## Current Status: Coin-Transfer-Only Mode
 
 **Date**: August 17, 2025  
-**Network**: Shardeum Unstablenet (Chain ID: 8080)  
+**Network**: Shardeum Liberty 1.X (Chain ID: 8080)  
 **Status**: Restricted Mode - Contract deployments temporarily disabled
 
 ## Error Message:

@@ -1,5 +1,4 @@
-// Riskzap Insurance Smart Contract Interface
-// This would be deployed on Shardeum Unstablenet
+// This would be deployed on Shardeum Liberty 1.X
 
 export const PAYFI_INSURANCE_ABI = [
   {
@@ -38,11 +37,11 @@ export const PAYFI_INSURANCE_ABI = [
   }
 ];
 
-// Shardeum Unstablenet configuration
+// Shardeum Liberty 1.X configuration
 export const SHARDEUM_CONFIG = {
-  chainId: 8080, // Shardeum Unstablenet Chain ID
+  chainId: 8080, // Shardeum Liberty 1.X Chain ID
   rpcUrl: "https://api-unstable.shardeum.org",
-  blockExplorer: "https://explorer-dapps.shardeum.org/",
+  blockExplorer: "https://explorer-unstable.shardeum.org/",
   currency: {
     name: "Shardeum",
     symbol: "SHM",
@@ -167,7 +166,7 @@ export const addShardeumNetwork = async () => {
         method: 'wallet_addEthereumChain',
         params: [{
           chainId: `0x${SHARDEUM_CONFIG.chainId.toString(16)}`,
-          chainName: 'Shardeum Unstablenet',
+          chainName: 'Shardeum Liberty 1.X',
           nativeCurrency: SHARDEUM_CONFIG.currency,
           rpcUrls: [SHARDEUM_CONFIG.rpcUrl],
           blockExplorerUrls: [SHARDEUM_CONFIG.blockExplorer]

@@ -144,8 +144,8 @@ async function automaticDeployment() {
   }
 
   try {
-    // Connect to Shardeum Unstablenet
-    console.log('🔗 Connecting to Shardeum Unstablenet...');
+    // Connect to Shardeum Liberty 1.X
+    console.log('🔗 Connecting to Shardeum Liberty 1.X...');
     const provider = new ethers.providers.JsonRpcProvider('https://api-unstable.shardeum.org');
     const wallet = new ethers.Wallet(`0x${process.env.PRIVATE_KEY}`, provider);
     
@@ -161,7 +161,7 @@ async function automaticDeployment() {
     }
 
     const network = await provider.getNetwork();
-    console.log('🌐 Network:', network.chainId === 8080 ? 'Shardeum Unstablenet ✅' : `Unknown (${network.chainId})`);
+    console.log('🌐 Network:', network.chainId === 8080 ? 'Shardeum Liberty 1.X ✅' : `Unknown (${network.chainId})`);
 
     // Deploy ERC20Mock Token
     console.log('\\n1️⃣ Deploying ERC20Mock Token...');
@@ -254,7 +254,7 @@ async function automaticDeployment() {
     console.log(`   ERC20Mock Token: ${token.address}`);
     console.log(`   PolicyManager: ${policyManager.address}`);
     console.log('✅ .env file updated with new addresses');
-    console.log('🌐 Network: Shardeum Unstablenet (Chain ID: 8080)');
+    console.log('🌐 Network: Shardeum Liberty 1.X (Chain ID: 8080)');
     console.log(`🔗 Explorer: https://explorer-unstable.shardeum.org/`);
     
     return {

@@ -4,13 +4,24 @@ import { ethers } from 'ethers';
 const LS_TOKEN_KEY = 'RISKZAP_SHM_TOKEN_ADDRESS';
 const LS_COMPANY_KEY = 'RISKZAP_COMPANY_WALLET';
 const LS_POLICY_KEY = 'RISKZAP_POLICY_CONTRACT';
+const shardeumLiberty = {
+  chainName: 'Shardeum Liberty 1.X',
+  rpcUrls: ['https://api-unstable.shardeum.org'],
+  nativeCurrency: {
+    name: 'SHM',
+    symbol: 'SHM',
+    decimals: 18,
+  },
+  blockExplorerUrls: ['https://explorer-unstable.shardeum.org/'],
+};
+
+// Policy contract key constant
+// const POLICY_KEY = 'RISKZAP_POLICY_CONTRACT'; // removed duplicate
 
 // Demo mode for development when contracts aren't deployed
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
-// Keep an internal default token only for developer convenience. Company wallet
-// must be configured at runtime (env OR localStorage) — there is no hardcoded
-// company wallet in this file.
+
 const DEFAULT_SHM_TOKEN_ADDRESS = (import.meta as any)?.env?.VITE_SHM_TOKEN_ADDRESS || '';
 
 export const SHM_TOKEN_DECIMALS = import.meta.env.VITE_SHM_TOKEN_DECIMALS
@@ -139,7 +150,7 @@ export async function purchaseWithPolicyContract(
   const tokenContract = new ethers.Contract(tokenAddr, erc20Abi, signer);
   const policyContract = new ethers.Contract(policyAddr, policyAbi, signer);
 
-  const amount = ethers.parseUnits(String(amountInShm), SHM_TOKEN_DECIMALS);
+  const amount = ethers.utils.parseUnits(String(amountInShm), SHM_TOKEN_DECIMALS);
 
   // Approve then purchase
   const approveTx = await tokenContract.approve(policyAddr, amount);
@@ -160,39 +171,44 @@ export async function connectWallet() {
 
   await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
 
-  const provider = new ethers.BrowserProvider((window as any).ethereum);
-  const signer = await provider.getSigner();
+  // Create provider with polling disabled to prevent network mismatch errors
+  const provider = new ethers.providers.Web3Provider((window as any).ethereum, "any");
+  const signer = provider.getSigner();
   const address = await signer.getAddress();
 
   // Check if we're on the correct network
   if (EXPECTED_CHAIN_ID) {
-    const network = await provider.getNetwork();
-    const chainIdNum = Number(network.chainId);
-    
-    if (chainIdNum !== EXPECTED_CHAIN_ID) {
-      // Try to switch to the correct network
-      try {
-        await (window as any).ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: `0x${EXPECTED_CHAIN_ID.toString(16)}` }],
-        });
-      } catch (switchError: any) {
-        // If the network doesn't exist, add it
-        if (switchError.code === 4902) {
+    try {
+      const network = await provider.getNetwork();
+      const chainIdNum = Number(network.chainId);
+      
+      if (chainIdNum !== EXPECTED_CHAIN_ID) {
+        // Try to switch to the correct network
+        try {
           await (window as any).ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: `0x${EXPECTED_CHAIN_ID.toString(16)}`,
-              chainName: 'Shardeum Unstablenet',
-              rpcUrls: ['https://api-unstable.shardeum.org'],
-              nativeCurrency: { name: 'Shardeum', symbol: 'SHM', decimals: 18 },
-              blockExplorerUrls: ['https://explorer-dapps.shardeum.org/']
-            }]
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: `0x${EXPECTED_CHAIN_ID.toString(16)}` }],
           });
-        } else {
-          throw switchError;
+        } catch (switchError: any) {
+          // If the network doesn't exist, add it
+          if (switchError.code === 4902) {
+            await (window as any).ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: `0x${EXPECTED_CHAIN_ID.toString(16)}`,
+                chainName: 'Shardeum Liberty 1.X',
+                rpcUrls: ['https://api-unstable.shardeum.org'],
+                nativeCurrency: { name: 'Shardeum', symbol: 'SHM', decimals: 18 },
+                blockExplorerUrls: ['https://explorer-unstable.shardeum.org/']
+              }]
+            });
+          } else {
+            throw switchError;
+          }
         }
       }
+    } catch (networkError) {
+      console.warn('Network check failed, but continuing:', networkError);
     }
   }
 
@@ -217,7 +233,7 @@ async function assertExpectedNetwork(signer: ethers.Signer) {
 /**
  * Get SHM token balance of a given address (using native SHM)
  */
-export async function getShmBalance(provider: ethers.Provider, address: string) {
+export async function getShmBalance(provider: ethers.providers.Provider, address: string) {
   if (!provider) {
     throw new Error('Provider is required to check SHM balance.');
   }
@@ -235,7 +251,7 @@ export async function getShmBalance(provider: ethers.Provider, address: string) 
   // For native SHM tokens, just get the native balance
   try {
     const balance = await provider.getBalance(address);
-    const formattedBalance = ethers.formatEther(balance);
+    const formattedBalance = ethers.utils.formatEther(balance);
     console.log('💰 Raw balance (wei):', balance.toString());
     console.log('💰 Formatted balance (SHM):', formattedBalance);
     return formattedBalance;
@@ -280,13 +296,13 @@ export async function sendShmToken(signer: ethers.Signer, amountInShm: string | 
   }
 
   // Send native SHM tokens directly
-  const amount = ethers.parseEther(String(amountInShm));
+  const amount = ethers.utils.parseEther(String(amountInShm));
   
   const tx = await signer.sendTransaction({
     to: company,
     value: amount,
     gasLimit: 21000, // Standard transfer gas limit
-    gasPrice: ethers.parseUnits("20", "gwei")
+    gasPrice: ethers.utils.parseUnits("20", "gwei")
   });
 
   await tx.wait();
@@ -314,13 +330,13 @@ export async function sendClaimPayout(companySigner: ethers.Signer, userAddress:
   }
 
   // Send native SHM tokens directly
-  const amount = ethers.parseEther(String(amountInShm));
+  const amount = ethers.utils.parseEther(String(amountInShm));
   
   const tx = await companySigner.sendTransaction({
     to: userAddress,
     value: amount,
     gasLimit: 21000,
-    gasPrice: ethers.parseUnits("20", "gwei")
+    gasPrice: ethers.utils.parseUnits("20", "gwei")
   });
 
   await tx.wait();

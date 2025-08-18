@@ -42,7 +42,7 @@ async function deployContract(
 }
 
 async function main() {
-  console.log('🚀 Manual Contract Deployment to Shardeum Unstablenet');
+  console.log('🚀 Manual Contract Deployment to Shardeum Liberty 1.X');
   
   if (!process.env.PRIVATE_KEY) {
     console.error('❌ Please set PRIVATE_KEY in your .env file');

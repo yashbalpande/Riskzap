@@ -25,7 +25,7 @@ const POLICY_ABI = [
 ];
 
 async function deployToShardeum() {
-  console.log('🚀 Manual deployment to Shardeum Unstablenet');
+  console.log('🚀 Manual deployment to Shardeum Liberty 1.X');
   
   if (!process.env.PRIVATE_KEY) {
     console.error('❌ Private key not found in .env file');
@@ -33,7 +33,7 @@ async function deployToShardeum() {
   }
 
   try {
-    // Connect to Shardeum Unstablenet
+    // Connect to Shardeum Liberty 1.X
     const provider = new ethers.providers.JsonRpcProvider('https://api-testnet.shardeum.org/');
     const wallet = new ethers.Wallet(`0x${process.env.PRIVATE_KEY}`, provider);
     
@@ -130,11 +130,11 @@ async function deployToShardeum() {
     console.log('3. 📁 Create new file: PolicyManager.sol');
     console.log('4. 📋 Copy contract code from ./contracts/ folder');
     console.log('5. 🔧 Compile contracts in Solidity Compiler');
-    console.log('6. 🦊 Connect MetaMask to Shardeum Unstablenet');
+    console.log('6. 🦊 Connect MetaMask to Shardeum Liberty 1.X');
     console.log('7. 🚀 Deploy using Deploy & Run Transactions');
     console.log('');
-    console.log('🔗 Shardeum Unstablenet RPC: https://api-unstable.shardeum.org');
-    console.log('🆔 Chain ID: 8083');
+    console.log('🔗 Shardeum Liberty 1.X RPC: https://api-unstable.shardeum.org');
+    console.log('🆔 Chain ID: 8080');
     console.log('💰 Your wallet:', process.env.PRIVATE_KEY ? 'Configured' : 'Not found');
   }
 }

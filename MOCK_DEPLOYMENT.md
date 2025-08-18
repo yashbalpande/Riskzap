@@ -9,7 +9,7 @@
 - **PolicyManager Deploy**: 0xdef456789abc123def456789abc123def456789abc123def456789abc123def4
 
 ## Network Details
-- **Network**: Shardeum Unstablenet
+- **Network**: Shardeum Liberty 1.X
 - **Chain ID**: 8083
 - **Deployer**: 0xFd3fBa510A135B5DE354B1d4b174208c343aaD42
 - **Gas Used**: ~2,500,000 gas total

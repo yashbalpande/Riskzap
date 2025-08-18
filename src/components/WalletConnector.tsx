@@ -115,7 +115,7 @@ const WalletConnector: React.FC = () => {
   const [isShardeum, setIsShardeum] = useState(false);
 
   useEffect(() => {
-    // Shardeum Unstablenet Chain ID is 8080
+  
     setIsShardeum(chainId === 8080);
   }, [chainId]);
 
@@ -156,7 +156,7 @@ const WalletConnector: React.FC = () => {
                 <AlertCircle className="h-4 w-4 text-warning" />
               )}
               <span className="text-sm">
-                {isShardeum ? 'Shardeum Unstablenet' : `Chain ${chainId}`}
+                {isShardeum ? 'Shardeum Liberty 1.X' : `Chain ${chainId}`}
               </span>
             </div>
 

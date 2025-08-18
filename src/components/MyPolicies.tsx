@@ -278,14 +278,14 @@ Policyholder:
 
 Transaction:
 - Transaction Hash: ${policy.txHash}
-- Blockchain: Shardeum Unstablenet
+- Blockchain: Shardeum Liberty 1.X
 
 Terms & Conditions:
 This is a micro-insurance policy powered by blockchain technology.
 Claims are subject to verification and approval.
 
 Generated on: ${new Date().toLocaleString()}
-Platform: RiskZap Insurance (Shardeum Unstablenet)
+Platform: RiskZap Insurance (Shardeum Liberty 1.X)
     `;
 
     // Create and download the file

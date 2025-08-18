@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 async function main() {
-  console.log('🚀 Starting deployment check for Shardeum Unstablenet...');
+  console.log('🚀 Starting deployment check for Shardeum Liberty 1.X...');
   
   if (!process.env.PRIVATE_KEY) {
     console.error('❌ Please set PRIVATE_KEY in your .env file');
@@ -16,7 +16,7 @@ async function main() {
     process.exit(1);
   }
 
-  // Connect to Shardeum Unstablenet - try multiple RPC endpoints
+  // Connect to Shardeum Liberty 1.X - try multiple RPC endpoints
   const rpcUrls = [
     process.env.SHARDEUM_RPC_URL || 'https://api-testnet.shardeum.org/',
     'https://api-testnet.shardeum.org/',
@@ -67,14 +67,14 @@ async function main() {
   const network = await provider.getNetwork();
   console.log('🌐 Connected to network:', network.name, 'Chain ID:', network.chainId);
   
-  if (network.chainId !== 8083) {
-    console.warn('⚠️  Warning: Expected Shardeum Unstablenet (Chain ID: 8083)');
+  if (network.chainId !== 8080) {
+    console.warn('⚠️  Warning: Expected Shardeum Liberty 1.X (Chain ID: 8080)');
   }
 
   console.log('\n✅ Deployment prerequisites check completed!');
   console.log('📝 Deployer wallet:', wallet.address);
   console.log('💳 Balance:', ethers.utils.formatEther(balance), 'SHM');
-  console.log('🌐 Network: Shardeum Unstablenet');
+  console.log('🌐 Network: Shardeum Liberty 1.X');
   
   console.log('\n📋 Next steps to deploy contracts:');
   console.log('1. ✅ Wallet funded with SHM');

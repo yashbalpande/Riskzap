@@ -95,7 +95,7 @@ const LiveActivityFeed: React.FC<LiveActivityFeedProps> = ({ maxItems = 10 }) =>
 
   const handleViewOnExplorer = (hash?: string) => {
     if (hash) {
-      window.open(`https://explorer-dapps.shardeum.org/transaction/${hash}`, '_blank');
+      window.open(`https://explorer-unstable.shardeum.org/transaction/${hash}`, '_blank');
     }
   };
 

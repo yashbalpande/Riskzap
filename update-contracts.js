@@ -2,7 +2,7 @@ import fs from 'fs';
 import { ethers } from 'ethers';
 
 // Function to update .env file with deployed contract addresses
-function updateContractAddresses(tokenAddress, policyManagerAddress, network = 'Shardeum Unstablenet') {
+function updateContractAddresses(tokenAddress, policyManagerAddress, network = 'Shardeum Liberty 1.X') {
   console.log('📝 Updating .env file with deployed contract addresses...');
   
   // Validate addresses
@@ -54,7 +54,7 @@ export { updateContractAddresses };
 if (process.argv.length >= 4) {
   const tokenAddress = process.argv[2];
   const policyManagerAddress = process.argv[3];
-  const network = process.argv[4] || 'Shardeum Unstablenet';
+  const network = process.argv[4] || 'Shardeum Liberty 1.X';
   
   try {
     updateContractAddresses(tokenAddress, policyManagerAddress, network);
@@ -65,5 +65,5 @@ if (process.argv.length >= 4) {
   }
 } else if (process.argv.length === 3 && process.argv[2] === '--help') {
   console.log('📖 Usage: node update-contracts.js <tokenAddress> <policyManagerAddress> [network]');
-  console.log('📖 Example: node update-contracts.js 0x742d35... 0x1234567... "Shardeum Unstablenet"');
+  console.log('📖 Example: node update-contracts.js 0x742d35... 0x1234567... "Shardeum Liberty 1.X"');
 }

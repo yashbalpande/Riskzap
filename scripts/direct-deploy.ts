@@ -9,14 +9,14 @@ const ERC20_BYTECODE = "0x608060405234801561001057600080fd5b50604051610c20380380
 const POLICY_MANAGER_BYTECODE = "0x608060405234801561001057600080fd5b5060405161080c38038061080c8339818101604052810190610032919061013a565b8160008054906101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508060018054906101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505050610177565b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b60006100ec826100c1565b9050919050565b6100fc816100e1565b811461010757600080fd5b50565b600081519050610119816100f3565b92915050565b61012881610133565b811461013357600080fd5b50565b6000815190506101458161011f565b92915050565b6000806040838503121561016257610161610124565b5b60006101708582860161010a565b925050602061018185828601610136565b9150509250929050565b610686806101866000396000f3fe";
 
 async function deployContracts() {
-  console.log('🚀 Direct contract deployment to Shardeum Unstablenet');
+  console.log('🚀 Direct contract deployment to Shardeum Liberty 1.X');
   
   if (!process.env.PRIVATE_KEY) {
     console.error('❌ Private key not found');
     process.exit(1);
   }
 
-  // Connect to Shardeum Unstablenet
+  // Connect to Shardeum Liberty 1.X
   const provider = new ethers.providers.JsonRpcProvider('https://api-testnet.shardeum.org/');
   const wallet = new ethers.Wallet(`0x${process.env.PRIVATE_KEY}`, provider);
   
@@ -96,7 +96,7 @@ async function deployContracts() {
     console.log('1. Go to https://remix.ethereum.org/');
     console.log('2. Upload contract files from ./contracts/');
     console.log('3. Compile contracts');
-    console.log('4. Connect MetaMask to Shardeum Unstablenet');
+    console.log('4. Connect MetaMask to Shardeum Liberty 1.X');
     console.log('5. Deploy manually');
     
     process.exit(1);

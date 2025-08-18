@@ -106,7 +106,7 @@ curl -X POST http://localhost:3001/api/verify \
 ✅ **Public API endpoint** - Available at http://localhost:3001/api/verify  
 ✅ **Pass/fail status** - Returns "pass" or "fail" in status field  
 ✅ **Clear documentation** - This file serves as API documentation  
-✅ **Wallet verification** - Confirms wallet actions on Shardeum  
+- **Blockchain**: Shardeum Liberty 1.X  
 
 ## 🚀 Deployment Ready
 

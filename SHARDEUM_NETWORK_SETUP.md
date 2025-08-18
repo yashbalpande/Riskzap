@@ -1,11 +1,11 @@
-# 🌐 Add Shardeum Unstablenet to MetaMask
+# 🌐 Add Shardeum Liberty 1.X to MetaMask
 
 ## Network Details:
-- **Network Name**: Shardeum Unstablenet
+- **Network Name**: Shardeum Liberty 1.X
 - **RPC URL**: https://api-unstable.shardeum.org
-- **Chain ID**: 8083
+- **Chain ID**: 8080
 - **Currency Symbol**: SHM
-- **Block Explorer**: https://explorer-dapps.shardeum.org/
+- **Block Explorer**: https://explorer-unstable.shardeum.org/
 
 ## Steps to Add Network:
 1. Open MetaMask
