@@ -4,6 +4,10 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+/**
+ * @title PolicyManager
+ * @dev Manages insurance policy purchases and withdrawals with fee structure
+ */
 contract PolicyManager is Ownable {
     IERC20 public token;
     address public companyWallet;
@@ -15,7 +19,12 @@ contract PolicyManager is Ownable {
     event CompanyUpdated(address indexed company);
     event Withdrawn(address indexed to, uint256 amount, uint256 fee);
 
-    constructor(address tokenAddr, address _companyWallet) {
+    /**
+     * @dev Constructor sets the token and company wallet addresses
+     * @param tokenAddr Address of the ERC20 token to be used
+     * @param _companyWallet Address where company fees will be sent
+     */
+    constructor(address tokenAddr, address _companyWallet) Ownable(msg.sender) {
         token = IERC20(tokenAddr);
         companyWallet = _companyWallet;
     }

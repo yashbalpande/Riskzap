@@ -183,7 +183,7 @@ export async function connectWallet() {
             method: 'wallet_addEthereumChain',
             params: [{
               chainId: `0x${EXPECTED_CHAIN_ID.toString(16)}`,
-              chainName: 'Shardeum Testnet',
+              chainName: 'Shardeum Unstablenet',
               rpcUrls: ['https://api-unstable.shardeum.org'],
               nativeCurrency: { name: 'Shardeum', symbol: 'SHM', decimals: 18 },
               blockExplorerUrls: ['https://explorer-dapps.shardeum.org/']
