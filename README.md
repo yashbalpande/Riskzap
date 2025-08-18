@@ -1,4 +1,4 @@
-# 🔥 RiskZap - Micro-Insurance DApp on Shardeum Liberty 1.X
+# 🔥 RiskZap - Micro-Insurance DApp on Shardeum Unstablenet
 
 ## 🏆 **HACKATHON DELIVERABLES** ✅
 
@@ -7,10 +7,10 @@
 🔗 **Verification API**: [http://localhost:3001/api/verify](http://localhost:3001/api/verify)  
 📊 **Health Check**: [http://localhost:3001/health](http://localhost:3001/health)  
 
-### **🔗 Deployed Smart Contracts on Shardeum Liberty 1.X**
+### **🔗 Deployed Smart Contracts on Shardeum Unstablenet**
 🪙 **ERC20Mock Token**: [`0xaa2b86e1f9de4cbdeaf177e61ce0e2fc091f9f9e`](https://explorer-unstable.shardeum.org/address/0xaa2b86e1f9de4cbdeaf177e61ce0e2fc091f9f9e)  
 📋 **PolicyManager**: [`0x055682a1a8fa88ed10a56724d29bcd44215e04d5`](https://explorer-unstable.shardeum.org/address/0x055682a1a8fa88ed10a56724d29bcd44215e04d5)  
-🌐 **Network**: Shardeum Liberty 1.X (Chain ID: 8080)  
+🌐 **Network**: Shardeum Unstablenet (Chain ID: 8080)  
 🔍 **Explorer**: https://explorer-unstable.shardeum.org/  
 
 ### **📂 Complete GitHub Repository**
@@ -30,7 +30,7 @@
 
 ## 🚀 Revolutionary Insurance Platform
 
-A cutting-edge decentralized insurance platform built on Shardeum Liberty 1.X, offering instant micro-policies with SHM token payments. This DApp demonstrates the future of Web3 insurance with gamified UX, 3D animations, and smart contract automation.
+A cutting-edge decentralized insurance platform built on Shardeum Unstablenet, offering instant micro-policies with SHM token payments. This DApp demonstrates the future of Web3 insurance with gamified UX, 3D animations, and smart contract automation.
 
 ## 🌟 Features
 
@@ -51,7 +51,7 @@ A cutting-edge decentralized insurance platform built on Shardeum Liberty 1.X, o
 ### Technical Stack
 - **Frontend**: React 18 + TypeScript + Vite
 - **3D Graphics**: Three.js + React Three Fiber + Drei
-- **Blockchain**: Web3.js + Shardeum Liberty 1.X
+- **Blockchain**: Web3.js + Shardeum Unstablenet
 - **Styling**: Tailwind CSS + Framer Motion
 - **State Management**: Redux Toolkit + React Context
 - **Smart Contracts**: Solidity (deployed on Shardeum)
@@ -92,9 +92,9 @@ npm run dev
 # DApp will be available at http://localhost:8080
 ```
 
-#### **4. Connect to Shardeum Liberty 1.X**
-The DApp automatically prompts users to add Shardeum Liberty 1.X:
-- **Network Name**: Shardeum Liberty 1.X
+#### **4. Connect to Shardeum Unstablenet**
+The DApp automatically prompts users to add Shardeum Unstablenet:
+- **Network Name**: Shardeum Unstablenet
 - **RPC URL**: https://api-unstable.shardeum.org
 - **Chain ID**: 8080
 - **Currency**: SHM

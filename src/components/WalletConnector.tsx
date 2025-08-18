@@ -45,19 +45,43 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           setAccount(accounts[0]);
           setIsConnected(true);
           
-          // Create provider for balance checking
-          const provider = new ethers.BrowserProvider(window.ethereum);
+          // Create provider for balance checking (using ethers v5 syntax)
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
           console.log('🔗 Created provider, checking balance...');
           
-          const balanceStr = await getShmBalance(provider, accounts[0]);
-          console.log('💰 Balance returned:', balanceStr);
+          // Get network info safely
+          try {
+            const network = await provider.getNetwork();
+            console.log('🌐 Network info:', network);
+            setChainId(Number(network.chainId));
+          } catch (networkError) {
+            console.warn('⚠️ Could not get network info:', networkError);
+            // Fallback to getting chain ID directly from ethereum
+            try {
+              const networkId = await window.ethereum.request({ method: 'eth_chainId' });
+              const chainId = parseInt(networkId, 16);
+              console.log('🌐 Chain ID (fallback):', chainId);
+              setChainId(chainId);
+            } catch (chainError) {
+              console.error('❌ Could not get chain ID:', chainError);
+              setChainId(null);
+            }
+          }
           
-          setBalance(parseFloat(balanceStr).toFixed(4));
-          
-          const networkId = await window.ethereum.request({ method: 'eth_chainId' });
-          const chainId = parseInt(networkId, 16);
-          console.log('🌐 Chain ID:', chainId);
-          setChainId(chainId);
+          // Get balance safely
+          try {
+            const balanceStr = await getShmBalance(provider, accounts[0]);
+            console.log('💰 Balance returned:', balanceStr);
+            setBalance(parseFloat(balanceStr).toFixed(4));
+          } catch (balanceError) {
+            console.error('❌ Error getting balance:', balanceError);
+            setBalance('0.0000');
+            toast({
+              title: "Balance Fetch Failed",
+              description: "Connected to wallet but couldn't fetch balance. Please check network connection.",
+              variant: "destructive",
+            });
+          }
         }
       } catch (error) {
         console.error('❌ Error checking connection:', error);
@@ -156,7 +180,7 @@ const WalletConnector: React.FC = () => {
                 <AlertCircle className="h-4 w-4 text-warning" />
               )}
               <span className="text-sm">
-                {isShardeum ? 'Shardeum Liberty 1.X' : `Chain ${chainId}`}
+                {isShardeum ? 'Shardeum Unstablenet' : `Chain ${chainId}`}
               </span>
             </div>
 

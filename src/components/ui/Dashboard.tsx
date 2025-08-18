@@ -242,7 +242,7 @@ const Dashboard: React.FC = () => {
             className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full glass-card border-glow-soft"
           >
             <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-            <span className="text-sm font-medium text-success">Live on Shardeum Liberty 1.X</span>
+            <span className="text-sm font-medium text-success">Live on Shardeum Unstablenet</span>
           </motion.div>
           
           <h1 className="text-hero text-gradient-primary mb-6 leading-tight">
@@ -450,7 +450,7 @@ const Dashboard: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-success floating" />
-            <span className="font-semibold text-lg">Shardeum Liberty 1.X Status</span>
+            <span className="font-semibold text-lg">Shardeum Unstablenet Status</span>
           </div>
           <div className="flex items-center gap-6 text-sm">
             <div className="flex items-center gap-2">

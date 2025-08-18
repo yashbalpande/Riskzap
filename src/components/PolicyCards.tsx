@@ -21,6 +21,26 @@ import {
 import { connectWallet, sendShmToken, getConfiguredCompanyWallet, calculatePurchaseFee, calculateWithdrawFee, sendClaimPayout } from '@/services/web3';
 import { ActivityService } from '@/services/activityService';
 
+// Utility to clear any potential circuit breaker state
+const clearCircuitBreakerState = () => {
+  try {
+    // Clear any potential ethers.js or RPC provider cache
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.includes('ethers') || key.includes('provider') || key.includes('circuit'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      console.log('🔄 Cleared potential circuit breaker state');
+    }
+  } catch (error) {
+    console.warn('⚠️ Could not clear circuit breaker state:', error);
+  }
+};
+
 interface PolicyType {
   id: string;
   name: string;
@@ -151,6 +171,9 @@ export const PolicyCards: React.FC = () => {
 
   // Preserve original purchasePolicy but extend to perform token transfer via SHM
   const purchasePolicy = async (policy: PolicyType) => {
+    // Clear any potential circuit breaker state
+    clearCircuitBreakerState();
+    
     // This would integrate with the smart contract
     console.log('🛒 Starting policy purchase:', policy.name);
     console.log('📦 Policy data:', policy);
@@ -182,9 +205,33 @@ export const PolicyCards: React.FC = () => {
       console.log('💰 Payment breakdown:', { premium: policy.basePremium, fee: feeCalculation.fee, total: totalAmount });
       
       console.log('🚀 Sending SHM transaction...');
-      // Transfer total amount (premium + platform fee) to company wallet
-      const tx = await sendShmToken(txSigner, totalAmount);
-      console.log('✅ Transaction successful:', tx.hash);
+      // Transfer total amount (premium + platform fee) to company wallet with retry logic
+      let tx;
+      let retryCount = 0;
+      const maxRetries = 3;
+      
+      while (retryCount < maxRetries) {
+        try {
+          tx = await sendShmToken(txSigner, totalAmount);
+          console.log('✅ Transaction successful:', tx.hash);
+          break; // Success, exit retry loop
+        } catch (txError: any) {
+          retryCount++;
+          console.warn(`⚠️ Transaction attempt ${retryCount} failed:`, txError.message);
+          
+          if (txError.message?.includes('circuit breaker') || txError.message?.includes('timeout')) {
+            if (retryCount < maxRetries) {
+              const delay = Math.min(1000 * Math.pow(2, retryCount), 5000); // Exponential backoff, max 5s
+              console.log(`🔄 Retrying in ${delay}ms...`);
+              await new Promise(resolve => setTimeout(resolve, delay));
+              continue;
+            }
+          }
+          
+          // If not a retryable error or max retries reached, throw the error
+          throw txError;
+        }
+      }
       
       console.log('📝 Logging activity...');
       // Log activity to real-time feed
