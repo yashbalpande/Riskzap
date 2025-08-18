@@ -186,7 +186,11 @@ const UserPoliciesDisplay: React.FC<{ policies: Policy[] }> = ({ policies }) => 
   );
 };
 
-const Dashboard: React.FC = () => {
+interface DashboardProps {
+  onSectionChange?: (section: string) => void;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ onSectionChange }) => {
   const { isConnected, account } = useWallet();
   const [userPolicies, setUserPolicies] = useState<Policy[]>([]);
 
@@ -378,14 +382,14 @@ const Dashboard: React.FC = () => {
           >
             <Button
               className="btn-primary px-8 py-3 text-base"
-              onClick={() => {/* Handle early access */}}
+              onClick={() => onSectionChange?.('policies')}
             >
               Join Beta
             </Button>
             <Button
               variant="outline"
               className="px-8 py-3 text-base border-subtle hover:border-primary/40 bg-background/50"
-              onClick={() => {/* Handle demo */}}
+              onClick={() => onSectionChange?.('flow')}
             >
               Try Demo
             </Button>

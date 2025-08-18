@@ -39,7 +39,7 @@ export const PAYFI_INSURANCE_ABI = [
 
 // Shardeum Liberty 1.X configuration
 export const SHARDEUM_CONFIG = {
-  chainId: 8080, // Shardeum Liberty 1.X Chain ID
+  chainId: 8083, // Shardeum Unstablenet Chain ID
   rpcUrl: "https://api-unstable.shardeum.org",
   blockExplorer: "https://explorer-unstable.shardeum.org/",
   currency: {

@@ -67,8 +67,8 @@ async function main() {
   const network = await provider.getNetwork();
   console.log('🌐 Connected to network:', network.name, 'Chain ID:', network.chainId);
   
-  if (network.chainId !== 8080) {
-    console.warn('⚠️  Warning: Expected Shardeum Liberty 1.X (Chain ID: 8080)');
+  if (network.chainId !== 8083) {
+    console.warn('⚠️  Warning: Expected Shardeum Unstablenet (Chain ID: 8083)');
   }
 
   console.log('\n✅ Deployment prerequisites check completed!');

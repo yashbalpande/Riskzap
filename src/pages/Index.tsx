@@ -39,7 +39,7 @@ const Index = () => {
   const renderSection = () => {
     switch (activeSection) {
       case 'dashboard':
-        return <Dashboard />;
+        return <Dashboard onSectionChange={handleSectionChange} />;
       case 'policies':
         return <PolicyCards />;
       case 'flow':

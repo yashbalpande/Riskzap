@@ -140,7 +140,7 @@ const WalletConnector: React.FC = () => {
 
   useEffect(() => {
   
-    setIsShardeum(chainId === 8080);
+    setIsShardeum(chainId === 8083);
   }, [chainId]);
 
   const formatAddress = (address: string) => {
