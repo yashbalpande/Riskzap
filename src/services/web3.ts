@@ -169,6 +169,9 @@ export async function connectWallet() {
     throw new Error('No web3 wallet found. Please install MetaMask or another provider.');
   }
 
+  console.log('🔌 Connecting to wallet...');
+  console.log('🔍 Expected Chain ID:', EXPECTED_CHAIN_ID);
+
   await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
 
   // Create provider with polling disabled to prevent network mismatch errors
@@ -176,20 +179,30 @@ export async function connectWallet() {
   const signer = provider.getSigner();
   const address = await signer.getAddress();
 
+  console.log('👤 Connected address:', address);
+
   // Check if we're on the correct network
   if (EXPECTED_CHAIN_ID) {
     try {
       const network = await provider.getNetwork();
       const chainIdNum = Number(network.chainId);
       
+      console.log('🌐 Current network:', network);
+      console.log('🔗 Current Chain ID:', chainIdNum);
+      
       if (chainIdNum !== EXPECTED_CHAIN_ID) {
+        console.log('⚠️ Wrong network detected. Switching to Shardeum...');
+        
         // Try to switch to the correct network
         try {
           await (window as any).ethereum.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: `0x${EXPECTED_CHAIN_ID.toString(16)}` }],
           });
+          console.log('✅ Successfully switched network');
         } catch (switchError: any) {
+          console.log('🔧 Network switch failed, trying to add network:', switchError);
+          
           // If the network doesn't exist, add it
           if (switchError.code === 4902) {
             await (window as any).ethereum.request({
@@ -202,10 +215,19 @@ export async function connectWallet() {
                 blockExplorerUrls: ['https://explorer-unstable.shardeum.org/']
               }]
             });
+            console.log('✅ Successfully added and switched to Shardeum network');
           } else {
             throw switchError;
           }
         }
+        
+        // Recreate provider after network switch
+        const newProvider = new ethers.providers.Web3Provider((window as any).ethereum, "any");
+        const newSigner = newProvider.getSigner();
+        const finalNetwork = await newProvider.getNetwork();
+        console.log('🔄 Final network after switch:', finalNetwork);
+        
+        return { provider: newProvider, signer: newSigner, address };
       }
     } catch (networkError) {
       console.warn('Network check failed, but continuing:', networkError);
