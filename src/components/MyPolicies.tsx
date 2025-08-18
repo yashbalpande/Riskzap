@@ -301,8 +301,9 @@ Platform: RiskZap Insurance (Shardeum Unstablenet)
   };
 
   const viewOnExplorer = (txHash: string) => {
-    window.open(`https://explorer-testnet.shardeum.org/transaction/${txHash}`, '_blank');
+    window.open(`https://explorer-unstable.shardeum.org/transaction/${txHash}`, '_blank');
   };
+
 
   const fileClaim = async (policy: PolicyRecord) => {
     try {

@@ -1,6 +1,34 @@
-# Riskzap - Micro-Policy DApp on Shardeum
+# 🔥 RiskZap - Micro-Insurance DApp on Shardeum Unstablenet
 
-## 🚀 Revolutionary Riskzap Platform
+## 🏆 **HACKATHON DELIVERABLES** ✅
+
+### **📺 Live Deployed DApp**
+🌐 **Frontend**: [http://localhost:8080](http://localhost:8080) *(Ready for production deployment)*  
+🔗 **Verification API**: [http://localhost:3001/api/verify](http://localhost:3001/api/verify)  
+📊 **Health Check**: [http://localhost:3001/health](http://localhost:3001/health)  
+
+### **🔗 Deployed Smart Contracts on Shardeum Unstablenet**
+🪙 **ERC20Mock Token**: [`0xaa2b86e1f9de4cbdeaf177e61ce0e2fc091f9f9e`](https://explorer-liberty20.shardeum.org/address/0xaa2b86e1f9de4cbdeaf177e61ce0e2fc091f9f9e)  
+📋 **PolicyManager**: [`0x055682a1a8fa88ed10a56724d29bcd44215e04d5`](https://explorer-liberty20.shardeum.org/address/0x055682a1a8fa88ed10a56724d29bcd44215e04d5)  
+🌐 **Network**: Shardeum Unstablenet (Chain ID: 8080)  
+🔍 **Explorer**: https://explorer-liberty20.shardeum.org/  
+
+### **📂 Complete GitHub Repository**
+✅ **Full source code** with comprehensive documentation  
+✅ **Smart contracts** with OpenZeppelin security standards  
+✅ **Frontend DApp** with Web3 integration  
+✅ **Backend API** for hackathon verification requirements  
+✅ **Setup instructions** for local development and deployment  
+
+### **📚 API Documentation**
+✅ **Comprehensive API docs**: [`API_DOCUMENTATION.md`](./API_DOCUMENTATION.md)  
+✅ **Verification endpoint** with pass/fail responses  
+✅ **Full integration examples** and testing commands  
+✅ **Security features** and error handling documentation  
+
+---
+
+## 🚀 Revolutionary Insurance Platform
 
 A cutting-edge decentralized insurance platform built on Shardeum Unstablenet, offering instant micro-policies with SHM token payments. This DApp demonstrates the future of Web3 insurance with gamified UX, 3D animations, and smart contract automation.
 
@@ -28,28 +56,78 @@ A cutting-edge decentralized insurance platform built on Shardeum Unstablenet, o
 - **State Management**: Redux Toolkit + React Context
 - **Smart Contracts**: Solidity (deployed on Shardeum)
 
-## 🛠 Installation & Setup
+## 🛠 **Quick Start Guide**
 
-### Prerequisites
+### **Prerequisites**
 - Node.js 18+ and npm
 - MetaMask or compatible Web3 wallet
 - Git
 
-### Quick Start
+### **🚀 Run the Complete System**
 
+#### **1. Clone & Install**
 ```bash
 # Clone the repository
-git clone <YOUR_GIT_URL>
-cd riskzap-dapp
+git clone https://github.com/yashbalpande/Riskzap.git
+cd Riskzap
 
 # Install dependencies
 npm install
-
-# Start development server
-npm run dev
 ```
 
-The app will be available at `http://localhost:8080`
+#### **2. Start Backend API** *(Required for Hackathon)*
+```bash
+# Start verification server
+cd backend
+node server.js
+
+# API will be available at http://localhost:3001
+```
+
+#### **3. Start Frontend DApp**
+```bash
+# In new terminal, start frontend
+npm run dev
+
+# DApp will be available at http://localhost:8080
+```
+
+#### **4. Connect to Shardeum Unstablenet**
+The DApp automatically prompts users to add Shardeum Unstablenet:
+- **Network Name**: Shardeum Unstablenet
+- **RPC URL**: https://api-unstable.shardeum.org
+- **Chain ID**: 8080
+- **Currency**: SHM
+- **Explorer**: https://explorer-liberty20.shardeum.org
+
+### **🧪 Test the API Endpoint** *(Hackathon Requirement)*
+
+```bash
+# Test health check
+curl http://localhost:3001/health
+
+# Test verification endpoint
+curl -X POST http://localhost:3001/api/verify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "walletAddress": "0xFd3fBa510A135B5DE354B1d4b174208c343aaD42",
+    "action": "policy_purchase",
+    "transactionHash": "0x623ea944d12109ff40a580daa36054413bb0f54a040fa7386ed1add7949232e5"
+  }'
+```
+
+**Expected Response:**
+```json
+{
+  "success": true,
+  "status": "pass",
+  "message": "Wallet action verified successfully",
+  "data": {
+    "blockchainConfirmed": true,
+    "verifiedAt": "2025-08-18T15:30:00.000Z"
+  }
+}
+```
 
 ### Verifying the SHM token address (helper)
 
