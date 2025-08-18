@@ -45,7 +45,6 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           setAccount(accounts[0]);
           setIsConnected(true);
           
-          // Create provider for balance checking (using ethers v5 syntax)
           const provider = new ethers.providers.Web3Provider(window.ethereum);
           console.log('🔗 Created provider, checking balance...');
           

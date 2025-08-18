@@ -370,9 +370,37 @@ const Dashboard: React.FC<DashboardProps> = ({ onSectionChange }) => {
             <span className="text-primary">You Love, Instantly</span>
           </h1>
           
-          <p className="text-subhero max-w-2xl mx-auto mb-8">
-            From your phone to your next trip Riskzap brings lightning-fast, AI-powered insurance on Shardeum.
+          <p className="text-subhero max-w-2xl mx-auto mb-6">
+            From your phone to your next trip — Riskzap brings lightning-fast, AI-powered insurance on Shardeum.
           </p>
+
+          {/* Platform Details */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="max-w-3xl mx-auto mb-8"
+          >
+            <div className="bg-background/30 backdrop-blur-sm border border-primary/20 rounded-2xl p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div className="space-y-2">
+                  <div className="text-2xl font-bold text-primary">2.0%</div>
+                  <div className="text-sm text-muted-foreground">Platform Fee</div>
+                  <div className="text-xs text-muted-foreground">On policy purchase</div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-2xl font-bold text-success">0.5%</div>
+                  <div className="text-sm text-muted-foreground">Withdrawal Fee</div>
+                  <div className="text-xs text-muted-foreground">On claim payouts</div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-2xl font-bold text-warning">15-20x</div>
+                  <div className="text-sm text-muted-foreground">Coverage Ratio</div>
+                  <div className="text-xs text-muted-foreground">Premium to coverage</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
           
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -545,6 +573,36 @@ const Dashboard: React.FC<DashboardProps> = ({ onSectionChange }) => {
                   </div>
                 </div>
               </motion.button>
+            </div>
+
+            {/* Platform Information */}
+            <div className="mt-8 p-6 rounded-xl bg-gradient-to-r from-primary/5 to-success/5 border border-primary/20">
+              <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                Platform Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                <div className="space-y-1">
+                  <div className="font-semibold text-primary">Fees Structure</div>
+                  <div className="text-muted-foreground">Platform: 2.0%</div>
+                  <div className="text-muted-foreground">Withdrawal: 0.5%</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="font-semibold text-success">Coverage Ratios</div>
+                  <div className="text-muted-foreground">Standard: 15x premium</div>
+                  <div className="text-muted-foreground">Health: 20x premium</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="font-semibold text-warning">Network Info</div>
+                  <div className="text-muted-foreground">Chain ID: 8083</div>
+                  <div className="text-muted-foreground">Currency: SHM</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="font-semibold text-accent">Contract Status</div>
+                  <div className="text-muted-foreground">Live & Verified</div>
+                  <div className="text-muted-foreground">Gas: ~0.001 SHM</div>
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>
