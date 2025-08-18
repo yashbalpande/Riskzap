@@ -23,7 +23,7 @@ RiskZap is a revolutionary decentralized insurance platform that makes purchasin
 ## 🛠️ Technology Stack
 
 - **Frontend**: React + TypeScript + Vite
-- **Blockchain**: Shardeum Network (Chain ID: 8083)
+- **Blockchain**: Shardeum Shardeum Unstablenet  (Chain ID: 8083)
 - **Smart Contracts**: Solidity with OpenZeppelin standards
 - **Wallet Integration**: MetaMask with ethers.js
 - **Styling**: Tailwind CSS for modern UI/UX
