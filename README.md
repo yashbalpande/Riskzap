@@ -63,6 +63,46 @@ Currency Symbol: SHM
 Block Explorer: https://explorer-unstable.shardeum.org/
 ```
 
+## 🔌 API Configuration
+
+RiskZap integrates with multiple APIs and services to provide a seamless insurance experience:
+
+### Environment Variables
+```bash
+# Frontend API Configuration
+VITE_API_BASE_URL=http://localhost:3001    # Backend API endpoint
+VITE_SHM_CHAIN_ID=8083                     # Target blockchain network
+VITE_DEMO_MODE=false                       # Demo mode toggle
+
+# Shardeum Network APIs
+SHARDEUM_RPC_URL=https://api-unstable.shardeum.org  # Blockchain RPC endpoint
+```
+
+### Blockchain API Integration
+- **Shardeum RPC**: Direct blockchain interaction for transactions
+- **Block Explorer API**: Transaction verification and history
+- **MetaMask Provider**: Wallet connectivity and signing
+- **Ethers.js**: Web3 library for smart contract interaction
+
+### Smart Contract APIs
+```javascript
+// Contract interaction endpoints
+- PolicyManager.purchasePolicy()     // Create new insurance policy
+- PolicyManager.claimPolicy()        // Process insurance claims  
+- ERC20Token.transfer()              // Handle SHM token transfers
+- ERC20Token.balanceOf()            // Check wallet balances
+```
+
+### Data Storage APIs
+- **LocalStorage**: Client-side policy data persistence
+- **ActivityService**: Transaction logging and history
+- **Real-time Updates**: Live activity feed with WebSocket-like updates
+
+### Third-party Integrations
+- **MetaMask API**: Wallet connection and transaction signing
+- **Shardeum Explorer API**: Transaction verification
+- **Network Status API**: Real-time blockchain metrics
+
 ## 🚀 Quick Start
 
 ### Prerequisites
