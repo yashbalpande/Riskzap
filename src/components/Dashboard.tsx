@@ -582,7 +582,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onSectionChange }) => {
                 </div>
                 <div className="space-y-1">
                   <div className="font-semibold text-warning">Network Info</div>
-                  <div className="text-muted-foreground">Chain ID: 8083</div>
+                  <div className="text-muted-foreground">Chain ID: 8080</div>
                   <div className="text-muted-foreground">Currency: SHM</div>
                 </div>
                 <div className="space-y-1">

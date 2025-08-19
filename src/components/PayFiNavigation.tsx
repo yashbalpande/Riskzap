@@ -22,7 +22,7 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigationItems = [
-    { id: 'dashboard', label: 'FEATURES', icon: BarChart3 },
+    { id: 'dashboard', label: 'Home', icon: BarChart3 },
     { id: 'policies', label: 'POLICIES', icon: Shield },
     { id: 'flow', label: 'HOW IT WORKS', icon: Zap },
     { id: 'analytics', label: 'ANALYTICS', icon: Sparkles },
@@ -32,7 +32,7 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
   return (
     <>
       {/* Desktop Navigation */}
-      <nav className="hidden lg:flex items-center justify-between px-6 py-3 mx-4 mt-4 rounded-full bg-slate-900/80 border border-slate-700 backdrop-blur-xl shadow-lg">
+      <nav className="hidden lg:flex items-center justify-between px-6 py-3 mx-4 mt-4 rounded-full bg-background-navbar border border-border backdrop-blur-xl shadow-medium">
         {/* Logo - Ultra Minimal */}
         <motion.div 
           className="flex items-center gap-2"
@@ -41,8 +41,8 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.2 }}
         >
-          <div className="w-7 h-7 bg-cyan-400 rounded-sm flex items-center justify-center shadow-lg">
-            <div className="w-3 h-3 bg-slate-900 rounded-full"></div>
+          <div className="w-7 h-7 bg-cyan-400 rounded-sm flex items-center justify-center">
+            <div className="w-3 h-3 bg-black rounded-full"></div>
           </div>
           <span className="text-xl font-black text-white">R</span>
         </motion.div>
@@ -135,7 +135,7 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
                       <div className="w-8 h-8 bg-cyan-400 rounded-sm flex items-center justify-center">
                         <div className="w-3 h-3 bg-black rounded-full"></div>
                       </div>
-                      <span className="text-2xl font-black text-white">RiskZap</span>
+                      <span className="text-2xl font-black text-white">R</span>
                     </motion.div>
                     <Button
                       variant="ghost"

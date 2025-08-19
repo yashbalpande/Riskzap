@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { connectWallet, getShmBalance } from '@/services/web3';
 import { ethers } from 'ethers';
 import { toast } from '@/hooks/use-toast';
-
 interface WalletContextType {
   account: string | null;
   isConnected: boolean;
@@ -44,43 +43,20 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         if (accounts.length > 0) {
           setAccount(accounts[0]);
           setIsConnected(true);
-          const provider = new Web3Provider(window.ethereum);
+          
+          // Create provider for          const provider = new Web3Provider(window.ethereum);
           console.log('🔗 Created provider, checking balance...');
           console.log('🔗 Created provider, checking balance...');
           
-          // Get network info safely
-          try {
-            const network = await provider.getNetwork();
-            console.log('🌐 Network info:', network);
-            setChainId(Number(network.chainId));
-          } catch (networkError) {
-            console.warn('⚠️ Could not get network info:', networkError);
-            // Fallback to getting chain ID directly from ethereum
-            try {
-              const networkId = await window.ethereum.request({ method: 'eth_chainId' });
-              const chainId = parseInt(networkId, 16);
-              console.log('🌐 Chain ID (fallback):', chainId);
-              setChainId(chainId);
-            } catch (chainError) {
-              console.error('❌ Could not get chain ID:', chainError);
-              setChainId(null);
-            }
-          }
+          const balanceStr = await getShmBalance(provider, accounts[0]);
+          console.log('💰 Balance returned:', balanceStr);
           
-          // Get balance safely
-          try {
-            const balanceStr = await getShmBalance(provider, accounts[0]);
-            console.log('💰 Balance returned:', balanceStr);
-            setBalance(parseFloat(balanceStr).toFixed(4));
-          } catch (balanceError) {
-            console.error('❌ Error getting balance:', balanceError);
-            setBalance('0.0000');
-            toast({
-              title: "Balance Fetch Failed",
-              description: "Connected to wallet but couldn't fetch balance. Please check network connection.",
-              variant: "destructive",
-            });
-          }
+          setBalance(parseFloat(balanceStr).toFixed(4));
+          
+          const networkId = await window.ethereum.request({ method: 'eth_chainId' });
+          const chainId = parseInt(networkId, 16);
+          console.log('🌐 Chain ID:', chainId);
+          setChainId(chainId);
         }
       } catch (error) {
         console.error('❌ Error checking connection:', error);
@@ -95,18 +71,9 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         await checkConnection();
       } catch (error) {
         console.error('Error connecting wallet:', error);
-        toast({
-          title: "Connection Failed",
-          description: "Unable to connect wallet. Please try again.",
-          variant: "destructive",
-        });
       }
     } else {
-      toast({
-        title: "Wallet Required",
-        description: "Please install MetaMask or another Web3 wallet to continue.",
-        variant: "destructive",
-      });
+      alert('Please install MetaMask or another Web3 wallet');
     }
   };
 
@@ -138,8 +105,9 @@ const WalletConnector: React.FC = () => {
   const [isShardeum, setIsShardeum] = useState(false);
 
   useEffect(() => {
-  
-    setIsShardeum(chainId === 8083);
+    // Shardeum testnet Chain ID is 8080
+    console.log('🔍 Current chainId:', chainId, 'Type:', typeof chainId);
+    setIsShardeum(chainId === 8080);
   }, [chainId]);
 
   const formatAddress = (address: string) => {
@@ -179,7 +147,11 @@ const WalletConnector: React.FC = () => {
                 <AlertCircle className="h-4 w-4 text-warning" />
               )}
               <span className="text-sm">
-                {isShardeum ? 'Shardeum Unstablenet' : `Chain ${chainId}`}
+                {isShardeum 
+                  ? 'Shardeum Testnet' 
+                  : chainId 
+                    ? `Chain ${chainId}` 
+                    : 'Not Connected'}
               </span>
             </div>
 
