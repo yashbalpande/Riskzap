@@ -16,6 +16,12 @@ import {
   ShoppingCart
 } from 'lucide-react';
 import LiveActivityFeed from '@/components/LiveActivityFeed';
+          
+          <h1 className="text-hero text-white mb-6 leading-tight">
+            Simple<br />
+            <span className="text-cyan-400">Protection</span>
+          </h1>
+          
 import { ActivityService } from '@/services/activityService';
 import { useWallet } from '@/components/WalletConnector';
 
@@ -423,25 +429,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onSectionChange }) => {
             </Button>
           </motion.div>
           
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-6 text-sm"
-          >
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-success" />
-              <span>Instant payouts</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <span>Blockchain secured</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-warning" />
-              <span>Sub-second claims</span>
-            </div>
-          </motion.div>
+
         </div>
       </motion.div>
 

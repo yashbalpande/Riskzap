@@ -856,17 +856,17 @@ Click "Purchase Now" to buy this policy or "Claim" if you already own it.`);
 
   return (
     <div className="w-full max-w-6xl mx-auto p-6">
-           <div className="text-center mb-12">
-        <h2 className="text-4xl font-bold text-gradient-primary mb-4">
+      <div className="text-center mb-12">
+        <h2 className="text-4xl font-bold text-white mb-4">
           Micro-Policy Marketplace
         </h2>
-        <p className="text-lg text-muted-foreground">
+        <p className="text-lg text-gray-300">
           Instant, affordable insurance for your immediate needs
         </p>
       </div>
 
       <div className="mb-6 text-right">
-        <Button onClick={openCreatePolicy} variant="outline">Create New Policy</Button>
+        <Button onClick={openCreatePolicy} variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white">Create New Policy</Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
@@ -894,10 +894,10 @@ Click "Purchase Now" to buy this policy or "Claim" if you already own it.`);
 
               <motion.div
                 className={`
-                  relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer card-modern
+                  relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer
                   ${isSelected 
-                    ? `${getCategoryColors(policy.id).border} bg-background-secondary shadow-elevated scale-105` 
-                    : `border-modern hover:${getCategoryColors(policy.id).border} ${getCategoryColors(policy.id).shadow}`
+                    ? `border-cyan-400 bg-gray-900 shadow-2xl shadow-cyan-500/20 scale-105` 
+                    : `border-gray-700 bg-gray-900 hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/10`
                   }
                 `}
                 onClick={() => handlePolicySelect(policy.id)}
@@ -905,40 +905,41 @@ Click "Purchase Now" to buy this policy or "Claim" if you already own it.`);
                 layout
               >
                 {/* Holographic Background Effect */}
-                <div className="absolute inset-0 holographic opacity-10" />
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-20" />
 
-                <div className="relative p-6 backdrop-blur-sm">
+                <div className="relative p-6 backdrop-blur-sm bg-gray-900/80">
                   {/* Header */}
                   <div className="flex items-center gap-4 mb-6">
-                    <div className={`p-3 rounded-xl ${getCategoryColors(policy.id).bgAccent}`}>
-                      <IconComponent className={`h-8 w-8 ${getCategoryColors(policy.id).accent}`} />
+                    <div className="p-3 rounded-xl bg-gray-800 border border-gray-600">
+                      <IconComponent className="h-8 w-8 text-cyan-400" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold">{policy.name}</h3>
-                      <p className="text-sm text-muted-foreground">
+                      <h3 className="text-xl font-bold text-white">{policy.name}</h3>
+                      <p className="text-sm text-gray-300">
                         {policy.description}
                       </p>
                     </div>
                   </div>
 
                   {/* Key Metrics */}
+                                    {/* Key Metrics */}
                   <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="text-center p-3 rounded-lg bg-background/50">
-                      <DollarSign className="h-5 w-5 text-success mx-auto mb-2" />
-                      <div className="text-lg font-bold text-success">
+                    <div className="text-center p-3 rounded-lg bg-gray-800/60 border border-gray-700">
+                      <Coins className="h-5 w-5 text-green-400 mx-auto mb-2" />
+                      <div className="text-lg font-bold text-green-400">
                         {policy.basePremium} SHM
                       </div>
-                      <div className="text-xs text-muted-foreground">Premium</div>
+                      <div className="text-xs text-gray-400">Premium</div>
                     </div>
-                    <div className="text-center p-3 rounded-lg bg-background/50">
-                      <Clock className="h-5 w-5 text-warning mx-auto mb-2" />
-                      <div className="text-sm font-bold">{policy.duration}</div>
-                      <div className="text-xs text-muted-foreground">Duration</div>
+                    <div className="text-center p-3 rounded-lg bg-gray-800/60 border border-gray-700">
+                      <Clock className="h-5 w-5 text-yellow-400 mx-auto mb-2" />
+                      <div className="text-sm font-bold text-white">{policy.duration}</div>
+                      <div className="text-xs text-gray-400">Duration</div>
                     </div>
-                    <div className="text-center p-3 rounded-lg bg-background/50">
-                      <Shield className="h-5 w-5 text-primary mx-auto mb-2" />
-                      <div className="text-sm font-bold">{policy.coverage}</div>
-                      <div className="text-xs text-muted-foreground">Coverage</div>
+                    <div className="text-center p-3 rounded-lg bg-gray-800/60 border border-gray-700">
+                      <Shield className="h-5 w-5 text-orange-400 mx-auto mb-2" />
+                      <div className="text-sm font-bold text-white">{policy.coverage}</div>
+                      <div className="text-xs text-gray-400">Coverage</div>
                     </div>
                   </div>
 
@@ -949,11 +950,11 @@ Click "Purchase Now" to buy this policy or "Claim" if you already own it.`);
                     className="overflow-hidden"
                   >
                     <div className="mb-6">
-                      <h4 className="font-semibold mb-3">Coverage Features:</h4>
+                      <h4 className="font-semibold mb-3 text-white">Coverage Features:</h4>
                       <ul className="space-y-2">
                         {policy.features.map((feature, idx) => (
-                          <li key={idx} className="flex items-center gap-2 text-sm">
-                            <div className="w-2 h-2 rounded-full bg-success" />
+                          <li key={idx} className="flex items-center gap-2 text-sm text-gray-300">
+                            <div className="w-2 h-2 rounded-full bg-cyan-400" />
                             {feature}
                           </li>
                         ))}
@@ -964,8 +965,8 @@ Click "Purchase Now" to buy this policy or "Claim" if you already own it.`);
                   {/* Action Button */}
                   <div className="space-y-3">
                     <Button
-                      variant={isSelected ? "hero" : (policy.id as any)}
-                      className="w-full gap-2 font-semibold"
+                      variant="default"
+                      className="w-full gap-2 font-semibold bg-cyan-600 hover:bg-cyan-700 text-white border-0"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleQuickBuy(e, policy);
@@ -981,8 +982,8 @@ Click "Purchase Now" to buy this policy or "Claim" if you already own it.`);
                           e.stopPropagation(); 
                           handleClaim(policy.id); 
                         }} 
-                        variant="claim" 
-                        className="flex-1"
+                        variant="outline" 
+                        className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
                       >
                         Claim
                       </Button>
@@ -991,8 +992,8 @@ Click "Purchase Now" to buy this policy or "Claim" if you already own it.`);
                           e.stopPropagation(); 
                           navigateToDetails(policy.id); 
                         }} 
-                        variant="details" 
-                        className="flex-1"
+                        variant="outline" 
+                        className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
                       >
                         Details
                       </Button>
@@ -1003,12 +1004,12 @@ Click "Purchase Now" to buy this policy or "Claim" if you already own it.`);
                 {/* Animated Border Effect */}
                 {isSelected && (
                   <motion.div
-                    className={`absolute inset-0 rounded-2xl border-2 ${getCategoryColors(policy.id).border}`}
+                    className="absolute inset-0 rounded-2xl border-2 border-cyan-400"
                     animate={{ 
                       boxShadow: [
-                        '0 0 20px rgba(0,0,0,0.3)',
-                        '0 0 40px rgba(0,0,0,0.4)',
-                        '0 0 20px rgba(0,0,0,0.3)'
+                        '0 0 20px rgba(6,182,212,0.3)',
+                        '0 0 40px rgba(6,182,212,0.5)',
+                        '0 0 20px rgba(6,182,212,0.3)'
                       ]
                     }}
                     transition={{ repeat: Infinity, duration: 2 }}

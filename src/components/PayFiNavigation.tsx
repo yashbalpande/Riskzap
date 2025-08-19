@@ -32,25 +32,19 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
   return (
     <>
       {/* Desktop Navigation */}
-      <nav className="hidden lg:flex items-center justify-between px-6 py-3 mx-4 mt-4 rounded-full bg-background-navbar border border-border backdrop-blur-xl shadow-medium">
-        {/* Logo - Glassmorphism Badge Style */}
+      <nav className="hidden lg:flex items-center justify-between px-6 py-3 mx-4 mt-4 rounded-full bg-slate-900/80 border border-slate-700 backdrop-blur-xl shadow-lg">
+        {/* Logo - Ultra Minimal */}
         <motion.div 
-          className="flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 shadow-lg"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          whileHover={{ scale: 1.05, y: -1 }}
+          className="flex items-center gap-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.2 }}
         >
-          <div className="relative">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg">
-              <Coins className="h-5 w-5 text-black" />
-            </div>
-            {/* Futuristic Glow Effect */}
-            <div className="absolute inset-0 w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 opacity-30 blur-sm animate-pulse"></div>
+          <div className="w-7 h-7 bg-cyan-400 rounded-sm flex items-center justify-center shadow-lg">
+            <div className="w-3 h-3 bg-slate-900 rounded-full"></div>
           </div>
-          <h1 className="text-lg font-bold text-yellow-400 tracking-wide drop-shadow-[0_0_6px_rgba(250,204,21,0.7)]">
-            Riskzap
-          </h1>
+          <span className="text-xl font-black text-white">R</span>
         </motion.div>
 
         {/* Navigation Tags - Compressed Webzi Style */}
@@ -97,21 +91,16 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
 
       {/* Mobile Navigation */}
       <nav className="lg:hidden flex items-center justify-between p-3 mx-2 mt-2 rounded-2xl glass-card border border-primary/10 backdrop-blur-xl shadow-lg">
-        {/* Mobile Logo - Elevated Badge Style */}
+        {/* Mobile Logo - Ultra Minimal */}
         <motion.div 
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/70 shadow-lg border border-white/10"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          className="flex items-center gap-2"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
-          <div className="relative">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 flex items-center justify-center">
-              <Coins className="h-3.5 w-3.5 text-black" />
-            </div>
-            <div className="absolute inset-0 w-6 h-6 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 opacity-30 blur-sm animate-pulse"></div>
+          <div className="w-6 h-6 bg-cyan-400 rounded-sm flex items-center justify-center">
+            <div className="w-2 h-2 bg-black rounded-full"></div>
           </div>
-          <span className="font-bold text-yellow-400 text-sm tracking-wide drop-shadow-[0_0_6px_rgba(250,204,21,0.7)]">
-            Riskzap
-          </span>
+          <span className="text-lg font-black text-white">R</span>
         </motion.div>
 
         {/* Mobile Menu Button */}
@@ -141,14 +130,13 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
                   {/* Mobile Menu Header */}
                   <div className="flex items-center justify-between mb-6">
                     {/* Mobile Menu Logo - Minimal Outline Style */}
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full border-2 border-yellow-400 flex items-center justify-center">
-                        <Coins className="h-3.5 w-3.5 text-yellow-400" />
+                                        {/* Mobile Menu Logo - Ultra Minimal */}
+                    <motion.div className="flex items-center gap-2 mb-6">
+                      <div className="w-8 h-8 bg-cyan-400 rounded-sm flex items-center justify-center">
+                        <div className="w-3 h-3 bg-black rounded-full"></div>
                       </div>
-                      <span className="font-bold text-white">
-                        <span className="underline decoration-yellow-400 decoration-2 underline-offset-2">Riskzap</span>
-                      </span>
-                    </div>
+                      <span className="text-2xl font-black text-white">RiskZap</span>
+                    </motion.div>
                     <Button
                       variant="ghost"
                       size="sm"

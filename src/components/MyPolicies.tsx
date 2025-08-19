@@ -402,18 +402,18 @@ Platform: RiskZap Insurance (Shardeum Liberty 1.X)
   }
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/60 backdrop-blur-md shadow-lg p-6">
+    <div className="rounded-2xl border border-gray-700 bg-gray-900 backdrop-blur-md shadow-lg p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Shield className="h-6 w-6 text-white" />
+          <Shield className="h-6 w-6 text-cyan-400" />
           <h2 className="text-xl font-bold text-white">My Policies</h2>
-          <span className="bg-white/10 text-white px-3 py-1 rounded-full text-xs font-semibold">
+          <span className="bg-gray-800 text-cyan-400 px-3 py-1 rounded-full text-xs font-semibold border border-gray-600">
             {policies.length} {policies.length === 1 ? 'Policy' : 'Policies'}
           </span>
         </div>
         <button
           onClick={loadUserPolicies}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-colors duration-200"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-800 text-cyan-400 hover:bg-gray-700 transition-colors duration-200 border border-gray-600"
           title="Refresh policies"
         >
           <RefreshCw className="h-4 w-4" />
@@ -423,33 +423,33 @@ Platform: RiskZap Insurance (Shardeum Liberty 1.X)
 
       {/* Policy Summary */}
       {policies.length > 0 && (
-        <div className="mb-8 p-6 rounded-xl bg-black/80 backdrop-blur-md border border-white/10 shadow-lg">
+        <div className="mb-8 p-6 rounded-xl bg-gray-800 backdrop-blur-md border border-gray-700 shadow-lg">
           <h3 className="font-semibold mb-6 text-sm text-white">Portfolio Overview</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
+            <div className="text-center p-4 rounded-lg bg-gray-900 border border-gray-600">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Shield className="h-4 w-4 text-gray-300" />
+                <Shield className="h-4 w-4 text-cyan-400" />
                 <span className="text-sm text-gray-300">Active Policies</span>
               </div>
-              <div className="text-2xl font-bold font-mono text-white">
+              <div className="text-2xl font-bold font-mono text-cyan-400">
                 {policies.filter(p => p.status === 'active').length}
               </div>
             </div>
-            <div className="text-center">
+            <div className="text-center p-4 rounded-lg bg-gray-900 border border-gray-600">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <DollarSign className="h-4 w-4 text-gray-300" />
+                <DollarSign className="h-4 w-4 text-green-400" />
                 <span className="text-sm text-gray-300">Total Invested</span>
               </div>
-              <div className="text-2xl font-bold font-mono text-white">
+              <div className="text-2xl font-bold font-mono text-green-400">
                 {policies.reduce((sum, p) => sum + p.totalPaid, 0).toFixed(4)} SHM
               </div>
             </div>
-            <div className="text-center">
+            <div className="text-center p-4 rounded-lg bg-gray-900 border border-gray-600">
               <div className="flex items-center justify-center gap-2 mb-3">
-                <Calendar className="h-4 w-4 text-gray-300" />
+                <Calendar className="h-4 w-4 text-orange-400" />
                 <span className="text-sm text-gray-300">Claim Value</span>
               </div>
-              <div className="text-2xl font-bold font-mono text-facc15">
+              <div className="text-2xl font-bold font-mono text-orange-400">
                 {policies
                   .filter(p => p.status === 'active')
                   .reduce((sum, p) => sum + calculatePotentialClaim(p).potentialAmount, 0)
@@ -520,13 +520,6 @@ Platform: RiskZap Insurance (Shardeum Liberty 1.X)
                       <Clock className="w-3 h-3 text-white" />
                     </div>
                     <span className="text-gray-300 text-sm">Expires: <span className="text-white">{formatDate(policy.expiryDate || '')}</span></span>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center">
-                      <Shield className="w-3 h-3 text-white" />
-                    </div>
-                    <span className="text-gray-300 text-sm">Blockchain Secured</span>
                   </div>
                 </div>
 

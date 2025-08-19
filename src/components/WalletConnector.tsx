@@ -44,8 +44,8 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         if (accounts.length > 0) {
           setAccount(accounts[0]);
           setIsConnected(true);
-          
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const provider = new Web3Provider(window.ethereum);
+          console.log('🔗 Created provider, checking balance...');
           console.log('🔗 Created provider, checking balance...');
           
           // Get network info safely
