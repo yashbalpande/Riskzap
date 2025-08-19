@@ -5,6 +5,7 @@ const LS_TOKEN_KEY = 'RISKZAP_SHM_TOKEN_ADDRESS';
 const LS_COMPANY_KEY = 'RISKZAP_COMPANY_WALLET';
 const LS_POLICY_KEY = 'RISKZAP_POLICY_CONTRACT';
 const shardeumLiberty = {
+  chainId: '0x1f90', // 8080 in hex
   chainName: 'Shardeum Unstablenet',
   rpcUrls: ['https://api-unstable.shardeum.org'],
   nativeCurrency: {

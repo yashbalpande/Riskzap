@@ -23,7 +23,7 @@ RiskZap is a revolutionary decentralized insurance platform that makes purchasin
 ## 🛠️ Technology Stack
 
 - **Frontend**: React + TypeScript + Vite
-- **Blockchain**: Shardeum Shardeum Unstablenet  (Chain ID: 8083)
+- **Blockchain**: Shardeum Shardeum Unstablenet  (Chain ID: 8080)
 - **Smart Contracts**: Solidity with OpenZeppelin standards
 - **Wallet Integration**: MetaMask with ethers.js
 - **Styling**: Tailwind CSS for modern UI/UX
@@ -58,7 +58,7 @@ Monitor your insurance portfolio with live data including:
 ```
 Network Name: Shardeum Unstablenet
 RPC URL: https://api-unstable.shardeum.org
-Chain ID: 8083
+Chain ID: 8080
 Currency Symbol: SHM
 Block Explorer: https://explorer-unstable.shardeum.org/
 ```
@@ -71,7 +71,7 @@ RiskZap integrates with multiple APIs and services to provide a seamless insuran
 ```bash
 # Frontend API Configuration
 VITE_API_BASE_URL=http://localhost:3001    # Backend API endpoint
-VITE_SHM_CHAIN_ID=8083                     # Target blockchain network
+VITE_SHM_CHAIN_ID=8080                     # Target blockchain network
 VITE_DEMO_MODE=false                       # Demo mode toggle
 
 # Shardeum Network APIs
