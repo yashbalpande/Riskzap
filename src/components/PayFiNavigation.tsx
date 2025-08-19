@@ -44,7 +44,7 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
           <div className="w-7 h-7 bg-cyan-400 rounded-sm flex items-center justify-center">
             <div className="w-3 h-3 bg-black rounded-full"></div>
           </div>
-          <span className="text-xl font-black text-white">R</span>
+          <span className="text-xl font-black text-white">Riskzap</span>
         </motion.div>
 
         {/* Navigation Tags - Compressed Webzi Style */}
