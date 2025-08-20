@@ -44,28 +44,19 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           setAccount(accounts[0]);
           setIsConnected(true);
           
-          // Use the connectWallet function which handles provider creation properly
-          try {
-            const { provider } = await connectWallet();
-            console.log('🔗 Used connectWallet, checking balance...');
-            
-            const balanceStr = await getShmBalance(provider, accounts[0]);
-            console.log('💰 Balance returned:', balanceStr);
-            
-            setBalance(parseFloat(balanceStr).toFixed(4));
-            
-            const networkId = await window.ethereum.request({ method: 'eth_chainId' });
-            const chainId = parseInt(networkId, 16);
-            console.log('🌐 Chain ID:', chainId);
-            setChainId(chainId);
-          } catch (walletError) {
-            console.warn('⚠️ Wallet connection failed, but account detected:', walletError);
-            // Still set basic info even if balance check fails
-            const networkId = await window.ethereum.request({ method: 'eth_chainId' });
-            const chainId = parseInt(networkId, 16);
-            setChainId(chainId);
-            setBalance('0.0');
-          }
+          // Create provider for balance checking
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          console.log('🔗 Created provider, checking balance...');
+          
+          const balanceStr = await getShmBalance(provider, accounts[0]);
+          console.log('💰 Balance returned:', balanceStr);
+          
+          setBalance(parseFloat(balanceStr).toFixed(4));
+          
+          const networkId = await window.ethereum.request({ method: 'eth_chainId' });
+          const chainId = parseInt(networkId, 16);
+          console.log('🌐 Chain ID:', chainId);
+          setChainId(chainId);
         }
       } catch (error) {
         console.error('❌ Error checking connection:', error);

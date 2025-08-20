@@ -1,11 +1,11 @@
-import { ethers } from 'ethers';
+import { ethers, Provider, BrowserProvider, JsonRpcProvider, Contract, parseUnits, formatUnits, parseEther, formatEther } from 'ethers';
 
 // -- Runtime-config keys (localStorage keys)
 const LS_TOKEN_KEY = 'RISKZAP_SHM_TOKEN_ADDRESS';
 const LS_COMPANY_KEY = 'RISKZAP_COMPANY_WALLET';
 const LS_POLICY_KEY = 'RISKZAP_POLICY_CONTRACT';
 const shardeumLiberty = {
-  chainId: '0x1f90', // 8080 in hex
+  chainId: '8080', // 8080 in hex
   chainName: 'Shardeum Unstablenet',
   rpcUrls: ['https://api-unstable.shardeum.org'],
   nativeCurrency: {
@@ -148,10 +148,10 @@ export async function purchaseWithPolicyContract(
   if (!policyAddr) throw new Error('Policy contract not configured. Set RISKZAP_POLICY_CONTRACT in settings or env.');
   if (!tokenAddr) throw new Error('Token address not configured. Set RISKZAP_SHM_TOKEN_ADDRESS.');
 
-  const tokenContract = new ethers.Contract(tokenAddr, erc20Abi, signer);
-  const policyContract = new ethers.Contract(policyAddr, policyAbi, signer);
+  const tokenContract = new Contract(tokenAddr, erc20Abi, signer);
+  const policyContract = new Contract(policyAddr, policyAbi, signer);
 
-  const amount = ethers.utils.parseUnits(String(amountInShm), SHM_TOKEN_DECIMALS);
+  const amount = parseUnits(String(amountInShm), SHM_TOKEN_DECIMALS);
 
   // Approve then purchase
   const approveTx = await tokenContract.approve(policyAddr, amount);
@@ -173,66 +173,61 @@ export async function connectWallet() {
   console.log('🔌 Connecting to wallet...');
   console.log('🔍 Expected Chain ID:', EXPECTED_CHAIN_ID);
 
+  // Request account access
   await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
 
-  // Create provider with polling disabled to prevent network mismatch errors
-  const provider = new ethers.providers.Web3Provider((window as any).ethereum, "any");
-  const signer = provider.getSigner();
+  // Create provider with explicit network to avoid issues
+  const provider = new BrowserProvider((window as any).ethereum);
+  
+  const signer = await provider.getSigner();
   const address = await signer.getAddress();
 
   console.log('👤 Connected address:', address);
 
   // Check if we're on the correct network
-  if (EXPECTED_CHAIN_ID) {
-    try {
-      const network = await provider.getNetwork();
-      const chainIdNum = Number(network.chainId);
+  try {
+    const network = await provider.getNetwork();
+    const chainIdNum = Number(network.chainId);
+    
+    console.log('🌐 Current network:', network);
+    console.log('🔗 Current Chain ID:', chainIdNum);
+    
+    // If we have an expected chain ID and we're not on it, try to switch
+    if (EXPECTED_CHAIN_ID && chainIdNum !== EXPECTED_CHAIN_ID) {
+      console.log('⚠️ Wrong network detected. Switching to Shardeum...');
       
-      console.log('🌐 Current network:', network);
-      console.log('🔗 Current Chain ID:', chainIdNum);
-      
-      if (chainIdNum !== EXPECTED_CHAIN_ID) {
-        console.log('⚠️ Wrong network detected. Switching to Shardeum...');
-        
+      try {
         // Try to switch to the correct network
-        try {
+        await (window as any).ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: `0x${EXPECTED_CHAIN_ID.toString(16)}` }],
+        });
+        console.log('✅ Successfully switched network');
+      } catch (switchError: any) {
+        console.log('🔧 Network switch failed, trying to add network:', switchError);
+        
+        // If the network doesn't exist, add it
+        if (switchError.code === 4902) {
           await (window as any).ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: `0x${EXPECTED_CHAIN_ID.toString(16)}` }],
+            method: 'wallet_addEthereumChain',
+            params: [shardeumLiberty]
           });
-          console.log('✅ Successfully switched network');
-        } catch (switchError: any) {
-          console.log('🔧 Network switch failed, trying to add network:', switchError);
-          
-          // If the network doesn't exist, add it
-          if (switchError.code === 4902) {
-            await (window as any).ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [{
-                chainId: `0x${EXPECTED_CHAIN_ID.toString(16)}`,
-                chainName: 'Shardeum Unstablenet',
-                rpcUrls: ['https://api-unstable.shardeum.org'],
-                nativeCurrency: { name: 'Shardeum', symbol: 'SHM', decimals: 18 },
-                blockExplorerUrls: ['https://explorer-unstable.shardeum.org/']
-              }]
-            });
-            console.log('✅ Successfully added and switched to Shardeum network');
-          } else {
-            throw switchError;
-          }
+          console.log('✅ Successfully added and switched to Shardeum network');
+        } else {
+          console.warn('Could not switch network automatically:', switchError);
         }
-        
-        // Recreate provider after network switch
-        const newProvider = new ethers.providers.Web3Provider((window as any).ethereum, "any");
-        const newSigner = newProvider.getSigner();
-        const finalNetwork = await newProvider.getNetwork();
-        console.log('🔄 Final network after switch:', finalNetwork);
-        
-        return { provider: newProvider, signer: newSigner, address };
       }
-    } catch (networkError) {
-      console.warn('Network check failed, but continuing:', networkError);
+      
+      // Recreate provider after network switch
+      const newProvider = new BrowserProvider((window as any).ethereum);
+      const newSigner = await newProvider.getSigner();
+      const finalNetwork = await newProvider.getNetwork();
+      console.log('🔄 Final network after switch:', finalNetwork);
+      
+      return { provider: newProvider, signer: newSigner, address };
     }
+  } catch (networkError) {
+    console.warn('Network check failed, but continuing:', networkError);
   }
 
   return { provider, signer, address };
@@ -256,7 +251,7 @@ async function assertExpectedNetwork(signer: ethers.Signer) {
 /**
  * Get SHM token balance of a given address (using native SHM)
  */
-export async function getShmBalance(provider: ethers.providers.Provider, address: string) {
+export async function getShmBalance(provider: Provider, address: string) {
   if (!provider) {
     throw new Error('Provider is required to check SHM balance.');
   }
@@ -287,9 +282,9 @@ export async function getShmBalance(provider: ethers.providers.Provider, address
       new Promise((_, reject) => 
         setTimeout(() => reject(new Error('Balance fetch timeout')), 10000)
       )
-    ]) as ethers.BigNumber;
+    ]) as bigint;
 
-    const formattedBalance = ethers.utils.formatEther(balance);
+    const formattedBalance = formatEther(balance);
     console.log('💰 Raw balance (wei):', balance.toString());
     console.log('💰 Formatted balance (SHM):', formattedBalance);
     return formattedBalance;
@@ -299,9 +294,9 @@ export async function getShmBalance(provider: ethers.providers.Provider, address
     // Try with fallback RPC provider
     try {
       console.log('🔄 Trying fallback RPC provider...');
-      const fallbackProvider = new ethers.providers.JsonRpcProvider('https://api-unstable.shardeum.org');
+      const fallbackProvider = new JsonRpcProvider('https://api-unstable.shardeum.org');
       const fallbackBalance = await fallbackProvider.getBalance(address);
-      const formattedFallbackBalance = ethers.utils.formatEther(fallbackBalance);
+      const formattedFallbackBalance = formatEther(fallbackBalance);
       console.log('💰 Fallback balance (SHM):', formattedFallbackBalance);
       return formattedFallbackBalance;
     } catch (fallbackError) {
@@ -355,17 +350,18 @@ export async function sendShmToken(signer: ethers.Signer, amountInShm: string | 
   }
 
   // Send native SHM tokens directly
-  const amount = ethers.utils.parseEther(String(amountInShm));
+  const amount = parseEther(String(amountInShm));
   
   try {
     // Get current gas price from network
     let gasPrice;
     try {
-      gasPrice = await provider.getGasPrice();
-      console.log('⛽ Current gas price:', ethers.utils.formatUnits(gasPrice, 'gwei'), 'gwei');
+      const feeData = await provider.getFeeData();
+      gasPrice = feeData.gasPrice || parseUnits("20", "gwei");
+      console.log('⛽ Current gas price:', formatUnits(gasPrice, 'gwei'), 'gwei');
     } catch (gasPriceError) {
       console.warn('⚠️ Could not get gas price, using fallback');
-      gasPrice = ethers.utils.parseUnits("20", "gwei");
+      gasPrice = parseUnits("20", "gwei");
     }
 
     const tx = await signer.sendTransaction({
@@ -406,13 +402,13 @@ export async function sendClaimPayout(companySigner: ethers.Signer, userAddress:
   }
 
   // Send native SHM tokens directly
-  const amount = ethers.utils.parseEther(String(amountInShm));
+  const amount = parseEther(String(amountInShm));
   
   const tx = await companySigner.sendTransaction({
     to: userAddress,
     value: amount,
     gasLimit: 21000,
-    gasPrice: ethers.utils.parseUnits("20", "gwei")
+    gasPrice: parseUnits("20", "gwei")
   });
 
   await tx.wait();
