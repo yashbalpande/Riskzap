@@ -31,9 +31,9 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
 
   return (
     <>
-      {/* Desktop Navigation */}
+      
       <nav className="hidden lg:flex items-center justify-between px-6 py-3 mx-4 mt-4 rounded-full bg-background-navbar border border-border backdrop-blur-xl shadow-medium">
-        {/* Logo - Ultra Minimal */}
+   
         <motion.div 
           className="flex items-center gap-2"
           initial={{ opacity: 0 }}
@@ -47,7 +47,6 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
           <span className="text-xl font-black text-white">Riskzap</span>
         </motion.div>
 
-        {/* Navigation Tags - Compressed Webzi Style */}
         <div className="flex items-center gap-6">
           {navigationItems.map((item, index) => {
             const isActive = activeSection === item.id;
@@ -83,15 +82,15 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
           })}
         </div>
 
-        {/* Compact Wallet Connector */}
+        
         <div className="flex items-center">
           <WalletConnector />
         </div>
       </nav>
 
-      {/* Mobile Navigation */}
+
       <nav className="lg:hidden flex items-center justify-between p-3 mx-2 mt-2 rounded-2xl glass-card border border-primary/10 backdrop-blur-xl shadow-lg">
-        {/* Mobile Logo - Ultra Minimal */}
+   
         <motion.div 
           className="flex items-center gap-2"
           whileHover={{ scale: 1.02 }}
@@ -103,7 +102,7 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
           <span className="text-lg font-black text-white">R</span>
         </motion.div>
 
-        {/* Mobile Menu Button */}
+  
         <Button
           variant="ghost"
           size="sm"
@@ -127,10 +126,9 @@ const PayFiNavigation: React.FC<NavigationProps> = ({ activeSection, onSectionCh
                   exit={{ x: '100%' }}
                   className="absolute right-2 top-2 bottom-2 w-72 card-modern border border-border rounded-2xl p-4 shadow-elevated backdrop-blur-xl"
                 >
-                  {/* Mobile Menu Header */}
+    
                   <div className="flex items-center justify-between mb-6">
-                    {/* Mobile Menu Logo - Minimal Outline Style */}
-                                        {/* Mobile Menu Logo - Ultra Minimal */}
+                   
                     <motion.div className="flex items-center gap-2 mb-6">
                       <div className="w-8 h-8 bg-cyan-400 rounded-sm flex items-center justify-center">
                         <div className="w-3 h-3 bg-black rounded-full"></div>

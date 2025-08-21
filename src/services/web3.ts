@@ -22,6 +22,91 @@ const shardeumLiberty = {
 // Demo mode for development when contracts aren't deployed
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
+/**
+ * Create a robust RPC provider with fallback URLs
+ */
+async function createRobustProvider(): Promise<JsonRpcProvider> {
+  const rpcUrls = [
+    'https://api-unstable.shardeum.org',
+    'https://rpc-unstable.shardeum.org',
+    'https://api.shardeum.org'
+  ];
+  
+  for (const url of rpcUrls) {
+    try {
+      console.log(`🔄 Trying RPC provider: ${url}`);
+      const provider = new JsonRpcProvider(url, {
+        chainId: 8080,
+        name: 'shardeum-unstablenet'
+      });
+      
+      // Test the provider with a simple call
+      await Promise.race([
+        provider.getBlockNumber(),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('Provider test timeout')), 3000)
+        )
+      ]);
+      
+      console.log(`✅ RPC provider working: ${url}`);
+      return provider;
+    } catch (error) {
+      console.warn(`❌ RPC provider failed: ${url}`, error);
+      continue;
+    }
+  }
+  
+  throw new Error('All RPC providers failed. Network may be down.');
+}
+
+/**
+ * Create a wallet provider with enhanced error handling
+ */
+async function createWalletProvider(): Promise<BrowserProvider> {
+  if (!(window as any).ethereum) {
+    throw new Error('No web3 wallet found. Please install MetaMask.');
+  }
+  
+  return new BrowserProvider((window as any).ethereum);
+}
+
+/**
+ * Force refresh the MetaMask connection and ensure correct network
+ */
+export async function refreshWalletConnection(): Promise<{ provider: BrowserProvider; signer: ethers.Signer; address: string }> {
+  if (!(window as any).ethereum) {
+    throw new Error('No web3 wallet found. Please install MetaMask.');
+  }
+
+  console.log('🔄 Refreshing wallet connection...');
+  
+  // Force refresh the connection
+  await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
+  
+  // Ensure we're on the correct network
+  try {
+    await (window as any).ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: '0x1f90' }], // 8080 in hex
+    });
+  } catch (switchError: any) {
+    if (switchError.code === 4902) {
+      // Network doesn't exist, add it
+      await (window as any).ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [shardeumLiberty]
+      });
+    }
+  }
+  
+  const provider = new BrowserProvider((window as any).ethereum);
+  const signer = await provider.getSigner();
+  const address = await signer.getAddress();
+  
+  console.log('✅ Wallet connection refreshed:', address);
+  return { provider, signer, address };
+}
+
 
 const DEFAULT_SHM_TOKEN_ADDRESS = (import.meta as any)?.env?.VITE_SHM_TOKEN_ADDRESS || '';
 
@@ -184,9 +269,15 @@ export async function connectWallet() {
 
   console.log('👤 Connected address:', address);
 
-  // Check if we're on the correct network
+  // Check if we're on the correct network with better error handling
   try {
-    const network = await provider.getNetwork();
+    const network = await Promise.race([
+      provider.getNetwork(),
+      new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Network check timeout')), 8000)
+      )
+    ]);
+    
     const chainIdNum = Number(network.chainId);
     
     console.log('🌐 Current network:', network);
@@ -221,13 +312,19 @@ export async function connectWallet() {
       // Recreate provider after network switch
       const newProvider = new BrowserProvider((window as any).ethereum);
       const newSigner = await newProvider.getSigner();
-      const finalNetwork = await newProvider.getNetwork();
-      console.log('🔄 Final network after switch:', finalNetwork);
+      
+      try {
+        const finalNetwork = await newProvider.getNetwork();
+        console.log('🔄 Final network after switch:', finalNetwork);
+      } catch (finalNetworkError) {
+        console.warn('Could not verify final network, but continuing:', finalNetworkError);
+      }
       
       return { provider: newProvider, signer: newSigner, address };
     }
   } catch (networkError) {
-    console.warn('Network check failed, but continuing:', networkError);
+    console.warn('Network check failed, but continuing with connection:', networkError);
+    // Continue with the original provider even if network check fails
   }
 
   return { provider, signer, address };
@@ -276,35 +373,68 @@ export async function getShmBalance(provider: Provider, address: string) {
       console.warn('⚠️ Could not get network info:', networkError);
     }
 
-    // Try to get balance with timeout
-    const balance = await Promise.race([
-      provider.getBalance(address),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Balance fetch timeout')), 10000)
-      )
-    ]) as bigint;
+    // Try to get balance with timeout and retry logic
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        const balance = await Promise.race([
+          provider.getBalance(address),
+          new Promise<never>((_, reject) => 
+            setTimeout(() => reject(new Error('Balance fetch timeout')), 8000)
+          )
+        ]);
 
-    const formattedBalance = formatEther(balance);
-    console.log('💰 Raw balance (wei):', balance.toString());
-    console.log('💰 Formatted balance (SHM):', formattedBalance);
-    return formattedBalance;
+        const formattedBalance = formatEther(balance);
+        console.log('💰 Raw balance (wei):', balance.toString());
+        console.log('💰 Formatted balance (SHM):', formattedBalance);
+        return formattedBalance;
+      } catch (retryError) {
+        retries--;
+        console.warn(`⚠️ Balance fetch attempt failed, ${retries} retries left:`, retryError);
+        if (retries > 0) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    }
+    
+    throw new Error('Failed to get balance after retries');
   } catch (error) {
     console.error('❌ Error getting SHM balance:', error);
     
-    // Try with fallback RPC provider
-    try {
-      console.log('🔄 Trying fallback RPC provider...');
-      const fallbackProvider = new JsonRpcProvider('https://api-unstable.shardeum.org');
-      const fallbackBalance = await fallbackProvider.getBalance(address);
-      const formattedFallbackBalance = formatEther(fallbackBalance);
-      console.log('💰 Fallback balance (SHM):', formattedFallbackBalance);
-      return formattedFallbackBalance;
-    } catch (fallbackError) {
-      console.error('❌ Fallback provider also failed:', fallbackError);
-      // If we're connected but can't get balance, return 0 instead of throwing
-      console.warn('⚠️ Returning 0 balance due to network error');
-      return "0.0";
+    // Try with multiple fallback RPC providers
+    const fallbackUrls = [
+      'https://api-unstable.shardeum.org',
+      'https://rpc-unstable.shardeum.org',
+      'https://api.shardeum.org'
+    ];
+    
+    for (const url of fallbackUrls) {
+      try {
+        console.log(`🔄 Trying fallback RPC provider: ${url}`);
+        const fallbackProvider = new JsonRpcProvider(url, {
+          chainId: 8080,
+          name: 'shardeum-unstablenet'
+        });
+        
+        const fallbackBalance = await Promise.race([
+          fallbackProvider.getBalance(address),
+          new Promise<never>((_, reject) => 
+            setTimeout(() => reject(new Error('Fallback timeout')), 5000)
+          )
+        ]);
+        
+        const formattedFallbackBalance = formatEther(fallbackBalance);
+        console.log(`💰 Fallback balance (SHM) from ${url}:`, formattedFallbackBalance);
+        return formattedFallbackBalance;
+      } catch (fallbackError) {
+        console.error(`❌ Fallback provider ${url} failed:`, fallbackError);
+        continue;
+      }
     }
+    
+    // If all providers fail, return 0 instead of throwing
+    console.warn('⚠️ All providers failed, returning 0 balance');
+    return "0.0";
   }
 }
 
@@ -352,11 +482,19 @@ export async function sendShmToken(signer: ethers.Signer, amountInShm: string | 
   // Send native SHM tokens directly
   const amount = parseEther(String(amountInShm));
   
+  // Prepare transaction parameters
+  let gasPrice;
+  let gasLimit = 21000n; // Use BigInt for gas limit
+  
   try {
-    // Get current gas price from network
-    let gasPrice;
+    // Get current gas price from network with better error handling
     try {
-      const feeData = await provider.getFeeData();
+      const feeData = await Promise.race([
+        provider.getFeeData(),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('Fee data timeout')), 5000)
+        )
+      ]);
       gasPrice = feeData.gasPrice || parseUnits("20", "gwei");
       console.log('⛽ Current gas price:', formatUnits(gasPrice, 'gwei'), 'gwei');
     } catch (gasPriceError) {
@@ -364,20 +502,100 @@ export async function sendShmToken(signer: ethers.Signer, amountInShm: string | 
       gasPrice = parseUnits("20", "gwei");
     }
 
-    const tx = await signer.sendTransaction({
+    // Estimate gas limit with fallback
+    try {
+      const estimatedGas = await provider.estimateGas({
+        to: company,
+        value: amount,
+        from: from
+      });
+      gasLimit = estimatedGas + (estimatedGas / 10n); // Add 10% buffer
+      console.log('⛽ Estimated gas limit:', gasLimit.toString());
+    } catch (gasEstimateError) {
+      console.warn('⚠️ Could not estimate gas, using standard limit');
+    }
+
+    const txParams = {
       to: company,
       value: amount,
-      gasLimit: 21000, // Standard transfer gas limit
+      gasLimit: gasLimit,
       gasPrice: gasPrice
+    };
+
+    console.log('📤 Sending transaction with params:', {
+      to: txParams.to,
+      value: formatEther(txParams.value),
+      gasLimit: txParams.gasLimit.toString(),
+      gasPrice: formatUnits(txParams.gasPrice, 'gwei') + ' gwei'
     });
 
+    const tx = await signer.sendTransaction(txParams);
     console.log('📤 Transaction sent:', tx.hash);
-    await tx.wait();
+    
+    // Wait for confirmation with timeout
+    const receipt = await Promise.race([
+      tx.wait(),
+      new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Transaction confirmation timeout')), 60000)
+      )
+    ]);
+    
     console.log('✅ Transaction confirmed:', tx.hash);
     return tx;
-  } catch (txError) {
+  } catch (txError: any) {
     console.error('❌ Transaction failed:', txError);
-    throw new Error(`Transaction failed: ${txError.message}`);
+    
+    // Handle specific RPC error codes
+    if (txError.code === -32603 || txError.message?.includes('Internal JSON-RPC error')) {
+      // Try to switch to a fallback RPC or retry
+      console.log('🔄 Detected RPC error, attempting fallback solution...');
+      
+      // If we have MetaMask, try to refresh the provider connection
+      if ((window as any).ethereum) {
+        try {
+          // Request a fresh connection
+          await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
+          
+          // Create a new provider and retry once
+          const freshProvider = new BrowserProvider((window as any).ethereum);
+          const freshSigner = await freshProvider.getSigner();
+          
+          // Prepare fresh transaction parameters
+          const freshTxParams = {
+            to: company,
+            value: amount,
+            gasLimit: gasLimit,
+            gasPrice: gasPrice
+          };
+          
+          console.log('🔄 Retrying transaction with fresh provider...');
+          const retryTx = await freshSigner.sendTransaction(freshTxParams);
+          console.log('📤 Retry transaction sent:', retryTx.hash);
+          
+          const retryReceipt = await retryTx.wait();
+          console.log('✅ Retry transaction confirmed:', retryTx.hash);
+          return retryTx;
+        } catch (retryError) {
+          console.error('❌ Retry also failed:', retryError);
+          throw new Error(`Network connectivity issue. Please check your internet connection and try again. Original error: ${txError.message}`);
+        }
+      }
+      
+      throw new Error(`Network error: Shardeum RPC is experiencing issues. Please try again in a few minutes. Error code: ${txError.code}`);
+    }
+    
+    // Provide more specific error messages for other errors
+    if (txError.message?.includes('insufficient funds')) {
+      throw new Error(`Insufficient funds for transaction. Check your SHM balance and gas fees.`);
+    } else if (txError.message?.includes('user rejected')) {
+      throw new Error(`Transaction was cancelled by user.`);
+    } else if (txError.message?.includes('timeout')) {
+      throw new Error(`Transaction timed out. Please try again.`);
+    } else if (txError.message?.includes('JSON-RPC')) {
+      throw new Error(`Network error: ${txError.message}. Please check your connection and try again.`);
+    } else {
+      throw new Error(`Transaction failed: ${txError.message || 'Unknown error'}`);
+    }
   }
 }
 
