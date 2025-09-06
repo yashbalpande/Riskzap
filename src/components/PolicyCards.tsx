@@ -241,6 +241,26 @@ export const PolicyCards: React.FC = () => {
         totalAmount.toFixed(4),
         tx.hash
       );
+
+      // Track analytics for policy purchase
+      try {
+        const { analyticsService } = await import('@/services/analytics');
+        await analyticsService.trackPolicyPurchase({
+          walletAddress: await txSigner.getAddress(),
+          policyType: policy.name,
+          premium: policy.basePremium,
+          coverage: policy.coverage,
+          duration: policy.duration,
+          totalPaid: totalAmount,
+          platformFee: feeCalculation.fee,
+          txHash: tx.hash,
+          status: 'active',
+          coverageAmount: policy.basePremium * 15 // Typical coverage multiplier
+        });
+        console.log('✅ Analytics tracked successfully');
+      } catch (analyticsError) {
+        console.warn('⚠️ Failed to track analytics:', analyticsError);
+      }
       
       console.log('🏗️ Preparing policy data for storage...');
       // Store policy purchase record with more comprehensive data

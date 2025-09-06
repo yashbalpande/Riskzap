@@ -3,69 +3,76 @@ import { motion } from 'framer-motion';
 import { Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import MyPolicies from '@/components/MyPolicies';
+import Footer from '@/components/Footer';
 import { useWallet } from '@/components/WalletConnector';
 
 interface MyPoliciesPageProps {
   onBack: () => void;
+  showFooter?: boolean; // Add prop to control footer display
 }
 
-const MyPoliciesPage: React.FC<MyPoliciesPageProps> = ({ onBack }) => {
+const MyPoliciesPage: React.FC<MyPoliciesPageProps> = ({ onBack, showFooter = true }) => {
   const { account, isConnected } = useWallet();
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 space-y-8">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-4"
-      >
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onBack}
-          className="flex items-center gap-2"
+    <div className={showFooter ? "min-h-screen flex flex-col" : ""}>
+      <div className={showFooter ? "flex-1 w-full max-w-7xl mx-auto p-6 space-y-8" : "w-full max-w-7xl mx-auto p-6 space-y-8"}>
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-4"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
-        </Button>
-        <div className="flex items-center gap-3">
-          <Shield className="h-8 w-8 text-primary" />
-          <div>
-            <h1 className="text-3xl font-bold text-gradient-fire">My Insurance Policies</h1>
-            <p className="text-muted-foreground">
-              {isConnected 
-                ? `Manage your insurance policies for ${account?.slice(0, 6)}...${account?.slice(-4)}`
-                : 'Connect your wallet to view your policies'
-              }
-            </p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Policy Management Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="grid grid-cols-1 gap-8"
-      >
-        {/* Main Policies Component */}
-        <div className="lg:col-span-1">
-          <MyPolicies />
-        </div>
-
-        {/* Policy Statistics */}
-        {isConnected && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack}
+            className="flex items-center gap-2"
           >
-            <PolicyStatistics />
-          </motion.div>
-        )}
-      </motion.div>
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+          <div className="flex items-center gap-3">
+            <Shield className="h-8 w-8 text-primary" />
+            <div>
+              <h1 className="text-3xl font-bold text-gradient-fire">My Insurance Policies</h1>
+              <p className="text-muted-foreground">
+                {isConnected 
+                  ? `Manage your insurance policies for ${account?.slice(0, 6)}...${account?.slice(-4)}`
+                  : 'Connect your wallet to view your policies'
+                }
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Policy Management Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-1 gap-8"
+        >
+          {/* Main Policies Component */}
+          <div className="lg:col-span-1">
+            <MyPolicies />
+          </div>
+
+          {/* Policy Statistics */}
+          {isConnected && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <PolicyStatistics />
+            </motion.div>
+          )}
+        </motion.div>
+      </div>
+      
+      {/* Footer - only show if showFooter is true */}
+      {showFooter && <Footer />}
     </div>
   );
 };

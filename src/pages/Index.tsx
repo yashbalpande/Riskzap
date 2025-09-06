@@ -6,8 +6,9 @@ import SectionTransition from '@/components/SectionTransition';
 import Dashboard from '@/components/Dashboard';
 import PolicyCards from '@/components/PolicyCards';
 import InsuranceFlowVisualization from '@/components/InsuranceFlowVisualization';
-import AnalyticsView from '@/components/AnalyticsView';
+import { AdminSettings } from '@/components/AdminSettings';
 import MyPoliciesPage from '@/pages/MyPoliciesPage';
+import Footer from '@/components/Footer';
 import { WalletProvider } from '@/components/WalletConnector';
 
 const Index = () => {
@@ -45,9 +46,9 @@ const Index = () => {
       case 'flow':
         return <InsuranceFlowVisualization />;
       case 'analytics':
-        return <AnalyticsView />;
+        return <AdminSettings />;
       case 'my-policies':
-        return <MyPoliciesPage onBack={() => handleSectionChange('dashboard')} />;
+        return <MyPoliciesPage onBack={() => handleSectionChange('dashboard')} showFooter={false} />;
       default:
         return <Dashboard />;
     }
@@ -86,6 +87,11 @@ const Index = () => {
             </motion.div>
           </AnimatePresence>
         </main>
+
+        {/* Footer */}
+        <SectionTransition index={3}>
+          <Footer />
+        </SectionTransition>
       </div>
     </WalletProvider>
   );

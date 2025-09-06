@@ -1,4 +1,5 @@
 import { ethers, Provider, BrowserProvider, JsonRpcProvider, Contract, parseUnits, formatUnits, parseEther, formatEther } from 'ethers';
+import { analyticsService } from './analytics';
 
 // -- Runtime-config keys (localStorage keys)
 const LS_TOKEN_KEY = 'RISKZAP_SHM_TOKEN_ADDRESS';
@@ -223,7 +224,14 @@ export function calculateWithdrawFee(amountInShm: number) {
 export async function purchaseWithPolicyContract(
   signer: ethers.Signer,
   policyId: number,
-  amountInShm: string | number
+  amountInShm: string | number,
+  policyData?: {
+    policyType: string;
+    coverage: string;
+    duration: string;
+    coverageAmount: number;
+    platformFee: number;
+  }
 ) { 
   const provider = signer.provider;
   if (!provider) throw new Error('Signer has no provider');
@@ -237,13 +245,35 @@ export async function purchaseWithPolicyContract(
   const policyContract = new Contract(policyAddr, policyAbi, signer);
 
   const amount = parseUnits(String(amountInShm), SHM_TOKEN_DECIMALS);
+  const walletAddress = await signer.getAddress();
 
   // Approve then purchase
   const approveTx = await tokenContract.approve(policyAddr, amount);
   await approveTx.wait();
 
   const tx = await policyContract.purchase(policyId, amount, '0x');
-  await tx.wait();
+  const receipt = await tx.wait();
+
+  // Track policy purchase analytics
+  if (policyData) {
+    try {
+      await analyticsService.trackPolicyPurchase({
+        walletAddress,
+        policyType: policyData.policyType,
+        premium: Number(formatUnits(amount, SHM_TOKEN_DECIMALS)),
+        coverage: policyData.coverage,
+        duration: policyData.duration,
+        totalPaid: Number(formatUnits(amount, SHM_TOKEN_DECIMALS)),
+        platformFee: policyData.platformFee,
+        txHash: tx.hash,
+        status: 'active',
+        coverageAmount: policyData.coverageAmount
+      });
+    } catch (analyticsError) {
+      console.warn('Failed to track policy purchase:', analyticsError);
+    }
+  }
+
   return tx;
 }
 
@@ -268,6 +298,13 @@ export async function connectWallet() {
   const address = await signer.getAddress();
 
   console.log('👤 Connected address:', address);
+
+  // Track wallet connection analytics
+  try {
+    await analyticsService.trackWalletConnection(address, navigator.userAgent);
+  } catch (analyticsError) {
+    console.warn('Failed to track wallet connection:', analyticsError);
+  }
 
   // Check if we're on the correct network with better error handling
   try {

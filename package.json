@@ -8,7 +8,12 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "compile": "hardhat compile",
-    "deploy": "hardhat run scripts/deploy.ts --network shardeum-unstablenet"
+    "deploy": "hardhat run scripts/deploy.ts --network shardeum-unstablenet",
+    "analytics:install": "cd analytics-api && npm install",
+    "analytics:dev": "cd analytics-api && npm run dev",
+    "analytics:start": "cd analytics-api && npm start",
+    "start:all": "concurrently \"npm run dev\" \"npm run analytics:dev\"",
+    "setup": "npm install && npm run analytics:install"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.1.2",

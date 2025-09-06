@@ -43,9 +43,12 @@ This model creates a **win-win scenario**:
 ## 🛠️ Technology Stack
 
 - **Frontend**: React + TypeScript + Vite
+- **Backend**: Node.js + Express + MongoDB Atlas
+- **Analytics API**: Comprehensive tracking and reporting system
 - **Blockchain**: Shardeum Shardeum Unstablenet  (Chain ID: 8080)
 - **Smart Contracts**: Solidity with OpenZeppelin standards
 - **Wallet Integration**: MetaMask with ethers.js
+- **Database**: MongoDB Atlas for analytics and user data
 - **Styling**: Tailwind CSS for modern UI/UX
 - **Development**: Hardhat for contract deployment
 
@@ -276,7 +279,53 @@ npm run dev          # Start development server
 npm run build        # Build for production
 npm run preview      # Preview production build
 npm run deploy       # Deploy smart contracts
+
+# Analytics API
+npm run analytics:install  # Install analytics API dependencies
+npm run analytics:dev      # Start analytics API in development
+npm run analytics:start    # Start analytics API in production
+npm run start:all          # Start both frontend and analytics API
+npm run setup              # Install all dependencies
 ```
+
+## 📊 Analytics & Monitoring
+
+RiskZap includes a comprehensive analytics system that tracks:
+
+### User Analytics
+- **Wallet Connections**: Track user engagement and session data
+- **Policy Purchases**: Monitor user behavior and preferences  
+- **Revenue Metrics**: Real-time financial tracking and reporting
+- **User Growth**: Analyze platform adoption and retention
+
+### System Analytics
+- **Global Statistics**: Total users, policies, and revenue
+- **Policy Distribution**: Track popular insurance types
+- **Performance Metrics**: Monitor platform health and API usage
+- **Revenue Trends**: Daily, weekly, and monthly financial reports
+
+### Analytics Dashboard
+Access the admin analytics dashboard to view:
+- Real-time user and revenue statistics
+- Policy type distribution and trends
+- User growth charts and engagement metrics
+- Platform health indicators and system status
+
+### API Endpoints
+The analytics API provides the following endpoints:
+
+**User Tracking:**
+- `POST /api/analytics/wallet-connection` - Track wallet connections
+- `POST /api/analytics/policy-purchase` - Track policy purchases
+- `GET /api/analytics/user/:address` - Get individual user analytics
+
+**System Analytics:**
+- `GET /api/analytics/global` - Get global platform statistics
+- `GET /api/analytics/revenue` - Get revenue analytics by timeframe
+- `GET /api/analytics/policy-types` - Get policy type distribution
+- `GET /api/analytics/user-growth` - Get user growth analytics
+
+For detailed API documentation, see the [Analytics API README](analytics-api/README.md).
 
 ## 🛡️ Security Features
 
@@ -285,6 +334,8 @@ npm run deploy       # Deploy smart contracts
 - **Input Validation** - Comprehensive parameter checking
 - **Event Logging** - Full audit trail for all transactions
 - **Network Verification** - Ensures correct chain interaction
+- **Rate Limiting** - API protection against abuse
+- **Data Encryption** - Secure MongoDB connections with authentication
 
 ## 🤝 Contributing
 

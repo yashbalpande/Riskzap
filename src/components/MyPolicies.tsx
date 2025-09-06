@@ -352,6 +352,20 @@ Platform: RiskZap Insurance (Shardeum Liberty 1.X)
         policyId: policy.policyId,
       });
 
+      // Track analytics for policy claim
+      try {
+        const { analyticsService } = await import('@/services/analytics');
+        await analyticsService.trackPolicyClaim(
+          account,
+          policy.policyId,
+          claimInfo.potentialAmount,
+          'local_claim_' + Date.now() // Generate a local claim hash since no blockchain tx
+        );
+        console.log('✅ Claim analytics tracked successfully');
+      } catch (analyticsError) {
+        console.warn('⚠️ Failed to track claim analytics:', analyticsError);
+      }
+
       // Update local state
       setPolicies(prevPolicies => 
         prevPolicies.map(p => 
