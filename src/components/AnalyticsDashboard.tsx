@@ -14,7 +14,7 @@ import {
   BarChart3,
   PieChart,
   Calendar,
-  Refresh
+  RefreshCw
 } from 'lucide-react';
 import { analyticsService } from '../services/analytics';
 
@@ -102,7 +102,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
           <div className="text-red-500 mb-4">❌ Error loading analytics</div>
           <p className="text-muted-foreground mb-4">{error}</p>
           <Button onClick={fetchAnalytics} variant="outline">
-            <Refresh className="w-4 h-4 mr-2" />
+            <RefreshCw className="w-4 h-4 mr-2" />
             Retry
           </Button>
         </div>
@@ -126,7 +126,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
           </p>
         </div>
         <Button onClick={fetchAnalytics} variant="outline" disabled={loading}>
-          <Refresh className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
       </div>
