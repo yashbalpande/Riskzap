@@ -1,4 +1,4 @@
-import { ethers, Provider, BrowserProvider, JsonRpcProvider, Contract, parseUnits, formatUnits, parseEther, formatEther } from 'ethers';
+import { ethers, Provider, BrowserProvider, Contract, parseUnits, formatUnits, parseEther, formatEther } from 'ethers';
 import { analyticsService } from './analytics';
 
 // -- Runtime-config keys (localStorage keys)
@@ -26,7 +26,7 @@ const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 /**
  * Create a robust RPC provider with fallback URLs
  */
-async function createRobustProvider(): Promise<JsonRpcProvider> {
+async function createRobustProvider(): Promise<ethers.JsonRpcProvider> {
   const rpcUrls = [
     'https://api-unstable.shardeum.org',
     'https://rpc-unstable.shardeum.org',
@@ -36,7 +36,7 @@ async function createRobustProvider(): Promise<JsonRpcProvider> {
   for (const url of rpcUrls) {
     try {
       console.log(`🔄 Trying RPC provider: ${url}`);
-      const provider = new JsonRpcProvider(url, {
+      const provider = new ethers.JsonRpcProvider(url, {
         chainId: 8080,
         name: 'shardeum-unstablenet'
       });
@@ -448,7 +448,7 @@ export async function getShmBalance(provider: Provider, address: string) {
     for (const url of fallbackUrls) {
       try {
         console.log(`🔄 Trying fallback RPC provider: ${url}`);
-        const fallbackProvider = new JsonRpcProvider(url, {
+        const fallbackProvider = new ethers.JsonRpcProvider(url, {
           chainId: 8080,
           name: 'shardeum-unstablenet'
         });
