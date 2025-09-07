@@ -1,4 +1,4 @@
-import { ethers, Provider, BrowserProvider, Contract, parseUnits, formatUnits, parseEther, formatEther } from 'ethers';
+import { ethers, Provider, Contract, parseUnits, formatUnits, parseEther, formatEther } from 'ethers';
 import { analyticsService } from './analytics';
 
 // -- Runtime-config keys (localStorage keys)
@@ -63,18 +63,18 @@ async function createRobustProvider(): Promise<ethers.JsonRpcProvider> {
 /**
  * Create a wallet provider with enhanced error handling
  */
-async function createWalletProvider(): Promise<BrowserProvider> {
+async function createWalletProvider(): Promise<ethers.BrowserProvider> {
   if (!(window as any).ethereum) {
     throw new Error('No web3 wallet found. Please install MetaMask.');
   }
   
-  return new BrowserProvider((window as any).ethereum);
+  return new ethers.BrowserProvider((window as any).ethereum);
 }
 
 /**
  * Force refresh the MetaMask connection and ensure correct network
  */
-export async function refreshWalletConnection(): Promise<{ provider: BrowserProvider; signer: ethers.Signer; address: string }> {
+export async function refreshWalletConnection(): Promise<{ provider: ethers.BrowserProvider; signer: ethers.Signer; address: string }> {
   if (!(window as any).ethereum) {
     throw new Error('No web3 wallet found. Please install MetaMask.');
   }
@@ -100,7 +100,7 @@ export async function refreshWalletConnection(): Promise<{ provider: BrowserProv
     }
   }
   
-  const provider = new BrowserProvider((window as any).ethereum);
+  const provider = new ethers.BrowserProvider((window as any).ethereum);
   const signer = await provider.getSigner();
   const address = await signer.getAddress();
   
@@ -292,7 +292,7 @@ export async function connectWallet() {
   await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
 
   // Create provider with explicit network to avoid issues
-  const provider = new BrowserProvider((window as any).ethereum);
+  const provider = new ethers.BrowserProvider((window as any).ethereum);
   
   const signer = await provider.getSigner();
   const address = await signer.getAddress();
@@ -347,7 +347,7 @@ export async function connectWallet() {
       }
       
       // Recreate provider after network switch
-      const newProvider = new BrowserProvider((window as any).ethereum);
+      const newProvider = new ethers.BrowserProvider((window as any).ethereum);
       const newSigner = await newProvider.getSigner();
       
       try {
@@ -594,7 +594,7 @@ export async function sendShmToken(signer: ethers.Signer, amountInShm: string | 
           await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
           
           // Create a new provider and retry once
-          const freshProvider = new BrowserProvider((window as any).ethereum);
+          const freshProvider = new ethers.BrowserProvider((window as any).ethereum);
           const freshSigner = await freshProvider.getSigner();
           
           // Prepare fresh transaction parameters
