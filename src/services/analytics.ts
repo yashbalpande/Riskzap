@@ -145,8 +145,8 @@ class AnalyticsService {
   }
 
   // Get user purchase history
-  async getUserPurchases(walletAddress: string): Promise<PolicyPurchase[]> {
-    return this.apiCall<PolicyPurchase[]>(`/api/analytics/purchases/${walletAddress}`);
+  async getUserPurchases(walletAddress: string): Promise<{ purchases: PolicyPurchase[], total: number, totalPages: number, currentPage: number }> {
+    return this.apiCall<{ purchases: PolicyPurchase[], total: number, totalPages: number, currentPage: number }>(`/api/analytics/purchases/${walletAddress}`);
   }
 
   // Get all connected users (admin endpoint)

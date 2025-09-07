@@ -242,7 +242,7 @@ export const PolicyCards: React.FC = () => {
         tx.hash
       );
 
-      // Track analytics for policy purchase
+      // Track analytics for policy purchase (this will save to MongoDB)
       try {
         const { analyticsService } = await import('@/services/analytics');
         await analyticsService.trackPolicyPurchase({
@@ -257,13 +257,19 @@ export const PolicyCards: React.FC = () => {
           status: 'active',
           coverageAmount: policy.basePremium * 15 // Typical coverage multiplier
         });
-        console.log('✅ Analytics tracked successfully');
+        console.log('✅ Policy saved to MongoDB successfully');
       } catch (analyticsError) {
-        console.warn('⚠️ Failed to track analytics:', analyticsError);
+        console.warn('⚠️ Failed to save policy to MongoDB:', analyticsError);
+        toast({
+          title: "Warning",
+          description: "Policy purchased but failed to save to database. Please contact support.",
+          variant: "destructive",
+        });
+        return;
       }
-      
-      console.log('🏗️ Preparing policy data for storage...');
-      // Store policy purchase record with more comprehensive data
+
+      console.log('🏗️ Preparing legacy policy data for local backup...');
+      // Keep local backup for compatibility (but MongoDB is primary)
       const signerAddress = await txSigner.getAddress();
       const policyData = {
         userWalletAddress: signerAddress || account || 'unknown',
@@ -281,11 +287,12 @@ export const PolicyCards: React.FC = () => {
         }
       };
       
-      console.log('🏗️ Creating policy with data:', policyData);
+      console.log('🏗️ Creating local backup with data:', policyData);
       
+      // Save local backup (secondary)
       const createdPolicy = await localDatabaseService.createPolicy(policyData);
       
-      console.log('✅ Policy creation result:', createdPolicy);
+      console.log('✅ Local backup result:', createdPolicy);
       
       if (!createdPolicy) {
         toast({
@@ -340,10 +347,30 @@ export const PolicyCards: React.FC = () => {
       console.error('❌ Purchase failed:', err);
       console.error('❌ Error details:', err?.message, err?.code);
       
-      // For testing purposes, let's save the policy to localStorage even if blockchain fails
-      console.log('🧪 Saving policy to localStorage despite blockchain failure (for testing)...');
+      // Save policy to MongoDB even if blockchain fails (for demo/testing)
+      console.log('🧪 Saving policy to MongoDB despite blockchain failure (for testing)...');
       
       try {
+        const fallbackTxHash = '0xfallback_' + Date.now();
+        const totalAmount = policy.basePremium + calculatePurchaseFee(policy.basePremium).fee;
+        
+        // Save to MongoDB first (primary storage)
+        const { analyticsService } = await import('@/services/analytics');
+        await analyticsService.trackPolicyPurchase({
+          walletAddress: account || '0xfallback',
+          policyType: policy.name,
+          premium: policy.basePremium,
+          coverage: policy.coverage,
+          duration: policy.duration,
+          totalPaid: totalAmount,
+          platformFee: calculatePurchaseFee(policy.basePremium).fee,
+          txHash: fallbackTxHash,
+          status: 'active',
+          coverageAmount: policy.basePremium * 15
+        });
+        console.log('✅ Fallback policy saved to MongoDB');
+
+        // Also save to localStorage as backup
         const fallbackPolicyData = {
           userWalletAddress: account || '0xfallback',
           policyType: policy.name,
@@ -352,26 +379,24 @@ export const PolicyCards: React.FC = () => {
           duration: policy.duration,
           metadata: {
             policyId: policy.id,
-            txHash: '0xfallback_' + Date.now(),
+            txHash: fallbackTxHash,
             platformFee: calculatePurchaseFee(policy.basePremium).fee,
-            totalPaid: policy.basePremium + calculatePurchaseFee(policy.basePremium).fee,
+            totalPaid: totalAmount,
             features: policy.features,
             walletAddress: account || '0xfallback'
           }
         };
         
-        console.log('🏗️ Creating fallback policy:', fallbackPolicyData);
+        console.log('🏗️ Creating fallback local policy:', fallbackPolicyData);
         const fallbackPolicy = await localDatabaseService.createPolicy(fallbackPolicyData);
-        console.log('✅ Fallback policy created:', fallbackPolicy);
+        console.log('✅ Fallback local policy created:', fallbackPolicy);
         
-        if (fallbackPolicy) {
-          toast({
-            title: "⚠️ Policy Saved (Blockchain Failed)",
-            description: `Policy saved to localStorage for testing. Blockchain transaction failed: ${err?.message}`,
-            variant: "default",
-          });
-          return;
-        }
+        toast({
+          title: "⚠️ Policy Saved (Blockchain Failed)",
+          description: `Policy saved to database for testing. Blockchain transaction failed: ${err?.message}`,
+          variant: "default",
+        });
+        return;
       } catch (fallbackErr) {
         console.error('❌ Even fallback policy creation failed:', fallbackErr);
       }

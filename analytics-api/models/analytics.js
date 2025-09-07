@@ -42,8 +42,8 @@ const policyPurchaseSchema = new mongoose.Schema({
   },
   policyType: {
     type: String,
-    required: true,
-    enum: ['health', 'auto', 'travel', 'life', 'property', 'crypto']
+    required: true
+    // Removed enum restriction to allow any policy type
   },
   premium: {
     type: Number,
@@ -56,8 +56,8 @@ const policyPurchaseSchema = new mongoose.Schema({
   },
   duration: {
     type: String,
-    required: true,
-    enum: ['5 days', '30 days', '120 days', '365 days', '365+ days']
+    required: true
+    // Removed enum restriction to allow any duration format
   },
   totalPaid: {
     type: Number,

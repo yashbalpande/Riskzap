@@ -124,17 +124,52 @@ const MyPolicies: React.FC = () => {
         return;
       }
 
-      console.log('🔍 Starting to load user policies...');
+      console.log('🔍 Starting to load user policies from MongoDB...');
       console.log('👤 Account:', account);
       console.log('⏰ Timestamp:', new Date().toISOString());
       
-      
-      await localDatabaseService.inspectLocalStorage();
+      // Load policies from MongoDB via analytics API
+      let dbPolicies: any[] = [];
+      try {
+        const { analyticsService } = await import('@/services/analytics');
+        const mongodbPolicies = await analyticsService.getUserPurchases(account);
+        
+        console.log('📊 Raw policies from MongoDB:', mongodbPolicies);
+        
+        if (mongodbPolicies && mongodbPolicies.purchases) {
+          // Convert MongoDB format to expected format
+          dbPolicies = mongodbPolicies.purchases.map((purchase: any) => ({
+            policy_id: purchase._id,
+            policyId: purchase._id,
+            user_wallet_address: purchase.walletAddress,
+            policy_type: purchase.policyType,
+            premium: purchase.premium,
+            coverage: purchase.coverage,
+            duration: purchase.duration,
+            purchase_date: purchase.purchaseTimestamp,
+            status: purchase.status,
+            claim_amount: null,
+            claim_date: null,
+            metadata: {
+              txHash: purchase.txHash,
+              totalPaid: purchase.totalPaid,
+              platformFee: purchase.platformFee,
+              policyId: purchase.policyType,
+              features: []
+            }
+          }));
+          console.log('✅ Converted MongoDB policies:', dbPolicies);
+        }
+      } catch (mongoError) {
+        console.warn('⚠️ Failed to load from MongoDB, falling back to localStorage:', mongoError);
+        
+        // Fallback to localStorage if MongoDB fails
+        await localDatabaseService.inspectLocalStorage();
+        dbPolicies = await localDatabaseService.getUserPolicies(account);
+        console.log('📊 Fallback policies from localStorage:', dbPolicies);
+      }
 
-      const dbPolicies = await localDatabaseService.getUserPolicies(account);
-      
-      console.log('📊 Raw policies from localStorage:', dbPolicies);
-      console.log('📈 Number of raw policies:', dbPolicies.length);
+      console.log('📈 Total policies found:', dbPolicies.length);
 
       if (dbPolicies.length === 0) {
         console.log('📭 No policies found for user');
@@ -340,18 +375,6 @@ Platform: RiskZap Insurance (Shardeum Liberty 1.X)
         netPayout: claimInfo.potentialAmount
       };
 
-      // Update the policy in the database
-      await localDatabaseService.updatePolicyStatus(policy.policyId, 'claimed', claimInfo.potentialAmount);
-
-      // Log the claim activity
-      await localDatabaseService.logActivity({
-        userWalletAddress: account,
-        action: 'claim_filed',
-        description: `Filed claim for ${policy.policyName} - ${claimInfo.potentialAmount.toFixed(4)} SHM`,
-        amount: claimInfo.potentialAmount,
-        policyId: policy.policyId,
-      });
-
       // Track analytics for policy claim
       try {
         const { analyticsService } = await import('@/services/analytics');
@@ -361,9 +384,26 @@ Platform: RiskZap Insurance (Shardeum Liberty 1.X)
           claimInfo.potentialAmount,
           'local_claim_' + Date.now() // Generate a local claim hash since no blockchain tx
         );
-        console.log('✅ Claim analytics tracked successfully');
+        console.log('✅ Claim tracked in MongoDB analytics successfully');
       } catch (analyticsError) {
-        console.warn('⚠️ Failed to track claim analytics:', analyticsError);
+        console.warn('⚠️ Failed to track claim in MongoDB analytics:', analyticsError);
+      }
+
+      // Update the policy in the local database (backup)
+      try {
+        await localDatabaseService.updatePolicyStatus(policy.policyId, 'claimed', claimInfo.potentialAmount);
+
+        // Log the claim activity locally
+        await localDatabaseService.logActivity({
+          userWalletAddress: account,
+          action: 'claim_filed',
+          description: `Filed claim for ${policy.policyName} - ${claimInfo.potentialAmount.toFixed(4)} SHM`,
+          amount: claimInfo.potentialAmount,
+          policyId: policy.policyId,
+        });
+        console.log('✅ Claim saved to local database as backup');
+      } catch (localError) {
+        console.warn('⚠️ Failed to save claim to local database backup:', localError);
       }
 
       // Update local state
