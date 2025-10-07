@@ -183,11 +183,11 @@ export function AdminSettings({ className }: AdminSettingsProps) {
                     <CardContent className="space-y-3">
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Network</span>
-                        <Badge variant="outline">Shardeum Unstablenet</Badge>
+                        <Badge variant="outline">Shardeum EVM Testnet</Badge>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Chain ID</span>
-                        <Badge variant="outline">8080</Badge>
+                        <Badge variant="outline">8119</Badge>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Token</span>

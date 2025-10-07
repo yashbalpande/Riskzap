@@ -16,9 +16,9 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 1337,
     },
-    "shardeum-unstablenet": {
-      url: process.env.SHARDEUM_RPC_URL || "https://api-unstable.shardeum.org",
-      chainId: 8080,
+    "shardeum-evm-testnet": {
+      url: process.env.SHARDEUM_RPC_URL || "https://api-mezame.shardeum.org",
+      chainId: 8119,
       accounts: process.env.PRIVATE_KEY ? [`0x${process.env.PRIVATE_KEY}`] : [],
       gasPrice: 20000000000, // 20 gwei
     },

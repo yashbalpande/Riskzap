@@ -39,9 +39,9 @@ export const PAYFI_INSURANCE_ABI = [
 
 // Shardeum Liberty 1.X configuration
 export const SHARDEUM_CONFIG = {
-  chainId: 8080, // Shardeum Unstablenet Chain ID
-  rpcUrl: "https://api-unstable.shardeum.org",
-  blockExplorer: "https://explorer-unstable.shardeum.org/",
+  chainId: 8119, // Shardeum EVM Testnet Chain ID
+  rpcUrl: "https://api-mezame.shardeum.org",
+  blockExplorer: "https://explorer-mezame.shardeum.org/",
   currency: {
     name: "Shardeum",
     symbol: "SHM",
@@ -166,7 +166,7 @@ export const addShardeumNetwork = async () => {
         method: 'wallet_addEthereumChain',
         params: [{
           chainId: `0x${SHARDEUM_CONFIG.chainId.toString(16)}`,
-          chainName: 'Shardeum Liberty 1.X',
+          chainName: 'Shardeum EVM Testnet',
           nativeCurrency: SHARDEUM_CONFIG.currency,
           rpcUrls: [SHARDEUM_CONFIG.rpcUrl],
           blockExplorerUrls: [SHARDEUM_CONFIG.blockExplorer]

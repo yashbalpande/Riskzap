@@ -6,15 +6,15 @@ const LS_TOKEN_KEY = 'RISKZAP_SHM_TOKEN_ADDRESS';
 const LS_COMPANY_KEY = 'RISKZAP_COMPANY_WALLET';
 const LS_POLICY_KEY = 'RISKZAP_POLICY_CONTRACT';
 const shardeumLiberty = {
-  chainId: '8080', // 8080 in hex
-  chainName: 'Shardeum Unstablenet',
-  rpcUrls: ['https://api-unstable.shardeum.org'],
+  chainId: '8119', // 8119 in hex
+  chainName: 'Shardeum EVM Testnet',
+  rpcUrls: ['https://api-mezame.shardeum.org'],
   nativeCurrency: {
     name: 'SHM',
     symbol: 'SHM',
     decimals: 18,
   },
-  blockExplorerUrls: ['https://explorer-unstable.shardeum.org/'],
+  blockExplorerUrls: ['https://explorer-mezame.shardeum.org/'],
 };
 
 // Policy contract key constant
@@ -28,8 +28,8 @@ const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
  */
 async function createRobustProvider(): Promise<ethers.JsonRpcProvider> {
   const rpcUrls = [
-    'https://api-unstable.shardeum.org',
-    'https://rpc-unstable.shardeum.org',
+    'https://api-mezame.shardeum.org',
+    'https://rpc-mezame.shardeum.org',
     'https://api.shardeum.org'
   ];
   
@@ -37,8 +37,8 @@ async function createRobustProvider(): Promise<ethers.JsonRpcProvider> {
     try {
       console.log(`🔄 Trying RPC provider: ${url}`);
       const provider = new ethers.JsonRpcProvider(url, {
-        chainId: 8080,
-        name: 'shardeum-unstablenet'
+        chainId: 8119,
+        name: 'shardeum-evm-testnet'
       });
       
       // Test the provider with a simple call
@@ -88,12 +88,12 @@ export async function refreshWalletConnection(): Promise<{ provider: ethers.Brow
   try {
     await (window as any).ethereum.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x1f90' }], // 8080 in hex
+      params: [{ chainId: '0x1F97' }], // 8119 in hex
     });
   } catch (switchError: any) {
     if (switchError.code === 4902) {
       // Network doesn't exist, add it
-      await (window as any).ethereum.request({
+          await (window as any).ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [shardeumLiberty]
       });

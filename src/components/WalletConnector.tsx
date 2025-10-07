@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Wallet, Power, AlertCircle, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { connectWallet, getShmBalance } from '@/services/web3';
-import { BrowserProvider } from 'ethers';
 import { toast } from '@/hooks/use-toast';
 interface WalletContextType {
   account: string | null;
@@ -105,9 +104,9 @@ const WalletConnector: React.FC = () => {
   const [isShardeum, setIsShardeum] = useState(false);
 
   useEffect(() => {
-    // Shardeum testnet Chain ID is 8080
+    // Shardeum EVM Testnet Chain ID is 8119
     console.log('🔍 Current chainId:', chainId, 'Type:', typeof chainId);
-    setIsShardeum(chainId === 8080);
+    setIsShardeum(chainId === 8119);
   }, [chainId]);
 
   const formatAddress = (address: string) => {
@@ -148,7 +147,7 @@ const WalletConnector: React.FC = () => {
               )}
               <span className="text-sm">
                 {isShardeum 
-                  ? 'Shardeum Unstablenet' 
+                  ? 'Shardeum EVM Testnet' 
                   : chainId 
                     ? `Chain ${chainId}` 
                     : 'Not Connected'}

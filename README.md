@@ -45,7 +45,7 @@ This model creates a **win-win scenario**:
 - **Frontend**: React + TypeScript + Vite
 - **Backend**: Node.js + Express + MongoDB Atlas
 - **Analytics API**: Comprehensive tracking and reporting system
-- **Blockchain**: Shardeum Shardeum Unstablenet  (Chain ID: 8080)
+- **Blockchain**: Shardeum EVM Testnet (Mezame)  (Chain ID: 8119)
 - **Smart Contracts**: Solidity with OpenZeppelin standards
 - **Wallet Integration**: MetaMask with ethers.js
 - **Database**: MongoDB Atlas for analytics and user data

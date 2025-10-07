@@ -18,9 +18,9 @@ async function main() {
 
   // Connect to Shardeum Liberty 1.X - try multiple RPC endpoints
   const rpcUrls = [
-    process.env.SHARDEUM_RPC_URL || 'https://api-testnet.shardeum.org/',
-    'https://api-testnet.shardeum.org/',
-    'https://api-unstable.shardeum.org',
+    process.env.SHARDEUM_RPC_URL || 'https://api-mezame.shardeum.org',
+    'https://api-mezame.shardeum.org',
+    'https://rpc-mezame.shardeum.org',
     'https://dapps.shardeum.org/'
   ];
   
@@ -67,19 +67,19 @@ async function main() {
   const network = await provider.getNetwork();
   console.log('🌐 Connected to network:', network.name, 'Chain ID:', network.chainId);
   
-  if (network.chainId !== 8080) {
-    console.warn('⚠️  Warning: Expected Shardeum Unstablenet (Chain ID: 8080)');
+  if (network.chainId !== 8119) {
+    console.warn('⚠️  Warning: Expected Shardeum EVM Testnet (Chain ID: 8119)');
   }
 
   console.log('\n✅ Deployment prerequisites check completed!');
   console.log('📝 Deployer wallet:', wallet.address);
   console.log('💳 Balance:', ethers.utils.formatEther(balance), 'SHM');
-  console.log('🌐 Network: Shardeum Liberty 1.X');
+  console.log('🌐 Network: Shardeum EVM Testnet');
   
   console.log('\n📋 Next steps to deploy contracts:');
   console.log('1. ✅ Wallet funded with SHM');
   console.log('2. ❌ Compile contracts: npx hardhat compile');
-  console.log('3. ❌ Deploy contracts: npx hardhat run scripts/deploy.ts --network shardeum-unstablenet');
+  console.log('3. ❌ Deploy contracts: npx hardhat run scripts/deploy.ts --network shardeum-evm-testnet');
   
   console.log('\n� Alternative: Manual deployment without Hardhat (coming in next step)');
 }

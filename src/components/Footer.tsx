@@ -102,13 +102,13 @@ const Footer: React.FC = () => {
           
           <div className="flex items-center gap-6 text-sm text-gray-500">
             <a 
-              href="https://explorer-unstable.shardeum.org/"
+              href="https://explorer-mezame.shardeum.org/"
               target="_blank"
               rel="noopener noreferrer"
               className="group flex items-center gap-2 hover:text-cyan-400 transition-colors duration-200 cursor-pointer"
             >
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              Live on Shardeum Unstablenet
+              Live on Shardeum EVM Testnet
               <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
             </a>
           </div>

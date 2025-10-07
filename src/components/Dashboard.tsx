@@ -361,14 +361,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onSectionChange }) => {
         className="smooth-curve-header text-center relative"
       >
         <div className="max-w-4xl mx-auto">
-          <motion.div
+            <motion.div
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
             className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full card-elevated border-success"
           >
             <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-            <span className="text-sm font-medium text-success">Live on Shardeum Unstablenet</span>
+            <span className="text-sm font-medium text-success">Live on Shardeum EVM Testnet</span>
           </motion.div>
           
           <h1 className="text-hero text-gradient-primary mb-6 leading-tight">
@@ -582,7 +582,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onSectionChange }) => {
                 </div>
                 <div className="space-y-1">
                   <div className="font-semibold text-warning">Network Info</div>
-                  <div className="text-muted-foreground">Chain ID: 8080</div>
+                  <div className="text-muted-foreground">Chain ID: 8119</div>
                   <div className="text-muted-foreground">Currency: SHM</div>
                 </div>
                 <div className="space-y-1">

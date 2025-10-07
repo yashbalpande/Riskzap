@@ -23,9 +23,30 @@ interface AnalyticsDashboardProps {
 }
 
 export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
-  const [globalData, setGlobalData] = useState<any>(null);
-  const [revenueData, setRevenueData] = useState<any[]>([]);
-  const [policyTypeData, setPolicyTypeData] = useState<any[]>([]);
+  interface GlobalAnalytics {
+    totalUsers: number;
+    totalConnections: number;
+    totalRevenue: number;
+    averagePolicyValue: number;
+    totalPoliciesSold: number;
+    activePoliciesCount: number;
+    claimedPoliciesCount: number;
+    totalCoverageIssued: number;
+  }
+
+  const [globalData, setGlobalData] = useState<GlobalAnalytics | null>(null);
+  interface RevenueItem {
+    date: string;
+    revenue: number;
+    policies: number;
+  }
+  const [revenueData, setRevenueData] = useState<RevenueItem[]>([]);
+  interface PolicyTypeItem {
+    type: string;
+    count: number;
+    revenue: number;
+  }
+  const [policyTypeData, setPolicyTypeData] = useState<PolicyTypeItem[]>([]);
   const [userGrowthData, setUserGrowthData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

@@ -129,7 +129,7 @@ const MyPolicies: React.FC = () => {
       console.log('⏰ Timestamp:', new Date().toISOString());
       
       // Load policies from MongoDB via analytics API
-      let dbPolicies: any[] = [];
+      let dbPolicies: PolicyRecord[] = [];
       try {
         const { analyticsService } = await import('@/services/analytics');
         const mongodbPolicies = await analyticsService.getUserPurchases(account);
@@ -139,24 +139,26 @@ const MyPolicies: React.FC = () => {
         if (mongodbPolicies && mongodbPolicies.purchases) {
           // Convert MongoDB format to expected format
           dbPolicies = mongodbPolicies.purchases.map((purchase: any) => ({
-            policy_id: purchase._id,
             policyId: purchase._id,
-            user_wallet_address: purchase.walletAddress,
-            policy_type: purchase.policyType,
             premium: purchase.premium,
-            coverage: purchase.coverage,
-            duration: purchase.duration,
-            purchase_date: purchase.purchaseTimestamp,
+            platformFee: purchase.platformFee ?? (purchase.premium * 0.02), // fallback if missing
+            totalPaid: purchase.totalPaid ?? purchase.premium,
+            purchaseDate: purchase.purchaseTimestamp,
+            userAddress: purchase.walletAddress,
+            txHash: purchase.txHash ?? '',
             status: purchase.status,
-            claim_amount: null,
-            claim_date: null,
-            metadata: {
-              txHash: purchase.txHash,
-              totalPaid: purchase.totalPaid,
-              platformFee: purchase.platformFee,
-              policyId: purchase.policyType,
-              features: []
-            }
+            policyName: getPolicyName(purchase.policyType),
+            policyType: getPolicyType(purchase.policyType),
+            coverageAmount: getCoverageAmount(purchase.policyType, purchase.premium),
+            expiryDate: getExpiryDate(purchase.purchaseTimestamp, purchase.policyType),
+            claimDate: null,
+            claimAmount: null,
+            baseClaimAmount: undefined,
+            timeBonus: undefined,
+            claimPercentage: undefined,
+            daysSincePurchase: undefined,
+            withdrawalFee: undefined,
+            netPayout: undefined
           }));
           console.log('✅ Converted MongoDB policies:', dbPolicies);
         }
@@ -336,7 +338,7 @@ Platform: RiskZap Insurance (Shardeum Liberty 1.X)
   };
 
   const viewOnExplorer = (txHash: string) => {
-    window.open(`https://explorer-unstable.shardeum.org/transaction/${txHash}`, '_blank');
+  window.open(`https://explorer-mezame.shardeum.org/transaction/${txHash}`, '_blank');
   };
 
 
