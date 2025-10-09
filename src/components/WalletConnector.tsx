@@ -4,7 +4,7 @@ import { Wallet, Power, AlertCircle, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { connectWallet, getShmBalance } from '@/services/web3';
 import { toast } from '@/hooks/use-toast';
-import { BrowserProvider } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 interface WalletContextType {
   account: string | null;
   isConnected: boolean;
@@ -44,8 +44,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           setAccount(accounts[0]);
           setIsConnected(true);
           
-          // Create provider for balance checking (ethers v6)
-          const provider = new BrowserProvider(window.ethereum);
+          const provider = new JsonRpcProvider(window.ethereum);
           console.log('🔗 Created provider, checking balance...');
           
           const balanceStr = await getShmBalance(provider, accounts[0]);
