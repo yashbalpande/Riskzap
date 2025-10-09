@@ -167,7 +167,29 @@ const MyPolicies: React.FC = () => {
         
         // Fallback to localStorage if MongoDB fails
         await localDatabaseService.inspectLocalStorage();
-        dbPolicies = await localDatabaseService.getUserPolicies(account);
+        const localPolicies = await localDatabaseService.getUserPolicies(account);
+        dbPolicies = localPolicies.map((localPolicy: any) => ({
+          policyId: localPolicy.policyId || localPolicy.policy_type || 'general',
+          premium: localPolicy.premium,
+          platformFee: localPolicy.platformFee ?? (localPolicy.premium * 0.02),
+          totalPaid: localPolicy.totalPaid ?? localPolicy.premium,
+          purchaseDate: localPolicy.purchaseDate ?? localPolicy.purchase_date,
+          userAddress: localPolicy.userAddress ?? localPolicy.user_wallet_address,
+          txHash: localPolicy.txHash ?? '',
+          status: localPolicy.status,
+          policyName: getPolicyName(localPolicy.policy_type || localPolicy.policyId),
+          policyType: getPolicyType(localPolicy.policy_type || localPolicy.policyId),
+          coverageAmount: getCoverageAmount(localPolicy.policy_type || localPolicy.policyId, localPolicy.premium),
+          expiryDate: getExpiryDate(localPolicy.purchaseDate ?? localPolicy.purchase_date, localPolicy.policy_type || localPolicy.policyId),
+          claimDate: localPolicy.claimDate ?? null,
+          claimAmount: localPolicy.claimAmount ?? null,
+          baseClaimAmount: undefined,
+          timeBonus: undefined,
+          claimPercentage: undefined,
+          daysSincePurchase: undefined,
+          withdrawalFee: undefined,
+          netPayout: undefined
+        }));
         console.log('📊 Fallback policies from localStorage:', dbPolicies);
       }
 
@@ -206,13 +228,13 @@ const MyPolicies: React.FC = () => {
         };
       });
 
-      console.log('✅ Enhanced policies for UI:', enhancedPolicies);
-      console.log('📊 Number of enhanced policies:', enhancedPolicies.length);
-      console.log('🔗 Setting policies in state...');
+      console.log(' Enhanced policies for UI:', enhancedPolicies);
+      console.log(' Number of enhanced policies:', enhancedPolicies.length);
+      console.log(' Setting policies in state...');
 
       setPolicies(enhancedPolicies);
       
-      console.log('✅ Policies set in state successfully');
+      console.log(' Policies set in state successfully');
     } catch (error) {
       console.error('Error loading policies:', error);
       setPolicies([]);
@@ -386,9 +408,9 @@ Platform: RiskZap Insurance (Shardeum Liberty 1.X)
           claimInfo.potentialAmount,
           'local_claim_' + Date.now() // Generate a local claim hash since no blockchain tx
         );
-        console.log('✅ Claim tracked in MongoDB analytics successfully');
+        console.log(' Claim tracked in MongoDB analytics successfully');
       } catch (analyticsError) {
-        console.warn('⚠️ Failed to track claim in MongoDB analytics:', analyticsError);
+        console.warn(' Failed to track claim in MongoDB analytics:', analyticsError);
       }
 
       // Update the policy in the local database (backup)
@@ -403,9 +425,9 @@ Platform: RiskZap Insurance (Shardeum Liberty 1.X)
           amount: claimInfo.potentialAmount,
           policyId: policy.policyId,
         });
-        console.log('✅ Claim saved to local database as backup');
+        console.log(' Claim saved to local database as backup');
       } catch (localError) {
-        console.warn('⚠️ Failed to save claim to local database backup:', localError);
+        console.warn(' Failed to save claim to local database backup:', localError);
       }
 
       // Update local state

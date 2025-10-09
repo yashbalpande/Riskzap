@@ -53,6 +53,9 @@ async function main() {
   console.log('📋 Deployer address:', wallet.address);
   
   // Check balance
+  if (!provider) {
+    throw new Error('Provider is undefined. Could not connect to any RPC endpoint.');
+  }
   const balance = await provider.getBalance(wallet.address);
   console.log('💰 Deployer balance:', ethers.utils.formatEther(balance), 'SHM');
   

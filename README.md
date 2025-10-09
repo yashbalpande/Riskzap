@@ -148,13 +148,13 @@ Monitor your insurance portfolio with live data including:
 
 ## 🌐 Network Configuration
 
-**Shardeum Unstablenet**
+**Shardeum EVM Testnet**
 ```
-Network Name: Shardeum Unstablenet
-RPC URL: https://api-unstable.shardeum.org
-Chain ID: 8080
+Network Name: Shardeum EVM Testnet (Mezame)
+RPC URL: https://api-mezame.shardeum.org
+Chain ID: 8119
 Currency Symbol: SHM
-Block Explorer: https://explorer-unstable.shardeum.org/
+Block Explorer: https://explorer-mezame.shardeum.org/
 ```
 
 ## 🔌 API Configuration
@@ -165,11 +165,11 @@ RiskZap integrates with multiple APIs and services to provide a seamless insuran
 ```bash
 # Frontend API Configuration
 VITE_API_BASE_URL=http://localhost:3001    # Backend API endpoint
-VITE_SHM_CHAIN_ID=8080                     # Target blockchain network
+VITE_SHM_CHAIN_ID=8119                     # Target blockchain network
 VITE_DEMO_MODE=false                       # Demo mode toggle
 
 # Shardeum Network APIs
-SHARDEUM_RPC_URL=https://api-unstable.shardeum.org  # Blockchain RPC endpoint
+SHARDEUM_RPC_URL=https://api-mezame.shardeum.org  # Blockchain RPC endpoint
 ```
 
 ### Blockchain API Integration
@@ -246,11 +246,11 @@ SHARDEUM_RPC_URL=https://api-unstable.shardeum.org  # Blockchain RPC endpoint
 
 **ERC20 Mock Token (Test SHM)**
 - Address: `0xaa2b86e1f9de4cbdeaf177e61ce0e2fc091f9f9e`
-- [View on Explorer](https://explorer-unstable.shardeum.org/account/0xaa2b86e1f9de4cbdeaf177e61ce0e2fc091f9f9e)
+- [View on Explorer](https://explorer-mezame.shardeum.org/account/0xaa2b86e1f9de4cbdeaf177e61ce0e2fc091f9f9e)
 
 **PolicyManager Contract**
 - Address: `0x055682a1a8fa88ed10a56724d29bcd44215e04d5`
-- [View on Explorer](https://explorer-unstable.shardeum.org/account/0x055682a1a8fa88ed10a56724d29bcd44215e04d5)
+- [View on Explorer](https://explorer-mezame.shardeum.org/account/0x055682a1a8fa88ed10a56724d29bcd44215e04d5)
 
 ### Contract Features
 - **ERC20 Integration** - Uses standard token transfers

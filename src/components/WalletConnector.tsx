@@ -4,6 +4,7 @@ import { Wallet, Power, AlertCircle, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { connectWallet, getShmBalance } from '@/services/web3';
 import { toast } from '@/hooks/use-toast';
+import { BrowserProvider } from 'ethers';
 interface WalletContextType {
   account: string | null;
   isConnected: boolean;

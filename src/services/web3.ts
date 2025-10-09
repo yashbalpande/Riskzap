@@ -440,8 +440,8 @@ export async function getShmBalance(provider: Provider, address: string) {
     
     // Try with multiple fallback RPC providers
     const fallbackUrls = [
-      'https://api-unstable.shardeum.org',
-      'https://rpc-unstable.shardeum.org',
+      'https://api-mezame.shardeum.org',
+      'https://rpc-mezame.shardeum.org',
       'https://api.shardeum.org'
     ];
     
@@ -449,8 +449,8 @@ export async function getShmBalance(provider: Provider, address: string) {
       try {
         console.log(`🔄 Trying fallback RPC provider: ${url}`);
         const fallbackProvider = new ethers.JsonRpcProvider(url, {
-          chainId: 8080,
-          name: 'shardeum-unstablenet'
+          chainId: 8119,
+          name: 'shardeum-testnet'
         });
         
         const fallbackBalance = await Promise.race([
